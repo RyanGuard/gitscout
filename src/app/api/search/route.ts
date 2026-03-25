@@ -124,13 +124,51 @@ const LOCATION_PATTERNS = [
   /\blocated\s+in\s+(.+?)(?:\s+(?:who|that|with|and)|\s*$)/i,
 ];
 
+// Known cities/locations for start-of-query detection (when no "in" prefix)
+const KNOWN_LOCATIONS = [
+  "san francisco", "sf", "bay area", "silicon valley", "new york", "nyc",
+  "austin", "seattle", "los angeles", "la", "boston", "miami", "denver",
+  "boulder", "portland", "chicago", "london", "berlin", "tel aviv",
+  "bangalore", "toronto", "vancouver", "buenos aires", "sao paulo",
+  "são paulo", "lagos", "kyiv", "warsaw", "remote",
+];
+
+// Role keywords → inferred languages (the key insight for quality results)
+const ROLE_TO_LANGUAGES: Record<string, string[]> = {
+  frontend: ["javascript", "typescript"],
+  "front-end": ["javascript", "typescript"],
+  "full-stack": ["javascript", "typescript"],
+  fullstack: ["javascript", "typescript"],
+  backend: ["go", "python", "java"],
+  "back-end": ["go", "python", "java"],
+  mobile: ["swift", "kotlin", "dart"],
+  ios: ["swift"],
+  android: ["kotlin", "java"],
+  devops: ["go", "python"],
+  infrastructure: ["go", "python"],
+  infra: ["go", "python"],
+  sre: ["go", "python"],
+  ml: ["python"],
+  "machine learning": ["python"],
+  ai: ["python"],
+  data: ["python"],
+  "data science": ["python"],
+  systems: ["rust", "c++"],
+  embedded: ["c", "c++", "rust"],
+  blockchain: ["rust", "solidity"],
+  web3: ["rust", "solidity", "typescript"],
+  security: ["python", "go", "c"],
+  platform: ["go", "python", "java"],
+};
+
 // Words to strip from the query (not useful for GitHub search)
 const FILLER_WORDS = new Set([
   "developers", "developer", "engineers", "engineer", "devs", "dev",
   "programmers", "programmer", "coders", "coder", "looking", "for",
   "find", "search", "show", "me", "the", "best", "top", "senior",
   "junior", "mid", "level", "experienced", "who", "that", "are",
-  "with", "and", "or", "a", "an", "hiring",
+  "with", "and", "or", "a", "an", "hiring", "staff", "principal",
+  "lead", "head",
 ]);
 
 // Parse a natural language search into structured GitHub query parts
@@ -138,10 +176,14 @@ function parseNaturalQuery(raw: string): {
   searchTerms: string[];
   languages: string[];
   location: string | null;
+  roleDetected: string | null;
+  minFollowers: number;
 } {
   let text = raw.trim();
   const languages: string[] = [];
   let location: string | null = null;
+  let roleDetected: string | null = null;
+  let minFollowers = 5; // default
 
   // Extract location from patterns like "in San Francisco", "from Berlin"
   for (const pattern of LOCATION_PATTERNS) {
@@ -149,6 +191,35 @@ function parseNaturalQuery(raw: string): {
     if (match) {
       location = match[1].trim().replace(/[,.]$/, "");
       text = text.replace(match[0], " ").trim();
+      break;
+    }
+  }
+
+  // If no "in X" pattern found, check for known city names anywhere in the query
+  if (!location) {
+    const lowerForLoc = text.toLowerCase();
+    for (const city of KNOWN_LOCATIONS) {
+      if (lowerForLoc.includes(city)) {
+        location = city;
+        // Remove the city from the text
+        text = text.replace(new RegExp(city, "gi"), " ").trim();
+        break;
+      }
+    }
+  }
+
+  // Detect role keywords BEFORE tokenizing (check multi-word roles first)
+  const lowerText = text.toLowerCase();
+  for (const [role, roleLangs] of Object.entries(ROLE_TO_LANGUAGES)) {
+    if (lowerText.includes(role)) {
+      roleDetected = role;
+      // Add inferred languages if no explicit ones found yet
+      for (const lang of roleLangs) {
+        if (!languages.includes(lang)) languages.push(lang);
+      }
+      // Role searches should have higher quality floor
+      minFollowers = 50;
+      text = text.replace(new RegExp(role, "gi"), " ").trim();
       break;
     }
   }
@@ -162,13 +233,13 @@ function parseNaturalQuery(raw: string): {
     const aliased = LANGUAGE_ALIASES[clean] || clean;
 
     if (KNOWN_LANGUAGES.has(aliased)) {
-      languages.push(aliased);
+      if (!languages.includes(aliased)) languages.push(aliased);
     } else if (!FILLER_WORDS.has(clean) && clean.length > 1) {
       remainingTerms.push(clean);
     }
   }
 
-  return { searchTerms: remainingTerms, languages, location };
+  return { searchTerms: remainingTerms, languages, location, roleDetected, minFollowers };
 }
 
 // Build a GitHub users search query string from our filters
@@ -210,8 +281,8 @@ function buildGitHubQuery(params: {
     parts.push(`repos:>=${Math.max(1, Math.floor(params.minStars / 50))}`);
   }
 
-  // Always filter for real developers (not empty accounts)
-  parts.push("followers:>=5");
+  // Quality floor — higher for role searches (50+), lower for generic (5+)
+  parts.push(`followers:>=${parsed.minFollowers}`);
 
   // If we have nothing useful, fall back to the raw query
   if (parts.length === 0 && params.q) {
