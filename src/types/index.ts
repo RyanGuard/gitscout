@@ -129,3 +129,86 @@ export interface PipelineStats {
   totalActivities: number;
   lastSyncedAt: string | null;
 }
+
+// --- Phase 2: Enrichment ---
+
+export interface ContactInfo {
+  id: string;
+  emails: string[];
+  primaryEmail: string | null;
+  phone: string | null;
+  linkedinUrl: string | null;
+  twitterUrl: string | null;
+  personalSite: string | null;
+  photoUrl: string | null;
+  currentTitle: string | null;
+  headline: string | null;
+  normalizedCompany: string | null;
+  seniorityLevel: string | null;
+  employmentHistory: Array<{
+    organization_name: string;
+    title: string | null;
+    current: boolean;
+    start_date: string | null;
+  }> | null;
+  enrichedAt: string | null;
+  enrichmentSource: string | null;
+}
+
+// --- Phase 2: JD Matching ---
+
+export interface ParsedRequirements {
+  languages: string[];
+  frameworks: string[];
+  tools: string[];
+  location: string | null;
+  seniority: string | null;
+  keywords: string[];
+  yearsExperience: number | null;
+}
+
+export interface MatchResult {
+  developer: DeveloperProfile;
+  fitScore: number;
+  matchedLanguages: string[];
+  matchedSkills: string[];
+  locationMatch: boolean;
+  seniorityMatch: boolean;
+  reasons: string[];
+}
+
+// --- Phase 2: CRM ---
+
+export interface CandidateListSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  entryCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CandidateEntry {
+  id: string;
+  stage: string;
+  addedAt: string;
+  developer: DeveloperProfile;
+  tags: string[];
+  lastNote: string | null;
+}
+
+// --- Phase 2: Ashby ---
+
+export interface AshbyJob {
+  id: string;
+  title: string;
+  status: string;
+  departmentId: string | null;
+  locationId: string | null;
+}
+
+export interface AshbyPushResult {
+  candidateId: string;
+  applicationId: string | null;
+  status: string;
+}

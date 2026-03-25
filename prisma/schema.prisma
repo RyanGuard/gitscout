@@ -35,9 +35,12 @@ model Developer {
   syncedAt        DateTime @default(now())
   lastSyncError   String?
 
-  languages    LanguageStat[]
-  repositories Repository[]
-  favorites    Favorite[]
+  languages       LanguageStat[]
+  repositories    Repository[]
+  favorites       Favorite[]
+  contactInfo     ContactInfo?
+  ashbyPushes     AshbyPush[]
+  candidateEntries CandidateEntry[]
 
   @@index([username])
   @@index([location])
@@ -84,9 +87,12 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  favorites     Favorite[]
+  accounts        Account[]
+  sessions        Session[]
+  favorites       Favorite[]
+  ashbyConnection AshbyConnection?
+  ashbyPushes     AshbyPush[]
+  candidateLists  CandidateList[]
 }
 
 model Account {
@@ -133,6 +139,120 @@ model Favorite {
 
   @@unique([userId, developerId])
 }
+
+// --- Phase 2: Enrichment ---
+
+model ContactInfo {
+  id                String    @id @default(cuid())
+  developerId       String    @unique
+  emails            String[]  @default([])
+  primaryEmail      String?
+  phone             String?
+  linkedinUrl       String?
+  twitterUrl        String?
+  mastodonUrl       String?
+  devtoUrl          String?
+  mediumUrl         String?
+  personalSite      String?
+  photoUrl          String?
+  currentTitle      String?
+  headline          String?
+  normalizedCompany String?
+  seniorityLevel    String?
+  timezone          String?
+  employmentHistory Json?
+  apolloId          String?
+  enrichedAt        DateTime?
+  enrichmentSource  String?
+  developer         Developer @relation(fields: [developerId], references: [id], onDelete: Cascade)
+}
+
+// --- Phase 2: Ashby ATS ---
+
+model AshbyConnection {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  apiKey    String
+  sourceId  String?
+  isValid   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AshbyPush {
+  id                 String    @id @default(cuid())
+  userId             String
+  developerId        String
+  ashbyCandidateId   String?
+  ashbyApplicationId String?
+  jobId              String?
+  sequenceId         String?
+  status             String    @default("pending")
+  errorMessage       String?
+  pushedAt           DateTime?
+  createdAt          DateTime  @default(now())
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  developer          Developer @relation(fields: [developerId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([developerId])
+  @@unique([userId, developerId, jobId])
+}
+
+// --- Phase 2: CRM ---
+
+model CandidateList {
+  id          String           @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries     CandidateEntry[]
+
+  @@index([userId])
+}
+
+model CandidateEntry {
+  id          String         @id @default(cuid())
+  listId      String
+  developerId String
+  stage       String         @default("identified")
+  addedAt     DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  list        CandidateList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  developer   Developer      @relation(fields: [developerId], references: [id], onDelete: Cascade)
+  notes       CandidateNote[]
+  tags        CandidateTag[]
+
+  @@unique([listId, developerId])
+  @@index([listId])
+  @@index([developerId])
+}
+
+model CandidateNote {
+  id        String         @id @default(cuid())
+  entryId   String
+  content   String
+  createdAt DateTime       @default(now())
+  entry     CandidateEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([entryId])
+}
+
+model CandidateTag {
+  id      String         @id @default(cuid())
+  entryId String
+  tag     String
+  entry   CandidateEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([entryId])
+  @@index([tag])
+}
+
+// --- Pipeline ---
 
 model SyncLog {
   id          String   @id @default(cuid())

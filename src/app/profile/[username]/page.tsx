@@ -306,7 +306,8 @@ export default async function ProfilePage({
               </span>
             </div>
 
-            <div className="mt-4 flex gap-2">
+            {/* Action buttons — Phase 2 agents add their buttons here */}
+            <div className="mt-4 flex flex-wrap gap-2" id="profile-actions">
               <a
                 href={`https://github.com/${developer.username}`}
                 target="_blank"
@@ -318,6 +319,9 @@ export default async function ProfilePage({
               {developer.source === "local" && (
                 <FavoriteButton developerId={developer.id} />
               )}
+              {/* AGENT_ENRICHMENT: <EnrichButton developerId={developer.id} /> */}
+              {/* AGENT_ASHBY: <PushToAshbyButton developerId={developer.id} /> */}
+              {/* AGENT_CRM: <AddToListButton developerId={developer.id} /> */}
             </div>
           </div>
         </div>
