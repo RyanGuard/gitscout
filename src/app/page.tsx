@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { GitBranch, Globe, Zap, Shield, Search, Heart, Clock, ArrowRight } from "lucide-react";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { DailyBriefing } from "@/components/features/DailyBriefing";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -119,6 +120,9 @@ function Dashboard() {
           <SearchInput onSearch={handleSearch} />
         </div>
       </div>
+
+      {/* Daily Briefing */}
+      <DailyBriefing />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Quick searches */}
