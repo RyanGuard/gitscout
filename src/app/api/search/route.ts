@@ -366,14 +366,28 @@ function buildGitHubQuery(params: {
 // Quick surface score from REST API data only (no GraphQL needed)
 // This is a fast estimate — full 5-pillar score comes after indexing
 function quickScore(user: GitHubUser): { score: number; tier: string } {
-  const followerSignal = Math.min(10, Math.log(1 + user.followers) / Math.log(1 + 500) * 5);
-  const repoSignal = Math.min(10, Math.log(1 + user.public_repos) / Math.log(1 + 50) * 5);
-  const ratio = user.following > 0 ? user.followers / user.following : user.followers;
-  const ratioBonus = ratio >= 5 ? 1 : ratio >= 2 ? 0.5 : 0;
-  const profileBonus = (user.bio ? 0.3 : 0) + (user.email ? 0.2 : 0) + (user.blog ? 0.2 : 0) + (user.hireable ? 0.3 : 0);
+  // Follower signal — logarithmic scale, no hard cap
+  // 100 followers ≈ 3.6, 1K ≈ 5.6, 10K ≈ 7.4, 100K ≈ 9.3, 293K ≈ 10
+  const followerSignal = Math.min(10, Math.log10(1 + user.followers) * 1.85);
 
-  const raw = followerSignal * 0.45 + repoSignal * 0.30 + ratioBonus + profileBonus;
-  const score = Math.round(Math.min(100, raw * 10) * 10) / 10;
+  // Repo signal — having repos is good but not as important
+  const repoSignal = Math.min(5, Math.log10(1 + user.public_repos) * 2.5);
+
+  // Follower/following ratio — high ratio indicates genuine influence
+  const ratio = user.following > 0 ? user.followers / user.following : Math.min(user.followers, 100);
+  const ratioBonus = ratio >= 20 ? 2 : ratio >= 10 ? 1.5 : ratio >= 5 ? 1 : ratio >= 2 ? 0.5 : 0;
+
+  // Profile completeness — bio, email, blog, hireable all signal engaged developer
+  const profileBonus = (user.bio ? 0.5 : 0) + (user.email ? 0.3 : 0) + (user.blog ? 0.3 : 0) + (user.hireable ? 0.4 : 0);
+
+  // Account age bonus — older accounts with high followers are more credible
+  const accountAge = user.created_at
+    ? (Date.now() - new Date(user.created_at).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+    : 0;
+  const ageBonus = accountAge >= 8 ? 1 : accountAge >= 5 ? 0.5 : 0;
+
+  const raw = followerSignal * 4 + repoSignal * 2 + ratioBonus * 3 + profileBonus * 2 + ageBonus * 2;
+  const score = Math.round(Math.min(100, raw) * 10) / 10;
 
   const tier = score >= 90 ? "Unicorn" : score >= 75 ? "On Fire" : score >= 60 ? "Gem" : score >= 40 ? "Seedling" : "Mystery";
   return { score, tier };

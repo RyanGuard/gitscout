@@ -105,14 +105,28 @@ export async function fetchContributions(
       fetchExternalMergedPRs(login),
     ]);
 
-    if (!graphqlRes.ok) return null;
+    if (!graphqlRes.ok) {
+      console.error(`[graphql] HTTP ${graphqlRes.status} for ${login}`);
+      return null;
+    }
 
     const json = await graphqlRes.json();
+
+    if (json.errors) {
+      console.error(`[graphql] Errors for ${login}:`, JSON.stringify(json.errors));
+    }
+
     const user = json?.data?.user;
-    if (!user) return null;
+    if (!user) {
+      console.error(`[graphql] No user data for ${login}. Response:`, JSON.stringify(json).slice(0, 200));
+      return null;
+    }
 
     const cc = user.contributionsCollection;
-    if (!cc) return null;
+    if (!cc) {
+      console.error(`[graphql] No contributionsCollection for ${login}`);
+      return null;
+    }
 
     // Analyze contribution calendar for consistency
     const weeks = cc.contributionCalendar?.weeks || [];
@@ -140,7 +154,8 @@ export async function fetchContributions(
       sponsorCount: user.sponsorshipsAsMaintainer?.totalCount ?? 0,
       externalMergedPRs: externalPRs,
     };
-  } catch {
+  } catch (err) {
+    console.error(`[graphql] Exception for ${login}:`, err instanceof Error ? err.message : err);
     return null;
   }
 }

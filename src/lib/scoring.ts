@@ -59,13 +59,14 @@ function tieredScore(value: number, tiers: [number, number][]): number {
 function scoreImpact(repos: GitHubRepo[], contributions: ContributionData | null): number {
   const nonFork = repos.filter((r) => !r.fork && !r.archived);
 
-  // Stars — capped per repo at 40% of pillar to prevent single-repo inflation
-  const maxSingleRepoContribution = 4; // 40% of 10
+  // Stars — capped per repo at 60% of pillar to prevent single-repo inflation
+  // but raised cap to better recognize viral repos (449K stars != 500 stars)
+  const maxSingleRepoContribution = 6;
   let starsScore = 0;
   for (const repo of nonFork) {
     const repoStarScore = tieredScore(repo.stargazers_count, [
       [1, 0.5], [10, 1], [100, 2], [500, 3], [1000, 4],
-      [5000, 5], [10000, 6],
+      [5000, 5], [10000, 6], [50000, 7], [100000, 8],
     ]);
     starsScore += Math.min(repoStarScore, maxSingleRepoContribution);
   }
@@ -180,9 +181,10 @@ function scoreTechnical(repos: GitHubRepo[]): number {
 // PILLAR 5: REPUTATION & SOCIAL PROOF (10%)
 // ═══════════════════════════════════════════════════════
 function scoreReputation(user: GitHubUser): number {
-  // Followers — log scale
+  // Followers — log scale, extended beyond 10K for top developers
   const followerScore = tieredScore(user.followers, [
-    [5, 1], [10, 2], [50, 4], [200, 6], [500, 7.5], [1000, 8.5], [5000, 9.5], [10000, 10],
+    [5, 1], [10, 2], [50, 4], [200, 6], [500, 7.5], [1000, 8.5],
+    [5000, 9], [10000, 9.3], [50000, 9.6], [100000, 9.8], [200000, 10],
   ]);
 
   // Follower/following ratio — thought leader signal
@@ -218,13 +220,27 @@ function computeConfidence(
     ? contributions.consistencyRatio > 0.1
     : false;
 
-  if (nonFork.length >= 10 && totalContribs >= 200 && hasRecentActivity) {
-    return { value: 1.0, label: "high" };
+  // If we have contribution data, use it for confidence
+  if (contributions) {
+    if (nonFork.length >= 10 && totalContribs >= 200 && hasRecentActivity) {
+      return { value: 1.0, label: "high" };
+    }
+    if (nonFork.length >= 5 && totalContribs >= 50) {
+      return { value: 0.95, label: "medium" };
+    }
+    // Have data but it's low — slight penalty
+    return { value: 0.85, label: "low" };
   }
-  if (nonFork.length >= 5 && totalContribs >= 50) {
+
+  // No contribution data (GraphQL failed) — don't penalize heavily
+  // Use repo count as a proxy signal instead
+  if (nonFork.length >= 10) {
+    return { value: 0.95, label: "medium" };
+  }
+  if (nonFork.length >= 5) {
     return { value: 0.9, label: "medium" };
   }
-  return { value: 0.75, label: "low" };
+  return { value: 0.8, label: "low" };
 }
 
 // ═══════════════════════════════════════════════════════
