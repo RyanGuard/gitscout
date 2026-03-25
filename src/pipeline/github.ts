@@ -199,7 +199,7 @@ function computeLanguageStats(repos: GitHubRepo[]) {
 
 // --- Sync Logic ---
 
-async function syncOneUser(username: string) {
+export async function syncOneUser(username: string) {
   const user = await fetchGitHubUser(username);
   if (!user) return null;
 

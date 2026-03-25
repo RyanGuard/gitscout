@@ -13,10 +13,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
-import { FavoriteButton } from "@/components/auth/FavoriteButton";
-import { EnrichButton } from "@/components/profile/EnrichButton";
-import { PushToAshbyButton } from "@/components/ashby/PushToAshbyButton";
-import { AddToListButton } from "@/components/crm/AddToListButton";
+import { ProfileActions } from "@/components/profile/ProfileActions";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -309,8 +306,7 @@ export default async function ProfilePage({
               </span>
             </div>
 
-            {/* Action buttons — Phase 2 agents add their buttons here */}
-            <div className="mt-4 flex flex-wrap gap-2" id="profile-actions">
+            <div className="mt-4 flex flex-wrap gap-2">
               <a
                 href={`https://github.com/${developer.username}`}
                 target="_blank"
@@ -319,12 +315,11 @@ export default async function ProfilePage({
               >
                 View on GitHub <ExternalLink className="h-3.5 w-3.5" />
               </a>
-              {developer.source === "local" && (
-                <FavoriteButton developerId={developer.id} />
-              )}
-              <EnrichButton developerId={developer.id} />
-              <PushToAshbyButton developerId={developer.id} />
-              <AddToListButton developerId={developer.id} />
+              <ProfileActions
+                developerId={developer.id}
+                username={developer.username}
+                isLocal={developer.source === "local"}
+              />
             </div>
           </div>
         </div>
