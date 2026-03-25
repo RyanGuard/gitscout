@@ -239,7 +239,7 @@ function parseNaturalQuery(raw: string): {
   for (const pattern of LOCATION_PATTERNS) {
     const match = text.match(pattern);
     if (match) {
-      location = match[1].trim().replace(/[,.]$/, "");
+      location = match[1].trim().replace(/[,.]$/, "").replace(/^the\s+/i, "");
       text = text.replace(match[0], " ").trim();
       break;
     }
