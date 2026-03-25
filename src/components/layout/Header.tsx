@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GitBranch, Search, Target, List } from "lucide-react";
 import { AuthButton } from "@/components/auth/AuthButton";
+import { SoundToggle } from "@/components/ui/SoundToggle";
 
 export function Header() {
   return (
@@ -32,6 +33,7 @@ export function Header() {
             <List className="h-4 w-4 sm:hidden" />
             <span>Lists</span>
           </Link>
+          <SoundToggle />
           <AuthButton />
         </nav>
       </div>

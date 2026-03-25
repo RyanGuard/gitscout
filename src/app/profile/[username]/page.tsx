@@ -15,6 +15,10 @@ import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
 import { ProfileActions } from "@/components/profile/ProfileActions";
 import { ScoreBreakdown } from "@/components/profile/ScoreBreakdown";
+import { ScoutingReport } from "@/components/features/ScoutingReport";
+import { OutreachDraft } from "@/components/features/OutreachDraft";
+import { FindSimilar } from "@/components/features/FindSimilar";
+import { ShareCard } from "@/components/features/ShareCard";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -354,6 +358,68 @@ export default async function ProfilePage({
           </div>
         </div>
       )}
+
+      {/* AI Features — Scouting Report + Outreach Draft */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <ScoutingReport
+          username={developer.username}
+          profileData={{
+            name: developer.name,
+            bio: developer.bio,
+            location: developer.location,
+            company: developer.company,
+            followers: developer.followers,
+            totalStars: developer.totalStars,
+            publicRepos: developer.publicRepos,
+            hireable: developer.hireable,
+            languages: developer.languages.map((l) => ({
+              language: l.language,
+              percentage: l.percentage,
+            })),
+            repositories: developer.repositories.map((r) => ({
+              name: r.name,
+              stars: r.stars,
+              language: r.language,
+              description: r.description,
+            })),
+          }}
+        />
+        <OutreachDraft
+          username={developer.username}
+          profileData={{
+            name: developer.name,
+            bio: developer.bio,
+            location: developer.location,
+            company: developer.company,
+            followers: developer.followers,
+            totalStars: developer.totalStars,
+            publicRepos: developer.publicRepos,
+            languages: developer.languages.map((l) => ({
+              language: l.language,
+              percentage: l.percentage,
+            })),
+            repositories: developer.repositories.map((r) => ({
+              name: r.name,
+              stars: r.stars,
+              language: r.language,
+              description: r.description,
+            })),
+          }}
+        />
+      </div>
+
+      {/* Find Similar + Share */}
+      <div className="mt-4 flex flex-wrap gap-3">
+        <FindSimilar
+          username={developer.username}
+          displayName={developer.name || developer.username}
+        />
+        <ShareCard
+          username={developer.username}
+          displayName={developer.name || developer.username}
+          score={developer.score}
+        />
+      </div>
     </div>
   );
 }

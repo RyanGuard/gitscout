@@ -31,6 +31,12 @@ export async function GET(
   ]);
 
   if (!userRes.ok) {
+    if (userRes.status === 429 || userRes.status === 403) {
+      return Response.json(
+        { error: "GitHub API rate limit exceeded. Try again in a few minutes." },
+        { status: 429 }
+      );
+    }
     return Response.json({ error: "Developer not found on GitHub" }, { status: 404 });
   }
 

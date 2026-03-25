@@ -87,6 +87,11 @@ export async function POST(request: Request) {
   });
 }
 
+// Sanitize user input to prevent XSS in JSON responses
+function sanitizeQuery(q: string): string {
+  return q.replace(/[<>]/g, "").slice(0, 200);
+}
+
 // ═══ GET — Existing live GitHub search (kept for backward compat) ═══
 
 const GITHUB_API = "https://api.github.com";
@@ -400,7 +405,7 @@ export async function GET(request: Request) {
       total: 0,
       page,
       totalPages: 0,
-      query: q,
+      query: sanitizeQuery(q),
     });
   }
 
@@ -556,6 +561,6 @@ export async function GET(request: Request) {
     total: githubTotal,
     page,
     totalPages: Math.ceil(githubTotal / limit),
-    query: q,
+    query: sanitizeQuery(q),
   });
 }

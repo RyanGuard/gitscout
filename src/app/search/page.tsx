@@ -60,6 +60,7 @@ function SearchPageInner() {
   const [inputValue, setInputValue] = useState(query);
   const [results, setResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(true);
 
   const initialFilters = parseFiltersFromParams(searchParams);
@@ -69,6 +70,7 @@ function SearchPageInner() {
     async (q: string, page = 1, f: FilterValues = {}) => {
       if (!q) return;
       setLoading(true);
+      setSearchError(null);
       const params = new URLSearchParams({ q, page: String(page) });
       if (f.languages && f.languages.length > 0) params.set("languages", f.languages.join(","));
       if (f.location) params.set("location", f.location);
@@ -76,13 +78,28 @@ function SearchPageInner() {
       if (f.hireable) params.set("hireable", "true");
       if (f.sort) params.set("sort", f.sort);
 
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
       try {
-        const res = await fetch(`/api/search?${params}`);
+        const res = await fetch(`/api/search?${params}`, { signal: controller.signal });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "Search failed" }));
+          setSearchError(err.error || `Search failed (${res.status})`);
+          setResults(null);
+          return;
+        }
         const data = await res.json();
         setResults(data);
-      } catch {
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          setSearchError("Search timed out. Try a simpler query or try again in a moment.");
+        } else {
+          setSearchError("Search failed. Please try again.");
+        }
         setResults(null);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     },
@@ -279,6 +296,12 @@ function SearchPageInner() {
               )}
             </div>
           </div>
+
+          {searchError && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              {searchError}
+            </div>
+          )}
 
           <SearchResults
             results={results}
