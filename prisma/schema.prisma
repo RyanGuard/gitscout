@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Developer {
+  id              String   @id @default(cuid())
+  githubId        Int      @unique
+  username        String   @unique
+  name            String?
+  email           String?
+  avatarUrl       String?
+  bio             String?
+  company         String?
+  location        String?
+  blog            String?
+  twitterUsername String?
+  publicRepos     Int      @default(0)
+  followers       Int      @default(0)
+  following       Int      @default(0)
+  hireable        Boolean  @default(false)
+  primaryLanguage String?
+  totalCommits    Int      @default(0)
+  totalStars      Int      @default(0)
+  score           Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  syncedAt        DateTime @default(now())
+
+  languages    LanguageStat[]
+  repositories Repository[]
+
+  @@index([username])
+  @@index([location])
+  @@index([primaryLanguage])
+  @@index([score])
+  @@index([totalStars])
+  @@index([followers])
+}
+
+model LanguageStat {
+  id          String @id @default(cuid())
+  language    String
+  bytes       Int    @default(0)
+  repoCount   Int    @default(0)
+  percentage  Float  @default(0)
+  developerId String
+  developer   Developer @relation(fields: [developerId], references: [id], onDelete: Cascade)
+
+  @@unique([developerId, language])
+}
+
+model Repository {
+  id          String   @id @default(cuid())
+  githubId    Int      @unique
+  name        String
+  fullName    String   @unique
+  description String?
+  language    String?
+  stars       Int      @default(0)
+  forks       Int      @default(0)
+  topics      String[] @default([])
+  pushedAt    DateTime?
+  developerId String
+  developer   Developer @relation(fields: [developerId], references: [id], onDelete: Cascade)
+
+  @@index([developerId])
+  @@index([language])
+  @@index([stars])
+}
+
+model SyncLog {
+  id          String   @id @default(cuid())
+  status      String   @default("running")
+  developers  Int      @default(0)
+  repos       Int      @default(0)
+  errors      Int      @default(0)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+}
