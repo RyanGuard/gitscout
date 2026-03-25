@@ -61,7 +61,10 @@ function SearchPageInner() {
   const [results, setResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(true);
+  // Default filters hidden on mobile, visible on desktop
+  const [showFilters, setShowFilters] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
+  );
 
   const initialFilters = parseFiltersFromParams(searchParams);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
@@ -91,6 +94,8 @@ function SearchPageInner() {
         }
         const data = await res.json();
         setResults(data);
+        // Surface rate limit warnings from the API
+        if (data.warning) setSearchError(data.warning);
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
           setSearchError("Search timed out. Try a simpler query or try again in a moment.");
@@ -160,7 +165,7 @@ function SearchPageInner() {
     (filters.hireable ? 1 : 0);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6">
+    <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-6">
       {/* Search bar */}
       <form onSubmit={handleSearch} className="relative mx-auto max-w-3xl mb-6">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />

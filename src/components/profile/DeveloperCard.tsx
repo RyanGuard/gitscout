@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { MapPin, Star, Users, GitFork, Mail, Clock, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { TierBadge } from "@/components/ui/TierBadge";
+import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
 import type { DeveloperProfile } from "@/types";
 
-const TIER_ACCENTS: Record<string, string> = {
-  Elite: "border-l-yellow-500",
-  Strong: "border-l-blue-500",
-  Solid: "border-l-emerald-500",
-  Emerging: "border-l-neutral-400",
+const SCORE_ACCENTS: Record<string, string> = {
+  Unicorn: "border-l-violet-500",
+  "On Fire": "border-l-amber-500",
+  Gem: "border-l-blue-500",
+  Seedling: "border-l-emerald-500",
 };
 
 interface DeveloperCardProps {
@@ -18,9 +18,8 @@ interface DeveloperCardProps {
 
 export function DeveloperCard({ developer }: DeveloperCardProps) {
   const topLanguages = developer.languages.slice(0, 4);
-  const devAny = developer as unknown as Record<string, unknown>;
-  const tier = devAny.tier as string | undefined;
-  const tierAccent = tier ? TIER_ACCENTS[tier] : undefined;
+  const tierInfo = developer.score > 0 ? getTierInfo(developer.score) : null;
+  const tierAccent = tierInfo ? SCORE_ACCENTS[tierInfo.label] : undefined;
   const hasEmail = !!developer.email;
 
   // Find most recently pushed repo for "last active" signal
@@ -46,9 +45,7 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
             />
             {developer.score > 0 && (
               <span className={`text-xs font-bold tabular-nums ${
-                tier === "Elite" ? "text-yellow-600 dark:text-yellow-400" :
-                tier === "Strong" ? "text-blue-600 dark:text-blue-400" :
-                "text-neutral-500"
+                tierInfo ? tierInfo.color : "text-neutral-500"
               }`}>
                 {developer.score}
               </span>

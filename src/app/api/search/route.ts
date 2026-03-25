@@ -352,8 +352,11 @@ function buildGitHubQuery(params: {
     parts.push("repos:>10");
   }
 
+  // Filter out organizations — only return actual users
+  parts.push("type:user");
+
   // If we have nothing useful, fall back to the raw query
-  if (parts.length === 0 && params.q) {
+  if (parts.length <= 1 && params.q) {
     parts.push(params.q);
   }
 
@@ -372,7 +375,7 @@ function quickScore(user: GitHubUser): { score: number; tier: string } {
   const raw = followerSignal * 0.45 + repoSignal * 0.30 + ratioBonus + profileBonus;
   const score = Math.round(Math.min(100, raw * 10) * 10) / 10;
 
-  const tier = score >= 90 ? "Elite" : score >= 75 ? "Strong" : score >= 60 ? "Solid" : score >= 40 ? "Emerging" : "Limited Data";
+  const tier = score >= 90 ? "Unicorn" : score >= 75 ? "On Fire" : score >= 60 ? "Gem" : score >= 40 ? "Seedling" : "Mystery";
   return { score, tier };
 }
 
@@ -446,6 +449,7 @@ export async function GET(request: Request) {
 
   let githubUsers: { login: string; id: number; avatar_url: string }[] = [];
   let githubTotal = 0;
+  let warning: string | undefined;
 
   try {
     const res = await fetch(`${GITHUB_API}/search/users?${ghParams}`, {
@@ -454,23 +458,33 @@ export async function GET(request: Request) {
     if (res.ok) {
       const data = await res.json();
       githubUsers = data.items || [];
-      githubTotal = Math.min(data.total_count || 0, 1000); // GitHub caps at 1000
+      githubTotal = Math.min(data.total_count || 0, 1000);
+    } else if (res.status === 403 || res.status === 429) {
+      warning = "GitHub API rate limit reached. Results may be incomplete. Try again in a minute.";
+      console.warn(`[search] GitHub rate limited: ${res.status}`);
     }
   } catch {
-    // GitHub API failed — fall through to local-only
+    warning = "GitHub search temporarily unavailable.";
   }
 
   // --- 2. Check which of these users we already have locally ---
   const githubIds = githubUsers.map((u) => u.id);
-  const localDevs = githubIds.length > 0
-    ? await prisma.developer.findMany({
-        where: { githubId: { in: githubIds } },
-        include: {
-          languages: { orderBy: { percentage: "desc" }, take: 5 },
-          repositories: { orderBy: { stars: "desc" }, take: 3 },
-        },
-      })
-    : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let localDevs: any[] = [];
+  try {
+    localDevs = githubIds.length > 0
+      ? await prisma.developer.findMany({
+          where: { githubId: { in: githubIds } },
+          include: {
+            languages: { orderBy: { percentage: "desc" }, take: 5 },
+            repositories: { orderBy: { stars: "desc" }, take: 3 },
+          },
+        })
+      : [];
+  } catch (dbErr) {
+    console.error("[search] Prisma query failed:", dbErr instanceof Error ? dbErr.message : dbErr);
+    // Continue with GitHub-only results
+  }
 
   const localByGithubId = new Map(localDevs.map((d) => [d.githubId, d]));
 
@@ -519,9 +533,10 @@ export async function GET(request: Request) {
         totalCommits: local.totalCommits,
         totalStars: local.totalStars,
         score: local.score,
-        tier: local.score >= 90 ? "Elite" : local.score >= 75 ? "Strong" : local.score >= 60 ? "Solid" : local.score >= 40 ? "Emerging" : "Limited Data",
+        tier: local.score >= 90 ? "Unicorn" : local.score >= 75 ? "On Fire" : local.score >= 60 ? "Gem" : local.score >= 40 ? "Seedling" : "Mystery",
         languages: local.languages,
-        repositories: local.repositories.map((r) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        repositories: local.repositories.map((r: any) => ({
           id: r.id,
           name: r.name,
           fullName: r.fullName,
@@ -542,10 +557,8 @@ export async function GET(request: Request) {
       return { ...githubUserToProfile(full), source: "github" as const };
     }
 
-    // Minimal profile from search result (no full data available)
-    // Use search position as a weak relevance signal (GitHub sorts by best match)
-    const positionIndex = githubUsers.indexOf(ghUser);
-    const positionScore = Math.max(5, 25 - positionIndex);
+    // Minimal profile — profile fetch failed (rate limit or error)
+    // Don't fabricate scores — mark as unscored
     return {
       id: `gh-${ghUser.id}`,
       githubId: ghUser.id,
@@ -565,8 +578,8 @@ export async function GET(request: Request) {
       primaryLanguage: null as string | null,
       totalCommits: 0,
       totalStars: 0,
-      score: positionScore,
-      tier: "Limited Data",
+      score: 0,
+      tier: "Unscored",
       languages: [] as { language: string; bytes: number; repoCount: number; percentage: number }[],
       repositories: [] as { id: string; name: string; fullName: string; description: string | null; language: string | null; stars: number; forks: number; topics: string[]; pushedAt: string | null }[],
       source: "github" as const,
@@ -582,5 +595,6 @@ export async function GET(request: Request) {
     page,
     totalPages: Math.ceil(githubTotal / limit),
     query: sanitizeQuery(q),
+    ...(warning ? { warning } : {}),
   });
 }
