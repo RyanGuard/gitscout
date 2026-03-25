@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { LogIn, LogOut, Heart } from "lucide-react";
+import { LogIn, LogOut, Heart, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
@@ -65,6 +65,14 @@ export function AuthButton() {
           >
             <Heart className="h-3.5 w-3.5" />
             My Favorites
+          </Link>
+          <Link
+            href="/settings"
+            onClick={() => setMenuOpen(false)}
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          >
+            <Settings className="h-3.5 w-3.5" />
+            Settings & Ashby
           </Link>
           <button
             onClick={() => signOut()}
