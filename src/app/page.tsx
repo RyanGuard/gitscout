@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { GitBranch, Globe, Zap, Shield, Search, Heart, Clock, ArrowRight } from "lucide-react";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { DailyBriefing } from "@/components/features/DailyBriefing";
-import { CityGrid } from "@/components/features/CityGrid";
+import dynamic from "next/dynamic";
+const DailyBriefing = dynamic(() => import("@/components/features/DailyBriefing").then(m => ({ default: m.DailyBriefing })), { ssr: false });
+const CityGrid = dynamic(() => import("@/components/features/CityGrid").then(m => ({ default: m.CityGrid })), { ssr: false });
 import { useEffect, useState } from "react";
 import Link from "next/link";
 

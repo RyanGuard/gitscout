@@ -311,56 +311,37 @@ export default async function ProfilePage({
               </span>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            {/* Action toolbar — all key actions in one row */}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               <a
                 href={`https://github.com/${developer.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
               >
-                View on GitHub <ExternalLink className="h-3.5 w-3.5" />
+                GitHub <ExternalLink className="h-3.5 w-3.5" />
               </a>
               <ProfileActions
                 developerId={developer.id}
                 username={developer.username}
                 isLocal={developer.source === "local"}
               />
+              <FindSimilar
+                username={developer.username}
+                displayName={developer.name || developer.username}
+              />
+              <ShareCard
+                username={developer.username}
+                displayName={developer.name || developer.username}
+                score={developer.score}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Score Breakdown — loads async, shows 5-pillar analysis */}
-      <div className="mt-6">
-        <ScoreBreakdown username={developer.username} />
-      </div>
-
-      {/* Languages */}
-      {developer.languages.length > 0 && (
-        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
-            Languages
-          </h2>
-          <LanguageBar languages={developer.languages} />
-        </div>
-      )}
-
-      {/* Repositories */}
-      {developer.repositories.length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
-            Top Repositories
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {developer.repositories.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* AI Features — Scouting Report + Outreach Draft */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      {/* AI Actions — Scouting Report + Outreach Draft */}
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <ScoutingReport
           username={developer.username}
           profileData={{
@@ -408,18 +389,36 @@ export default async function ProfilePage({
         />
       </div>
 
-      {/* Find Similar + Share */}
-      <div className="mt-4 flex flex-wrap gap-3">
-        <FindSimilar
-          username={developer.username}
-          displayName={developer.name || developer.username}
-        />
-        <ShareCard
-          username={developer.username}
-          displayName={developer.name || developer.username}
-          score={developer.score}
-        />
+      {/* Score Breakdown — loads async, shows 5-pillar analysis */}
+      <div className="mt-6">
+        <ScoreBreakdown username={developer.username} />
       </div>
+
+      {/* Languages */}
+      {developer.languages.length > 0 && (
+        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
+            Languages
+          </h2>
+          <LanguageBar languages={developer.languages} />
+        </div>
+      )}
+
+      {/* Repositories */}
+      {developer.repositories.length > 0 && (
+        <div className="mt-6">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
+            Top Repositories
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {developer.repositories.map((repo) => (
+              <RepoCard key={repo.id} repo={repo} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* (AI features and Find Similar / Share Card are in the header toolbar above) */}
     </div>
   );
 }
