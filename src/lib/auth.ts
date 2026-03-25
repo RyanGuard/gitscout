@@ -28,9 +28,11 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  pages: {
-    signIn: "/",
-  },
+  // Remove custom signIn page temporarily so errors are visible
+  // pages: {
+  //   signIn: "/",
+  // },
+  debug: process.env.NODE_ENV === "development",
 };
 
 // Extend the session type to include user.id
