@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2, TrendingUp, GitPullRequest, Activity, Code2, Users, ShieldCheck, AlertTriangle } from "lucide-react";
+import { ScoreRing } from "@/components/ui/ScoreRing";
 import { cn } from "@/lib/utils";
 
 interface PillarData {
@@ -125,23 +126,16 @@ export function ScoreBreakdown({ username }: { username: string }) {
       "rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900",
       tierConfig.glow && `shadow-lg ${tierConfig.glow}`
     )}>
-      {/* Score header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
+      {/* Score header with animated ring */}
+      <div className="flex items-center gap-6 mb-6">
+        <ScoreRing score={data.score} size={110} />
+        <div className="flex-1">
           <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
             GitScout Score
           </h2>
           <p className="text-xs text-neutral-500 mt-0.5">
             5-pillar analysis • {data.externalMergedPRs} external merged PRs
           </p>
-        </div>
-        <div className="text-right">
-          <div className={cn("text-4xl font-black tabular-nums", tierConfig.color)}>
-            {data.score}
-          </div>
-          <div className={cn("text-sm font-semibold mt-0.5", tierConfig.color)}>
-            {data.tier}
-          </div>
         </div>
       </div>
 

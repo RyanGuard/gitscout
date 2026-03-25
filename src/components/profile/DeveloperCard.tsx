@@ -1,26 +1,15 @@
 import Link from "next/link";
 import { MapPin, Star, Users, GitFork, Mail, Clock, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { TierBadge } from "@/components/ui/TierBadge";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
 import type { DeveloperProfile } from "@/types";
 
-const TIER_STYLES: Record<string, { badge: string; accent: string }> = {
-  Elite: {
-    badge: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 font-bold",
-    accent: "border-l-yellow-500",
-  },
-  Strong: {
-    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-    accent: "border-l-blue-500",
-  },
-  Solid: {
-    badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-    accent: "border-l-emerald-500",
-  },
-  Emerging: {
-    badge: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
-    accent: "border-l-neutral-400",
-  },
+const TIER_ACCENTS: Record<string, string> = {
+  Elite: "border-l-yellow-500",
+  Strong: "border-l-blue-500",
+  Solid: "border-l-emerald-500",
+  Emerging: "border-l-neutral-400",
 };
 
 interface DeveloperCardProps {
@@ -31,7 +20,7 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
   const topLanguages = developer.languages.slice(0, 4);
   const devAny = developer as unknown as Record<string, unknown>;
   const tier = devAny.tier as string | undefined;
-  const tierStyle = tier ? TIER_STYLES[tier] : undefined;
+  const tierAccent = tier ? TIER_ACCENTS[tier] : undefined;
   const hasEmail = !!developer.email;
 
   // Find most recently pushed repo for "last active" signal
@@ -42,7 +31,7 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
     <Link
       href={`/profile/${developer.username}`}
       className={`group block rounded-xl border border-neutral-200 bg-white shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600 ${
-        tierStyle ? `border-l-4 ${tierStyle.accent}` : ""
+        tierAccent ? `border-l-4 ${tierAccent}` : ""
       }`}
     >
       <div className="p-5">
@@ -73,10 +62,8 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
               <h3 className="truncate text-base font-semibold text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                 {developer.name || developer.username}
               </h3>
-              {tier && tierStyle && (
-                <Badge className={tierStyle.badge}>
-                  {tier === "Elite" ? "★ " : ""}{tier}
-                </Badge>
+              {developer.score > 0 && (
+                <TierBadge score={developer.score} size="sm" />
               )}
               {developer.hireable && (
                 <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">

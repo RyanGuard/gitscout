@@ -2,6 +2,9 @@
 
 import { SearchX, Lightbulb } from "lucide-react";
 import { DeveloperCard } from "@/components/profile/DeveloperCard";
+import { AnimatedResultsList } from "@/components/ui/AnimatedResultsList";
+import { SearchRadar } from "@/components/ui/SearchRadar";
+import { SearchLoadingMessages } from "@/components/ui/SearchLoadingMessages";
 import type { SearchResult } from "@/types";
 
 interface SearchResultsProps {
@@ -13,28 +16,9 @@ interface SearchResultsProps {
 export function SearchResults({ results, loading, onPageChange }: SearchResultsProps) {
   if (loading) {
     return (
-      <div className="space-y-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="animate-pulse rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900"
-            style={{ animationDelay: `${i * 75}ms` }}
-          >
-            <div className="flex items-start gap-4">
-              <div className="h-14 w-14 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-700" />
-              <div className="min-w-0 flex-1 space-y-2.5">
-                <div className="h-5 w-40 rounded bg-neutral-200 dark:bg-neutral-700" />
-                <div className="h-3.5 w-24 rounded bg-neutral-200 dark:bg-neutral-700" />
-                <div className="h-3.5 w-full max-w-xs rounded bg-neutral-200 dark:bg-neutral-700" />
-                <div className="flex gap-3 pt-1">
-                  <div className="h-3.5 w-20 rounded bg-neutral-200 dark:bg-neutral-700" />
-                  <div className="h-3.5 w-16 rounded bg-neutral-200 dark:bg-neutral-700" />
-                  <div className="h-3.5 w-16 rounded bg-neutral-200 dark:bg-neutral-700" />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center py-16 gap-4">
+        <SearchRadar isSearching={true} resultsFound={0} />
+        <SearchLoadingMessages isSearching={true} />
       </div>
     );
   }
@@ -68,22 +52,18 @@ export function SearchResults({ results, loading, onPageChange }: SearchResultsP
 
   return (
     <div>
-      <p className="mb-4 text-sm text-neutral-500">
-        {results.total} developer{results.total !== 1 ? "s" : ""} found
-      </p>
-
-      <div className="space-y-3">
+      <AnimatedResultsList searchKey={results.query + results.page}>
         {results.developers.map((dev) => (
           <DeveloperCard key={dev.id} developer={dev} />
         ))}
-      </div>
+      </AnimatedResultsList>
 
       {results.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
           <button
             onClick={() => onPageChange(results.page - 1)}
             disabled={results.page <= 1}
-            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50 disabled:opacity-40 disabled:hover:bg-transparent dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50 disabled:opacity-40 dark:border-neutral-700 dark:hover:bg-neutral-800"
           >
             Previous
           </button>
@@ -93,7 +73,7 @@ export function SearchResults({ results, loading, onPageChange }: SearchResultsP
           <button
             onClick={() => onPageChange(results.page + 1)}
             disabled={results.page >= results.totalPages}
-            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50 disabled:opacity-40 disabled:hover:bg-transparent dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50 disabled:opacity-40 dark:border-neutral-700 dark:hover:bg-neutral-800"
           >
             Next
           </button>
