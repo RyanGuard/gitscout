@@ -7,7 +7,13 @@
     "build": "prisma generate && prisma db push && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "qa": "npx playwright test --reporter=list",
+    "qa:roles": "npx playwright test tests/qa/search-roles.spec.ts --reporter=list",
+    "qa:locations": "npx playwright test tests/qa/search-locations.spec.ts --reporter=list",
+    "qa:quality": "npx playwright test tests/qa/search-quality.spec.ts --reporter=list",
+    "qa:perf": "npx playwright test tests/qa/search-performance.spec.ts --reporter=list",
+    "qa:pipelines": "npx playwright test tests/qa/api-pipelines.spec.ts --reporter=list"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -29,6 +35,8 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",

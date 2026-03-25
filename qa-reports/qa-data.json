@@ -1,0 +1,272 @@
+{
+  "screenshots": [],
+  "navigation": [
+    {
+      "test": "Feature card \"Live GitHub search\" visible",
+      "passed": true,
+      "details": "Visible on landing page"
+    },
+    {
+      "test": "Feature card \"Apollo enrichment\" visible",
+      "passed": true,
+      "details": "Visible on landing page"
+    },
+    {
+      "test": "Feature card \"Push to Ashby\" visible",
+      "passed": true,
+      "details": "Visible on landing page"
+    },
+    {
+      "test": "Role card \"Frontend Engineer\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Role card \"Backend Engineer\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Role card \"ML Engineer\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Role card \"DevOps / Infra\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Role card \"Rust Systems\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Role card \"Mobile Developer\" visible on home",
+      "passed": false,
+      "details": "Not visible (expected for logged-out view)"
+    },
+    {
+      "test": "Landing hero heading",
+      "passed": true,
+      "details": "Heading text: \"GitScout\""
+    },
+    {
+      "test": "Search input on landing",
+      "passed": true,
+      "details": "Search input found"
+    },
+    {
+      "test": "Sample search term \"rust developers in San Francisco\" button",
+      "passed": true,
+      "details": "Button present and clickable"
+    },
+    {
+      "test": "Sample search term \"python machine learning\" button",
+      "passed": true,
+      "details": "Button present and clickable"
+    },
+    {
+      "test": "Sample search term \"TypeScript React\" button",
+      "passed": true,
+      "details": "Button present and clickable"
+    },
+    {
+      "test": "Sample search term \"go engineers in Berlin\" button",
+      "passed": true,
+      "details": "Button present and clickable"
+    },
+    {
+      "test": "Dark theme on home",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    },
+    {
+      "test": "Dark theme on search",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    },
+    {
+      "test": "Dark theme on lists",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    },
+    {
+      "test": "Dark theme on match",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    },
+    {
+      "test": "Dark theme on favorites",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    },
+    {
+      "test": "Dark theme on profile-torvalds",
+      "passed": true,
+      "details": "Body bg: rgb(10, 10, 10). No contrast issues found."
+    }
+  ],
+  "accessibility": [
+    {
+      "route": "home",
+      "violations": []
+    },
+    {
+      "route": "search",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "kbd"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "lists",
+      "violations": []
+    },
+    {
+      "route": "match",
+      "violations": []
+    },
+    {
+      "route": "favorites",
+      "violations": []
+    },
+    {
+      "route": "profile-torvalds",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": 12,
+          "targets": [
+            ".text-current\\/60",
+            ".group:nth-child(1) > .mb-1\\.5.justify-between.items-center > .tabular-nums.font-bold.text-neutral-900 > .font-normal.text-neutral-400",
+            ".group:nth-child(2) > .mb-1\\.5.justify-between.items-center > .tabular-nums.font-bold.text-neutral-900 > .font-normal.text-neutral-400"
+          ]
+        }
+      ]
+    }
+  ],
+  "performance": [
+    {
+      "route": "home",
+      "metrics": {
+        "domContentLoaded": 41.29999999701977,
+        "loadComplete": 162.09999999403954,
+        "firstContentfulPaint": 48,
+        "ttfb": 24.200000002980232,
+        "networkIdleTime": 705
+      }
+    },
+    {
+      "route": "search",
+      "metrics": {
+        "domContentLoaded": 63.80000001192093,
+        "loadComplete": 175.40000000596046,
+        "firstContentfulPaint": 68,
+        "ttfb": 31.80000001192093,
+        "networkIdleTime": 728
+      }
+    },
+    {
+      "route": "lists",
+      "metrics": {
+        "domContentLoaded": 54.599999994039536,
+        "loadComplete": 174.29999999701977,
+        "firstContentfulPaint": 60,
+        "ttfb": 34.3999999910593,
+        "networkIdleTime": 785
+      }
+    },
+    {
+      "route": "match",
+      "metrics": {
+        "domContentLoaded": 47.5,
+        "loadComplete": 155.20000000298023,
+        "firstContentfulPaint": 56,
+        "ttfb": 29,
+        "networkIdleTime": 700
+      }
+    },
+    {
+      "route": "favorites",
+      "metrics": {
+        "domContentLoaded": 96.29999999701977,
+        "loadComplete": 228.70000000298023,
+        "firstContentfulPaint": 100,
+        "ttfb": 71.09999999403954,
+        "networkIdleTime": 778
+      }
+    },
+    {
+      "route": "profile-torvalds",
+      "metrics": {
+        "domContentLoaded": 238.1000000089407,
+        "loadComplete": 339.5,
+        "firstContentfulPaint": 68,
+        "ttfb": 41.400000005960464,
+        "networkIdleTime": 1214
+      }
+    }
+  ],
+  "visualBugs": [
+    {
+      "route": "home-light",
+      "issues": []
+    },
+    {
+      "route": "home-dark",
+      "issues": []
+    },
+    {
+      "route": "search-light",
+      "issues": []
+    },
+    {
+      "route": "search-dark",
+      "issues": []
+    },
+    {
+      "route": "lists-light",
+      "issues": []
+    },
+    {
+      "route": "lists-dark",
+      "issues": []
+    },
+    {
+      "route": "match-light",
+      "issues": []
+    },
+    {
+      "route": "match-dark",
+      "issues": []
+    },
+    {
+      "route": "favorites-light",
+      "issues": []
+    },
+    {
+      "route": "favorites-dark",
+      "issues": []
+    },
+    {
+      "route": "profile-torvalds-light",
+      "issues": []
+    },
+    {
+      "route": "profile-torvalds-dark",
+      "issues": []
+    }
+  ]
+}

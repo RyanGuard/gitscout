@@ -1,0 +1,146 @@
+{
+  "accessibility": [
+    {
+      "route": "home",
+      "violationCount": 0,
+      "violations": []
+    },
+    {
+      "route": "search",
+      "violationCount": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodeCount": 1,
+          "targets": [
+            "kbd"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "lists",
+      "violationCount": 0,
+      "violations": []
+    },
+    {
+      "route": "match",
+      "violationCount": 0,
+      "violations": []
+    },
+    {
+      "route": "favorites",
+      "violationCount": 0,
+      "violations": []
+    },
+    {
+      "route": "profile-torvalds",
+      "violationCount": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodeCount": 6,
+          "targets": [
+            ".p-4.rounded-lg.bg-white:nth-child(1) > .mt-3.gap-2.items-center > .text-neutral-400.text-xs",
+            ".p-4.rounded-lg.bg-white:nth-child(2) > .mt-3.gap-2.items-center > .text-neutral-400.text-xs",
+            ".p-4.rounded-lg.bg-white:nth-child(3) > .mt-3.gap-2.items-center > .text-neutral-400.text-xs"
+          ]
+        }
+      ]
+    }
+  ],
+  "performance": [
+    {
+      "route": "home",
+      "metrics": {
+        "domContentLoaded": 58,
+        "loadComplete": 193,
+        "firstContentfulPaint": 64,
+        "ttfb": 37,
+        "networkIdleTime": 750
+      }
+    },
+    {
+      "route": "search",
+      "metrics": {
+        "domContentLoaded": 97,
+        "loadComplete": 242,
+        "firstContentfulPaint": 104,
+        "ttfb": 48,
+        "networkIdleTime": 868
+      }
+    },
+    {
+      "route": "lists",
+      "metrics": {
+        "domContentLoaded": 60,
+        "loadComplete": 225,
+        "firstContentfulPaint": 64,
+        "ttfb": 33,
+        "networkIdleTime": 861
+      }
+    },
+    {
+      "route": "match",
+      "metrics": {
+        "domContentLoaded": 57,
+        "loadComplete": 248,
+        "firstContentfulPaint": 64,
+        "ttfb": 30,
+        "networkIdleTime": 809
+      }
+    },
+    {
+      "route": "favorites",
+      "metrics": {
+        "domContentLoaded": 95,
+        "loadComplete": 229,
+        "firstContentfulPaint": 100,
+        "ttfb": 74,
+        "networkIdleTime": 778
+      }
+    },
+    {
+      "route": "profile-torvalds",
+      "metrics": {
+        "domContentLoaded": 714,
+        "loadComplete": 953,
+        "firstContentfulPaint": 76,
+        "ttfb": 53,
+        "networkIdleTime": 1525
+      }
+    }
+  ],
+  "visualBugs": [
+    {
+      "route": "home",
+      "issues": []
+    },
+    {
+      "route": "search",
+      "issues": []
+    },
+    {
+      "route": "lists",
+      "issues": []
+    },
+    {
+      "route": "match",
+      "issues": []
+    },
+    {
+      "route": "favorites",
+      "issues": []
+    },
+    {
+      "route": "profile-torvalds",
+      "issues": []
+    }
+  ]
+}

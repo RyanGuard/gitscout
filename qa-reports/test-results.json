@@ -1,0 +1,577 @@
+{
+  "results": [
+    {
+      "name": "GET /api/stats — valid request",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 332,
+      "details": "totalDevelopers=62, totalRepositories=1022",
+      "secretLeaks": [],
+      "responseShape": [
+        "totalDevelopers",
+        "totalRepositories",
+        "totalActivities",
+        "lastSyncedAt"
+      ]
+    },
+    {
+      "name": "GET /api/stats — with extraneous query params",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 75,
+      "details": "Extraneous params should be ignored",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/stats — wrong method",
+      "status": "PASS",
+      "statusCode": 405,
+      "duration": 11,
+      "details": "Expected 405, got 405",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/search?q=react — valid query",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 338,
+      "details": "Found 5 developers, total=1000",
+      "secretLeaks": [],
+      "responseShape": [
+        "developers",
+        "total",
+        "page",
+        "totalPages",
+        "query"
+      ]
+    },
+    {
+      "name": "GET /api/search — no query params",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 6,
+      "details": "Status 200, response has 5 keys",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/search?limit=notanumber — malformed limit",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 566,
+      "details": "Status 200 with malformed limit",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/search?q=<script>alert(1)</script> — XSS attempt",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 170,
+      "details": "WARNING: Unescaped XSS payload in response",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/search?q=(2000 chars) — very long query",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 94,
+      "details": "Status 200 with 2000-char query",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/search?q=' OR 1=1 -- — SQL injection attempt",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 135,
+      "details": "Status 200 — SQL injection attempt",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/search — valid SSE stream",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 597,
+      "details": "SSE stream received, 188 bytes, has events: true",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/search — empty body",
+      "status": "PASS",
+      "statusCode": null,
+      "duration": 10007,
+      "details": "Aborted/errored: This operation was aborted",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/search — invalid JSON body",
+      "status": "FAIL",
+      "statusCode": 200,
+      "duration": 40319,
+      "details": "Status 200 for invalid JSON",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/profiles/torvalds — valid username",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 955,
+      "details": "Found profile: torvalds",
+      "secretLeaks": [],
+      "responseShape": [
+        "id",
+        "githubId",
+        "username",
+        "name",
+        "email",
+        "avatarUrl",
+        "bio",
+        "company",
+        "location",
+        "blog",
+        "twitterUsername",
+        "publicRepos",
+        "followers",
+        "following",
+        "hireable",
+        "primaryLanguage",
+        "totalCommits",
+        "totalStars",
+        "score",
+        "languages",
+        "repositories"
+      ]
+    },
+    {
+      "name": "GET /api/profiles/ — empty username",
+      "status": "FAIL",
+      "statusCode": 308,
+      "duration": 6,
+      "details": "Status 308 for empty username",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/profiles/zzz_nonexistent_user_12345 — non-existent user",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 79,
+      "details": "Status 404, error: Developer not found",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/profiles/../../../etc/passwd — path traversal",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 59,
+      "details": "Path traversal attempt: status 404",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/profiles/用户名 — unicode username",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 68,
+      "details": "Unicode username: status 404",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/score/torvalds — valid username",
+      "status": "FAIL",
+      "statusCode": 404,
+      "duration": 65,
+      "details": "Score: undefined, Tier: undefined, Confidence: undefined",
+      "secretLeaks": [],
+      "responseShape": [
+        "error"
+      ]
+    },
+    {
+      "name": "GET /api/score/zzz_nonexistent_12345 — non-existent user",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 58,
+      "details": "Status 404, error: Developer not found on GitHub",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/score/ — empty username",
+      "status": "FAIL",
+      "statusCode": 308,
+      "duration": 1,
+      "details": "Status 308 for empty username",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/score/<script> — XSS in path",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 54,
+      "details": "XSS in path: status 404",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/scouting-report — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 915,
+      "details": "Expected 401 unauthorized, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/scouting-report — empty body, no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 9,
+      "details": "Status 401 for empty body without auth",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/scouting-report — wrong method",
+      "status": "PASS",
+      "statusCode": 405,
+      "duration": 8,
+      "details": "Status 405 for GET method",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/outreach-draft — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 307,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/outreach-draft — empty body, no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 22,
+      "details": "Status 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/outreach-draft — wrong method",
+      "status": "PASS",
+      "statusCode": 405,
+      "duration": 8,
+      "details": "Status 405 for GET",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/find-similar?username=torvalds — valid",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 662,
+      "details": "Found 0 similar developers",
+      "secretLeaks": [],
+      "responseShape": [
+        "developers",
+        "sourceUsername",
+        "filters",
+        "locationSkipped",
+        "total"
+      ]
+    },
+    {
+      "name": "GET /api/find-similar — missing username",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 7,
+      "details": "Expected 400, got 400. Error: Missing username parameter",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/find-similar?username= — empty username",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 6,
+      "details": "Expected 400, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/find-similar?username=zzz_fake_999 — non-existent user",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 108,
+      "details": "Expected 404, got 404",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/developer-card?username=torvalds — valid",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 205,
+      "details": "Content-Type: image/svg+xml, SVG: true, 3825 bytes",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/developer-card — missing username",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 6,
+      "details": "Expected 400, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/developer-card?username= — empty username",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 4,
+      "details": "Expected 400, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/developer-card?username=zzz_fake — non-existent",
+      "status": "PASS",
+      "statusCode": 404,
+      "duration": 111,
+      "details": "Expected 404, got 404",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/lists — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 234,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/lists — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 16,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/lists — empty body, no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 14,
+      "details": "Status 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/lists/fake-id — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 1155,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "DELETE /api/lists/fake-id — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 17,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/lists/fake-id/entries — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 1115,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/lists/fake/entries/fake/notes — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 1068,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/favorites — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 198,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/favorites — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 17,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "DELETE /api/favorites/fake-id — no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 1015,
+      "details": "Expected 401, got 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/favorites — empty body, no auth",
+      "status": "PASS",
+      "statusCode": 401,
+      "duration": 8,
+      "details": "Status 401",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/match — valid JD",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 555,
+      "details": "Found 42 candidates",
+      "secretLeaks": [],
+      "responseShape": [
+        "requirements",
+        "candidates",
+        "total"
+      ]
+    },
+    {
+      "name": "POST /api/match — empty body",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 10,
+      "details": "Expected 400, got 400. Error: Provide 'jobDescription', 'jobId', or 'requirements'",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/match — invalid JSON",
+      "status": "PASS",
+      "statusCode": 500,
+      "duration": 37,
+      "details": "Status 500 for invalid JSON",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "GET /api/match — wrong method",
+      "status": "PASS",
+      "statusCode": 405,
+      "duration": 7,
+      "details": "Status 405 for GET",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/match — missing all required fields",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 8,
+      "details": "Expected 400 for missing required fields, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/match/parse — valid JD text",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 237,
+      "details": "Parsed requirements keys: languages, frameworks, tools, location, seniority, keywords, yearsExperience",
+      "secretLeaks": [],
+      "responseShape": [
+        "languages",
+        "frameworks",
+        "tools",
+        "location",
+        "seniority",
+        "keywords",
+        "yearsExperience"
+      ]
+    },
+    {
+      "name": "POST /api/match/parse — empty body",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 10,
+      "details": "Expected 400 for missing text, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "POST /api/match/parse — text as number",
+      "status": "PASS",
+      "statusCode": 400,
+      "duration": 15,
+      "details": "Expected 400 for non-string text, got 400",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "PERF: /api/stats response time < 2s",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 458,
+      "details": "Response time: 458ms (limit: 2000ms)",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "PERF: /api/search?q=react&limit=5 response time < 15s",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 352,
+      "details": "Response time: 352ms (limit: 15000ms)",
+      "secretLeaks": [],
+      "responseShape": null
+    },
+    {
+      "name": "PERF: /api/score/torvalds response time < 15s",
+      "status": "PASS",
+      "statusCode": 200,
+      "duration": 59,
+      "details": "Response time: 59ms (limit: 15000ms)",
+      "secretLeaks": [],
+      "responseShape": null
+    }
+  ],
+  "summary": {
+    "total": 57,
+    "passed": 53,
+    "failed": 4,
+    "errored": 0,
+    "secretLeaks": []
+  }
+}

@@ -284,6 +284,12 @@ function buildGitHubQuery(params: {
   // Quality floor — higher for role searches (50+), lower for generic (5+)
   parts.push(`followers:>=${parsed.minFollowers}`);
 
+  // Ensure we have enough query substance for GitHub to accept
+  // (GitHub requires at least some text or structured query)
+  if (parsed.searchTerms.length === 0 && !loc) {
+    parts.push("repos:>10");
+  }
+
   // If we have nothing useful, fall back to the raw query
   if (parts.length === 0 && params.q) {
     parts.push(params.q);
