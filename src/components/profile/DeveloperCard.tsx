@@ -4,12 +4,21 @@ import { Badge } from "@/components/ui/Badge";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import type { DeveloperProfile } from "@/types";
 
+const TIER_STYLES: Record<string, string> = {
+  Elite: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  Strong: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  Solid: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  Emerging: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+};
+
 interface DeveloperCardProps {
-  developer: DeveloperProfile;
+  developer: DeveloperProfile & { tier?: string };
 }
 
 export function DeveloperCard({ developer }: DeveloperCardProps) {
   const topLanguages = developer.languages.slice(0, 3);
+  const tier = (developer as unknown as Record<string, unknown>).tier as string | undefined;
+  const tierStyle = tier && TIER_STYLES[tier];
 
   return (
     <Link
@@ -24,10 +33,15 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
           className="h-14 w-14 rounded-full border-2 border-neutral-100 dark:border-neutral-800"
         />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="truncate text-lg font-semibold text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
               {developer.name || developer.username}
             </h3>
+            {tier && tierStyle && (
+              <Badge className={tierStyle}>
+                {tier === "Elite" ? "★ " : ""}{tier}
+              </Badge>
+            )}
             {developer.hireable && (
               <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                 Hireable
@@ -48,18 +62,29 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
                 {developer.location}
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <Star className="h-3.5 w-3.5" />
-              {formatNumber(developer.totalStars)}
-            </span>
-            <span className="flex items-center gap-1">
-              <GitFork className="h-3.5 w-3.5" />
-              {developer.publicRepos} repos
-            </span>
-            <span className="flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" />
-              {formatNumber(developer.followers)}
-            </span>
+            {developer.followers > 0 && (
+              <span className="flex items-center gap-1">
+                <Users className="h-3.5 w-3.5" />
+                {formatNumber(developer.followers)}
+              </span>
+            )}
+            {developer.totalStars > 0 && (
+              <span className="flex items-center gap-1">
+                <Star className="h-3.5 w-3.5" />
+                {formatNumber(developer.totalStars)}
+              </span>
+            )}
+            {developer.publicRepos > 0 && (
+              <span className="flex items-center gap-1">
+                <GitFork className="h-3.5 w-3.5" />
+                {developer.publicRepos} repos
+              </span>
+            )}
+            {developer.score > 0 && (
+              <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                Score: {developer.score}
+              </span>
+            )}
           </div>
 
           {topLanguages.length > 0 && (

@@ -133,8 +133,25 @@ function buildGitHubQuery(params: {
   return parts.join(" ");
 }
 
-// Convert a raw GitHub user into our DeveloperProfile shape (lightweight, no repos/languages)
+// Quick surface score from REST API data only (no GraphQL needed)
+// This is a fast estimate — full 5-pillar score comes after indexing
+function quickScore(user: GitHubUser): { score: number; tier: string } {
+  const followerSignal = Math.min(10, Math.log(1 + user.followers) / Math.log(1 + 500) * 5);
+  const repoSignal = Math.min(10, Math.log(1 + user.public_repos) / Math.log(1 + 50) * 5);
+  const ratio = user.following > 0 ? user.followers / user.following : user.followers;
+  const ratioBonus = ratio >= 5 ? 1 : ratio >= 2 ? 0.5 : 0;
+  const profileBonus = (user.bio ? 0.3 : 0) + (user.email ? 0.2 : 0) + (user.blog ? 0.2 : 0) + (user.hireable ? 0.3 : 0);
+
+  const raw = followerSignal * 0.45 + repoSignal * 0.30 + ratioBonus + profileBonus;
+  const score = Math.round(Math.min(100, raw * 10) * 10) / 10;
+
+  const tier = score >= 90 ? "Elite" : score >= 75 ? "Strong" : score >= 60 ? "Solid" : score >= 40 ? "Emerging" : "Limited Data";
+  return { score, tier };
+}
+
+// Convert a raw GitHub user into our DeveloperProfile shape
 function githubUserToProfile(user: GitHubUser) {
+  const { score, tier } = quickScore(user);
   return {
     id: `gh-${user.id}`,
     githubId: user.id,
@@ -154,7 +171,8 @@ function githubUserToProfile(user: GitHubUser) {
     primaryLanguage: null as string | null,
     totalCommits: 0,
     totalStars: 0,
-    score: 0,
+    score,
+    tier,
     languages: [] as { language: string; bytes: number; repoCount: number; percentage: number }[],
     repositories: [] as { id: string; name: string; fullName: string; description: string | null; language: string | null; stars: number; forks: number; topics: string[]; pushedAt: string | null }[],
     source: "github" as const,
@@ -274,6 +292,7 @@ export async function GET(request: Request) {
         totalCommits: local.totalCommits,
         totalStars: local.totalStars,
         score: local.score,
+        tier: local.score >= 90 ? "Elite" : local.score >= 75 ? "Strong" : local.score >= 60 ? "Solid" : local.score >= 40 ? "Emerging" : "Limited Data",
         languages: local.languages,
         repositories: local.repositories.map((r) => ({
           id: r.id,
@@ -323,22 +342,8 @@ export async function GET(request: Request) {
     };
   });
 
-  // --- 5. Sort by quality — best developers first ---
-  developers.sort((a, b) => {
-    // Local (indexed + scored) profiles always rank above GitHub-only
-    if (a.source === "local" && b.source !== "local") return -1;
-    if (b.source === "local" && a.source !== "local") return 1;
-
-    // For local profiles, use our computed score
-    if (a.source === "local" && b.source === "local") {
-      return (b.score || 0) - (a.score || 0);
-    }
-
-    // For GitHub profiles, rank by followers * 2 + repos
-    const aQuality = (a.followers || 0) * 2 + (a.publicRepos || 0);
-    const bQuality = (b.followers || 0) * 2 + (b.publicRepos || 0);
-    return bQuality - aQuality;
-  });
+  // --- 5. Sort by score — best developers first ---
+  developers.sort((a, b) => (b.score || 0) - (a.score || 0));
 
   return Response.json({
     developers,
