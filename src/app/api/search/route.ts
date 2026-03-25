@@ -41,6 +41,10 @@ export async function POST(request: Request) {
         if (roleCategory) {
           sendEvent("deep_progress", { message: `Scanning ${roleCategory} contributors...`, progress: 0.1 });
 
+          // 50s timeout to fit within Vercel's 60s function limit
+          const deepController = new AbortController();
+          const deepTimeout = setTimeout(() => deepController.abort(), 50000);
+
           const deepRes = await fetch(`${baseUrl}/api/search/deep`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -52,7 +56,8 @@ export async function POST(request: Request) {
               activeInDays: 90,
               maxResults: 50,
             }),
-          });
+            signal: deepController.signal,
+          }).finally(() => clearTimeout(deepTimeout));
 
           sendEvent("deep_progress", { message: "Enriching profiles and scoring...", progress: 0.6 });
 
@@ -600,8 +605,12 @@ export async function GET(request: Request) {
     };
   });
 
-  // --- 5. Sort by score — best developers first ---
-  developers.sort((a, b) => (b.score || 0) - (a.score || 0));
+  // --- 5. Sort results ---
+  // Only re-sort by score when user selected "score" sort (or default)
+  // For followers/stars/joined, GitHub already sorted by that — preserve order
+  if (sort === "score") {
+    developers.sort((a, b) => (b.score || 0) - (a.score || 0));
+  }
 
   return Response.json({
     developers,

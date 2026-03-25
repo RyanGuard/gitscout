@@ -33,7 +33,17 @@ export function FavoriteButton({ developerId, className }: FavoriteButtonProps) 
     checkFavorite();
   }, [checkFavorite]);
 
-  if (!session) return null;
+  if (!session) {
+    return (
+      <button
+        disabled
+        title="Sign in to save developers"
+        className="rounded-lg border border-neutral-200 p-2 text-neutral-300 cursor-not-allowed dark:border-neutral-700 dark:text-neutral-600"
+      >
+        <Heart className="h-4 w-4" />
+      </button>
+    );
+  }
 
   async function toggle() {
     setLoading(true);

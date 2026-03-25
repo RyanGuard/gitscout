@@ -87,8 +87,13 @@ function SearchPageInner() {
       try {
         const res = await fetch(`/api/search?${params}`, { signal: controller.signal });
         if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: "Search failed" }));
-          setSearchError(err.error || `Search failed (${res.status})`);
+          const err = await res.json().catch(() => ({}));
+          const msg = res.status === 429
+            ? "GitHub API rate limit reached. Try again in a minute."
+            : res.status >= 500
+              ? "Server error. Our team has been notified."
+              : err.error || `Search failed (${res.status})`;
+          setSearchError(msg);
           setResults(null);
           return;
         }
@@ -303,8 +308,33 @@ function SearchPageInner() {
           </div>
 
           {searchError && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
-              {searchError}
+            <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              <span>{searchError}</span>
+              <button
+                onClick={() => { setSearchError(null); if (query) doSearch(query, 1, filters); }}
+                className="ml-3 shrink-0 rounded-md bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!query && !results && !loading && (
+            <div className="py-16 text-center">
+              <Search className="mx-auto h-12 w-12 text-neutral-200 dark:text-neutral-700" />
+              <h3 className="mt-4 text-lg font-medium text-neutral-600 dark:text-neutral-400">Find your next hire</h3>
+              <p className="mt-1 text-sm text-neutral-500">Search by role, language, location, or name</p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                {["React developers in SF", "Python ML engineers", "Rust systems", "Go in Seattle", "TypeScript fullstack"].map((term) => (
+                  <button
+                    key={term}
+                    onClick={() => { setInputValue(term); router.push(`/search?q=${encodeURIComponent(term)}`); }}
+                    className="rounded-full border border-neutral-200 px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-neutral-700 dark:text-neutral-400"
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

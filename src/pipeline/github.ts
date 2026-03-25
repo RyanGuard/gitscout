@@ -209,9 +209,7 @@ export async function syncOneUser(username: string) {
   const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
 
   // Fetch commit data via GraphQL (falls back to null if no token or on error)
-  console.log(`[sync] Fetching contributions for ${username}, token type: ${process.env.GITHUB_TOKEN?.startsWith('ghp_') ? 'classic' : process.env.GITHUB_TOKEN?.startsWith('github_pat_') ? 'fine-grained' : 'unknown/missing'}`);
   const contributions = await fetchContributions(username);
-  console.log(`[sync] Contributions for ${username}:`, contributions ? `commits=${contributions.totalCommitContributions}, PRs=${contributions.externalMergedPRs}` : 'NULL');
 
   const {
     score,
