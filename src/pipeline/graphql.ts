@@ -83,10 +83,7 @@ export async function fetchContributions(
             }
           }
         }
-        sponsorshipsAsMaintainer(first: 1) {
-          totalCount
-        }
-        isSponsorable
+        hasSponsorsListing
       }
     }
   `;
@@ -150,8 +147,8 @@ export async function fetchContributions(
       activeWeeks,
       totalWeeks,
       consistencyRatio: totalWeeks > 0 ? activeWeeks / totalWeeks : 0,
-      isSponsorable: user.isSponsorable ?? false,
-      sponsorCount: user.sponsorshipsAsMaintainer?.totalCount ?? 0,
+      isSponsorable: user.hasSponsorsListing ?? false,
+      sponsorCount: 0,
       externalMergedPRs: externalPRs,
     };
   } catch (err) {
