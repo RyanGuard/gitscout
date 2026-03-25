@@ -14,6 +14,9 @@ import { Badge } from "@/components/ui/Badge";
 import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
 import { FavoriteButton } from "@/components/auth/FavoriteButton";
+import { EnrichButton } from "@/components/profile/EnrichButton";
+import { PushToAshbyButton } from "@/components/ashby/PushToAshbyButton";
+import { AddToListButton } from "@/components/crm/AddToListButton";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -319,9 +322,9 @@ export default async function ProfilePage({
               {developer.source === "local" && (
                 <FavoriteButton developerId={developer.id} />
               )}
-              {/* AGENT_ENRICHMENT: <EnrichButton developerId={developer.id} /> */}
-              {/* AGENT_ASHBY: <PushToAshbyButton developerId={developer.id} /> */}
-              {/* AGENT_CRM: <AddToListButton developerId={developer.id} /> */}
+              <EnrichButton developerId={developer.id} />
+              <PushToAshbyButton developerId={developer.id} />
+              <AddToListButton developerId={developer.id} />
             </div>
           </div>
         </div>
