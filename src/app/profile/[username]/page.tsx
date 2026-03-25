@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/Badge";
 import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
 import { ProfileActions } from "@/components/profile/ProfileActions";
+import { ScoreBreakdown } from "@/components/profile/ScoreBreakdown";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -323,6 +324,11 @@ export default async function ProfilePage({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Score Breakdown — loads async, shows 5-pillar analysis */}
+      <div className="mt-6">
+        <ScoreBreakdown username={developer.username} />
       </div>
 
       {/* Languages */}
