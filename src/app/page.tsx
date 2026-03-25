@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { GitBranch, Globe, Zap, Shield, Search, Heart, Clock, ArrowRight } from "lucide-react";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { DailyBriefing } from "@/components/features/DailyBriefing";
+import { CityGrid } from "@/components/features/CityGrid";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -123,6 +124,11 @@ function Dashboard() {
 
       {/* Daily Briefing */}
       <DailyBriefing />
+
+      {/* City Grid */}
+      <div className="mb-6">
+        <CityGrid />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Quick searches */}
