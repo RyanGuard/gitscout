@@ -2,8 +2,9 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, EyeOff } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
+import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
 
 const POPULAR_LANGUAGES = [
@@ -68,6 +69,13 @@ function SearchPageInner() {
 
   const initialFilters = parseFiltersFromParams(searchParams);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
+  const [hideViewed, setHideViewed] = useState(false);
+  const [viewedCount, setViewedCount] = useState(0);
+
+  // Update viewed count on mount and after navigation back
+  useEffect(() => {
+    setViewedCount(getViewedCount());
+  }, [results]);
 
   const doSearch = useCallback(
     async (q: string, page = 1, f: FilterValues = {}) => {
@@ -283,6 +291,24 @@ function SearchPageInner() {
                 />
                 Open to work only
               </label>
+              <label className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hideViewed}
+                  onChange={(e) => setHideViewed(e.target.checked)}
+                  className="rounded accent-blue-600"
+                />
+                <EyeOff className="h-3.5 w-3.5" />
+                Hide viewed ({viewedCount})
+              </label>
+              {viewedCount > 0 && hideViewed && (
+                <button
+                  onClick={() => { clearViewedProfiles(); setViewedCount(0); setHideViewed(false); }}
+                  className="text-xs text-neutral-500 hover:text-red-500 transition-colors"
+                >
+                  Reset viewed history
+                </button>
+              )}
             </div>
           </div>
         </aside>
@@ -339,7 +365,12 @@ function SearchPageInner() {
           )}
 
           <SearchResults
-            results={results}
+            results={hideViewed && results ? {
+              ...results,
+              developers: results.developers.filter(
+                d => !getViewedProfiles().has(d.username.toLowerCase())
+              ),
+            } : results}
             loading={loading}
             onPageChange={(page) => doSearch(query, page, filters)}
           />

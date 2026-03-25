@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { MapPin, Star, Users, GitFork, Mail, Clock, Building2 } from "lucide-react";
+import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
+import { markProfileViewed, isProfileViewed } from "@/lib/viewedProfiles";
+import { useState, useEffect } from "react";
 import type { DeveloperProfile } from "@/types";
 
 const SCORE_ACCENTS: Record<string, string> = {
@@ -21,6 +25,16 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
   const tierInfo = developer.score > 0 ? getTierInfo(developer.score) : null;
   const tierAccent = tierInfo ? SCORE_ACCENTS[tierInfo.label] : undefined;
   const hasEmail = !!developer.email;
+  const [viewed, setViewed] = useState(false);
+
+  useEffect(() => {
+    setViewed(isProfileViewed(developer.username));
+  }, [developer.username]);
+
+  function handleClick() {
+    markProfileViewed(developer.username);
+    setViewed(true);
+  }
 
   // Find most recently pushed repo for "last active" signal
   const recentRepo = developer.repositories?.[0];
@@ -29,9 +43,10 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
   return (
     <Link
       href={`/profile/${developer.username}`}
+      onClick={handleClick}
       className={`group block rounded-xl border border-neutral-200 bg-white shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600 ${
         tierAccent ? `border-l-4 ${tierAccent}` : ""
-      }`}
+      } ${viewed ? "opacity-70" : ""}`}
     >
       <div className="p-5">
         <div className="flex items-start gap-4">
@@ -70,6 +85,11 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
               {hasEmail && (
                 <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
                   <Mail className="h-3 w-3" /> Email
+                </Badge>
+              )}
+              {viewed && (
+                <Badge className="bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-500">
+                  <Eye className="h-3 w-3" /> Viewed
                 </Badge>
               )}
             </div>
