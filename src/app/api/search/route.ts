@@ -1,6 +1,94 @@
 import { prisma } from "@/lib/prisma";
 import type { GitHubUser } from "@/types";
 
+// ═══ POST — SSE Streaming Orchestrator (quick + deep in parallel) ═══
+export async function POST(request: Request) {
+  const body = await request.json().catch(() => ({}));
+  const { roleCategory, language, location, minFollowers, minStars, query: freeText, perPage, page } = body;
+
+  const encoder = new TextEncoder();
+  const baseUrl = request.url.replace(/\/api\/search.*/, "");
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      function sendEvent(event: string, data: unknown) {
+        controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+      }
+
+      try {
+        // --- Quick search (fast path, always runs) ---
+        sendEvent("status", { message: "Running quick search..." });
+
+        const quickRes = await fetch(`${baseUrl}/api/search/quick`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            language,
+            location,
+            minFollowers: minFollowers || 10,
+            query: freeText,
+            perPage: perPage || 30,
+            page: page || 1,
+          }),
+        });
+
+        if (quickRes.ok) {
+          const quickData = await quickRes.json();
+          sendEvent("quick_results", quickData);
+        }
+
+        // --- Deep search (quality path, runs if roleCategory specified) ---
+        if (roleCategory) {
+          sendEvent("deep_progress", { message: `Scanning ${roleCategory} contributors...`, progress: 0.1 });
+
+          const deepRes = await fetch(`${baseUrl}/api/search/deep`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              roleCategory,
+              language,
+              location,
+              minStars,
+              activeInDays: 90,
+              maxResults: 50,
+            }),
+          });
+
+          sendEvent("deep_progress", { message: "Enriching profiles and scoring...", progress: 0.6 });
+
+          if (deepRes.ok) {
+            const deepData = await deepRes.json();
+            sendEvent("deep_results", deepData);
+            sendEvent("complete", {
+              quickCount: 0,
+              deepCount: deepData.total_count,
+              unicorns: deepData.meta?.unicorns || 0,
+            });
+          } else {
+            sendEvent("complete", { quickCount: 0, deepCount: 0, unicorns: 0 });
+          }
+        } else {
+          sendEvent("complete", { quickCount: 0, deepCount: 0, unicorns: 0 });
+        }
+      } catch (error) {
+        sendEvent("error", { message: error instanceof Error ? error.message : "Search failed" });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
+
+// ═══ GET — Existing live GitHub search (kept for backward compat) ═══
+
 const GITHUB_API = "https://api.github.com";
 
 function githubHeaders(): HeadersInit {
