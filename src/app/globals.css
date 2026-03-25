@@ -35,9 +35,84 @@ body {
   animation: shimmer 3s ease-in-out infinite;
 }
 
+/* ── Live pulse dot ── */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.8); }
+}
+.animate-pulse-live {
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+/* ── Slow float ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ── Gradient text ── */
+.text-gradient {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glass card ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Glow ring on hover ── */
+.glow-hover {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glow-hover:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12), 0 0 40px rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── Sparkline bar animation ── */
+@keyframes grow-bar {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.animate-grow-bar {
+  animation: grow-bar 0.6s ease-out forwards;
+  transform-origin: bottom;
+}
+
+/* ── Scan line ── */
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-scan {
+  animation: scan 3s ease-in-out infinite;
+}
+
+/* ── Subtle grain texture for depth ── */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-shimmer,
+  .animate-pulse-live,
+  .animate-float,
+  .animate-grow-bar,
+  .animate-scan,
   [class*="animate-"] {
     animation: none !important;
     transition: none !important;
