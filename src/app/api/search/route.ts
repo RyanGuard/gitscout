@@ -14,6 +14,75 @@ function githubHeaders(): HeadersInit {
   return headers;
 }
 
+// Known programming languages for extraction from natural language queries
+const KNOWN_LANGUAGES = new Set([
+  "javascript", "typescript", "python", "rust", "go", "golang", "java", "c", "c++",
+  "c#", "csharp", "ruby", "php", "swift", "kotlin", "scala", "elixir", "haskell",
+  "dart", "r", "lua", "zig", "perl", "shell", "bash", "sql", "html", "css",
+  "objective-c", "clojure", "erlang", "fortran", "julia", "ocaml", "vue", "svelte",
+]);
+
+const LANGUAGE_ALIASES: Record<string, string> = {
+  js: "javascript", ts: "typescript", golang: "go", "c#": "csharp",
+  "c sharp": "csharp", node: "javascript", react: "javascript",
+  "node.js": "javascript", nodejs: "javascript",
+};
+
+// Patterns that indicate location in natural language
+const LOCATION_PATTERNS = [
+  /\bin\s+(.+?)(?:\s+(?:who|that|with|and|looking|developers?|engineers?|devs?)|\s*$)/i,
+  /\bfrom\s+(.+?)(?:\s+(?:who|that|with|and|looking|developers?|engineers?|devs?)|\s*$)/i,
+  /\bbased\s+in\s+(.+?)(?:\s+(?:who|that|with|and)|\s*$)/i,
+  /\blocated\s+in\s+(.+?)(?:\s+(?:who|that|with|and)|\s*$)/i,
+];
+
+// Words to strip from the query (not useful for GitHub search)
+const FILLER_WORDS = new Set([
+  "developers", "developer", "engineers", "engineer", "devs", "dev",
+  "programmers", "programmer", "coders", "coder", "looking", "for",
+  "find", "search", "show", "me", "the", "best", "top", "senior",
+  "junior", "mid", "level", "experienced", "who", "that", "are",
+  "with", "and", "or", "a", "an", "hiring",
+]);
+
+// Parse a natural language search into structured GitHub query parts
+function parseNaturalQuery(raw: string): {
+  searchTerms: string[];
+  languages: string[];
+  location: string | null;
+} {
+  let text = raw.trim();
+  const languages: string[] = [];
+  let location: string | null = null;
+
+  // Extract location from patterns like "in San Francisco", "from Berlin"
+  for (const pattern of LOCATION_PATTERNS) {
+    const match = text.match(pattern);
+    if (match) {
+      location = match[1].trim().replace(/[,.]$/, "");
+      text = text.replace(match[0], " ").trim();
+      break;
+    }
+  }
+
+  // Tokenize remaining text and extract languages
+  const words = text.toLowerCase().split(/\s+/);
+  const remainingTerms: string[] = [];
+
+  for (const word of words) {
+    const clean = word.replace(/[,.:;!?]/g, "");
+    const aliased = LANGUAGE_ALIASES[clean] || clean;
+
+    if (KNOWN_LANGUAGES.has(aliased)) {
+      languages.push(aliased);
+    } else if (!FILLER_WORDS.has(clean) && clean.length > 1) {
+      remainingTerms.push(clean);
+    }
+  }
+
+  return { searchTerms: remainingTerms, languages, location };
+}
+
 // Build a GitHub users search query string from our filters
 function buildGitHubQuery(params: {
   q: string;
@@ -24,18 +93,38 @@ function buildGitHubQuery(params: {
 }): string {
   const parts: string[] = [];
 
-  // Main query — could be a name, keyword, or tech
-  if (params.q) parts.push(params.q);
+  // Parse natural language from the main query
+  const parsed = parseNaturalQuery(params.q);
 
-  if (params.languages && params.languages.length > 0) {
-    // GitHub search supports one language filter, use the first
-    parts.push(`language:${params.languages[0]}`);
+  // Add remaining search terms (names, keywords not recognized as language/location)
+  if (parsed.searchTerms.length > 0) {
+    parts.push(parsed.searchTerms.join(" "));
   }
-  if (params.location) {
-    parts.push(`location:"${params.location}"`);
+
+  // Merge languages: explicit filter + extracted from query
+  const allLanguages = [
+    ...(params.languages || []),
+    ...parsed.languages,
+  ];
+  const uniqueLanguages = [...new Set(allLanguages)];
+  if (uniqueLanguages.length > 0) {
+    // GitHub user search supports one language filter
+    parts.push(`language:${uniqueLanguages[0]}`);
   }
+
+  // Merge location: explicit filter takes priority, then extracted
+  const loc = params.location || parsed.location;
+  if (loc) {
+    parts.push(`location:"${loc}"`);
+  }
+
   if (params.minStars) {
     parts.push(`repos:>=${Math.max(1, Math.floor(params.minStars / 50))}`);
+  }
+
+  // If we have nothing useful, fall back to the raw query
+  if (parts.length === 0 && params.q) {
+    parts.push(params.q);
   }
 
   return parts.join(" ");
