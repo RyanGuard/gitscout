@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   MapPin,
   Building2,
@@ -16,6 +17,49 @@ import { formatNumber } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+
+  const developer = await prisma.developer.findUnique({
+    where: { username },
+    select: { name: true, username: true, bio: true, avatarUrl: true },
+  });
+
+  if (!developer) {
+    return {
+      title: "Developer Not Found — GitScout",
+      description: "This developer profile could not be found on GitScout.",
+    };
+  }
+
+  const displayName = developer.name || developer.username;
+  const title = `${displayName} (@${developer.username}) — GitScout`;
+  const description =
+    developer.bio || `Developer profile for ${developer.username} on GitScout`;
+  const avatarUrl =
+    developer.avatarUrl || `https://github.com/${developer.username}.png`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: avatarUrl }],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: [avatarUrl],
+    },
+  };
+}
 
 export default async function ProfilePage({
   params,

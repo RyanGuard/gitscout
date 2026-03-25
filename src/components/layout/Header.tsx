@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GitBranch } from "lucide-react";
+import { GitBranch, Search, ExternalLink } from "lucide-react";
 
 export function Header() {
   return (
@@ -7,22 +7,25 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <GitBranch className="h-6 w-6" />
-          <span>GitScout</span>
+          <span className="hidden sm:inline">GitScout</span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
+        <nav className="flex items-center gap-3 sm:gap-6 text-sm">
           <Link
             href="/search"
-            className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
           >
-            Search
+            <Search className="h-4 w-4 sm:hidden" />
+            <span>Search</span>
           </Link>
           <a
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
           >
-            GitHub
+            <span className="hidden sm:inline">GitHub</span>
+            <ExternalLink className="h-3.5 w-3.5 hidden sm:block" />
+            <span className="sm:hidden">GitHub</span>
           </a>
         </nav>
       </div>

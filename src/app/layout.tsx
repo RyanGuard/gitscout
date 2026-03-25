@@ -17,6 +17,22 @@ export const metadata: Metadata = {
   title: "GitScout - Discover Talented Developers",
   description:
     "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://gitscout.dev"
+  ),
+  openGraph: {
+    title: "GitScout - Discover Talented Developers",
+    description:
+      "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
+    siteName: "GitScout",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GitScout - Discover Talented Developers",
+    description:
+      "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
+  },
 };
 
 export default function RootLayout({

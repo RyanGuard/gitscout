@@ -1,9 +1,116 @@
 import { prisma } from "@/lib/prisma";
-import { computeScore } from "@/lib/scoring";
-import { fetchContributions } from "@/pipeline/graphql";
 import type { GitHubUser, GitHubRepo } from "@/types";
 
 const GITHUB_API = "https://api.github.com";
+
+// --- Rate Limit State ---
+
+let rateLimitRemaining = Infinity;
+let rateLimitReset = 0;
+let searchRateLimitRemaining = Infinity;
+let searchRateLimitReset = 0;
+
+function updateRateLimit(headers: Headers, isSearch = false) {
+  const remaining = headers.get("x-ratelimit-remaining");
+  const reset = headers.get("x-ratelimit-reset");
+
+  if (remaining !== null) {
+    const val = parseInt(remaining, 10);
+    if (isSearch) {
+      searchRateLimitRemaining = val;
+    } else {
+      rateLimitRemaining = val;
+    }
+    console.log(`[rate-limit] ${isSearch ? "search" : "core"} remaining: ${val}`);
+  }
+  if (reset !== null) {
+    const val = parseInt(reset, 10);
+    if (isSearch) {
+      searchRateLimitReset = val;
+    } else {
+      rateLimitReset = val;
+    }
+  }
+}
+
+async function waitForRateLimit(isSearch = false) {
+  const remaining = isSearch ? searchRateLimitRemaining : rateLimitRemaining;
+  const reset = isSearch ? searchRateLimitReset : rateLimitReset;
+
+  if (remaining < 10 && reset > 0) {
+    const waitMs = Math.max(0, reset * 1000 - Date.now()) + 1000;
+    console.log(`[rate-limit] ${isSearch ? "search" : "core"} low (${remaining}), waiting ${Math.ceil(waitMs / 1000)}s until reset`);
+    await new Promise((r) => setTimeout(r, waitMs));
+  }
+}
+
+// --- Retry Logic ---
+
+class GitHubApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public retryable: boolean,
+  ) {
+    super(message);
+    this.name = "GitHubApiError";
+  }
+}
+
+async function fetchWithRetry(
+  url: string,
+  options: { isSearch?: boolean } = {},
+): Promise<Response> {
+  const maxAttempts = 3;
+  const backoffBase = [1000, 3000, 9000];
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await waitForRateLimit(options.isSearch);
+
+    const res = await fetch(url, { headers: githubHeaders() });
+    updateRateLimit(res.headers, options.isSearch);
+
+    if (res.ok) return res;
+
+    // Rate limited — wait for reset and retry
+    if (res.status === 403 || res.status === 429) {
+      const resetHeader = res.headers.get("x-ratelimit-reset");
+      if (resetHeader) {
+        const resetTime = parseInt(resetHeader, 10);
+        const waitMs = Math.max(0, resetTime * 1000 - Date.now()) + 1000;
+        console.log(`[rate-limit] HTTP ${res.status}, waiting ${Math.ceil(waitMs / 1000)}s for reset`);
+        await new Promise((r) => setTimeout(r, waitMs));
+        continue;
+      }
+    }
+
+    // 404 — don't retry
+    if (res.status === 404) {
+      throw new GitHubApiError(`Not found: ${url}`, 404, false);
+    }
+
+    // 5xx — retry with backoff
+    if (res.status >= 500) {
+      if (attempt < maxAttempts - 1) {
+        const delay = backoffBase[attempt];
+        console.log(`[retry] HTTP ${res.status} on attempt ${attempt + 1}, retrying in ${delay}ms`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+    }
+
+    // Other errors — throw non-retryable
+    throw new GitHubApiError(
+      `GitHub API error ${res.status}: ${url}`,
+      res.status,
+      false,
+    );
+  }
+
+  throw new GitHubApiError(`All ${maxAttempts} attempts failed for: ${url}`, 0, false);
+}
+
+// --- GitHub API Functions ---
 
 function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
@@ -17,31 +124,54 @@ function githubHeaders(): HeadersInit {
 }
 
 async function fetchGitHubUser(username: string): Promise<GitHubUser | null> {
-  const res = await fetch(`${GITHUB_API}/users/${username}`, {
-    headers: githubHeaders(),
-  });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetchWithRetry(`${GITHUB_API}/users/${username}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof GitHubApiError && err.status === 404) return null;
+    throw err;
+  }
 }
 
 async function fetchGitHubRepos(username: string): Promise<GitHubRepo[]> {
-  const res = await fetch(
-    `${GITHUB_API}/users/${username}/repos?per_page=100&sort=stars&direction=desc`,
-    { headers: githubHeaders() }
-  );
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetchWithRetry(
+      `${GITHUB_API}/users/${username}/repos?per_page=100&sort=stars&direction=desc`,
+    );
+    return res.json();
+  } catch (err) {
+    if (err instanceof GitHubApiError && err.status === 404) return [];
+    throw err;
+  }
 }
 
-async function searchGitHubUsers(query: string): Promise<string[]> {
-  const res = await fetch(
-    `${GITHUB_API}/search/users?q=${encodeURIComponent(query)}&per_page=30`,
-    { headers: githubHeaders() }
-  );
-  if (!res.ok) return [];
-  const data = await res.json();
-  return (data.items || []).map((u: { login: string }) => u.login);
+async function searchGitHubUsers(
+  query: string,
+  pages = 1,
+): Promise<string[]> {
+  const allLogins: string[] = [];
+
+  for (let page = 1; page <= pages; page++) {
+    try {
+      const res = await fetchWithRetry(
+        `${GITHUB_API}/search/users?q=${encodeURIComponent(query)}&per_page=30&page=${page}`,
+        { isSearch: true },
+      );
+      const data = await res.json();
+      const logins = (data.items || []).map((u: { login: string }) => u.login);
+      allLogins.push(...logins);
+
+      if (logins.length < 30) break;
+    } catch (err) {
+      console.error(`[search] Failed to fetch page ${page}: ${err}`);
+      break;
+    }
+  }
+
+  return allLogins;
 }
+
+// --- Stats ---
 
 function computeLanguageStats(repos: GitHubRepo[]) {
   const langMap = new Map<string, { bytes: number; count: number }>();
@@ -65,6 +195,18 @@ function computeLanguageStats(repos: GitHubRepo[]) {
     .sort((a, b) => b.percentage - a.percentage);
 }
 
+function computeScore(user: GitHubUser, repos: GitHubRepo[]): number {
+  const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+  return (
+    totalStars * 2 +
+    user.followers * 1.5 +
+    user.public_repos * 0.5 +
+    (user.hireable ? 10 : 0)
+  );
+}
+
+// --- Sync Logic ---
+
 async function syncOneUser(username: string) {
   const user = await fetchGitHubUser(username);
   if (!user) return null;
@@ -73,17 +215,7 @@ async function syncOneUser(username: string) {
   const nonForkRepos = repos.filter((r) => !r.fork && !r.archived);
   const languageStats = computeLanguageStats(repos);
   const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
-
-  // Fetch commit data via GraphQL (falls back to null if no token or on error)
-  const contributions = await fetchContributions(username);
-
-  const {
-    score,
-    totalCommits,
-    recentActivity,
-    languageDiversity,
-    avgRepoQuality,
-  } = computeScore({ user, repos, contributions });
+  const score = computeScore(user, repos);
 
   const developer = await prisma.developer.upsert({
     where: { githubId: user.id },
@@ -104,10 +236,7 @@ async function syncOneUser(username: string) {
       hireable: user.hireable ?? false,
       primaryLanguage: languageStats[0]?.language ?? null,
       totalStars,
-      totalCommits,
-      recentActivity,
-      languageDiversity,
-      avgRepoQuality,
+      totalCommits: 0,
       score,
     },
     update: {
@@ -126,16 +255,12 @@ async function syncOneUser(username: string) {
       hireable: user.hireable ?? false,
       primaryLanguage: languageStats[0]?.language ?? null,
       totalStars,
-      totalCommits,
-      recentActivity,
-      languageDiversity,
-      avgRepoQuality,
       score,
       syncedAt: new Date(),
+      lastSyncError: null,
     },
   });
 
-  // Upsert languages
   for (const lang of languageStats) {
     await prisma.languageStat.upsert({
       where: {
@@ -159,7 +284,6 @@ async function syncOneUser(username: string) {
     });
   }
 
-  // Remove stale language entries
   const currentLanguages = languageStats.map((l) => l.language);
   await prisma.languageStat.deleteMany({
     where: {
@@ -168,7 +292,6 @@ async function syncOneUser(username: string) {
     },
   });
 
-  // Upsert repos (top 20 non-fork, non-archived)
   for (const repo of nonForkRepos.slice(0, 20)) {
     await prisma.repository.upsert({
       where: { githubId: repo.id },
@@ -203,9 +326,11 @@ async function syncOneUser(username: string) {
 export async function syncDevelopers({
   usernames,
   query,
+  pages,
 }: {
   usernames: string[];
   query?: string;
+  pages?: number;
 }) {
   const log = await prisma.syncLog.create({ data: {} });
   let synced = 0;
@@ -213,7 +338,7 @@ export async function syncDevelopers({
 
   const allUsernames = [...usernames];
   if (query) {
-    const searched = await searchGitHubUsers(query);
+    const searched = await searchGitHubUsers(query, pages ?? 1);
     allUsernames.push(...searched);
   }
 
@@ -221,21 +346,31 @@ export async function syncDevelopers({
 
   for (const username of unique) {
     try {
-      await syncOneUser(username);
-      synced++;
-    } catch {
+      const result = await syncOneUser(username);
+      if (result) {
+        synced++;
+      } else {
+        errors++;
+        await prisma.developer.updateMany({
+          where: { username },
+          data: { lastSyncError: `User not found: ${username}` },
+        });
+      }
+    } catch (err) {
       errors++;
-    }
-    // Rate limit: 1 second between users
-    if (unique.indexOf(username) < unique.length - 1) {
-      await new Promise((r) => setTimeout(r, 1000));
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[sync] Failed to sync ${username}: ${message}`);
+      await prisma.developer.updateMany({
+        where: { username },
+        data: { lastSyncError: message },
+      }).catch(() => {});
     }
   }
 
   await prisma.syncLog.update({
     where: { id: log.id },
     data: {
-      status: "completed",
+      status: errors > 0 && synced === 0 ? "failed" : "completed",
       developers: synced,
       errors,
       completedAt: new Date(),

@@ -14,7 +14,7 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
   return (
     <Link
       href={`/profile/${developer.username}`}
-      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all hover:border-blue-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600"
+      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600"
     >
       <div className="flex items-start gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}

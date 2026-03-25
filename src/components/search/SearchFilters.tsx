@@ -18,23 +18,30 @@ const POPULAR_LANGUAGES = [
   "C#",
 ];
 
-interface SearchFiltersProps {
-  onFilterChange: (filters: {
-    languages?: string[];
-    location?: string;
-    minStars?: number;
-    hireable?: boolean;
-    sort?: string;
-  }) => void;
+interface FilterValues {
+  languages?: string[];
+  location?: string;
+  minStars?: number;
+  hireable?: boolean;
+  sort?: string;
 }
 
-export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
+interface SearchFiltersProps {
+  onFilterChange: (filters: FilterValues) => void;
+  defaultValues?: FilterValues;
+}
+
+export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersProps) {
   const [open, setOpen] = useState(false);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [location, setLocation] = useState("");
-  const [minStars, setMinStars] = useState("");
-  const [hireable, setHireable] = useState(false);
-  const [sort, setSort] = useState("score");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
+    defaultValues?.languages || []
+  );
+  const [location, setLocation] = useState(defaultValues?.location || "");
+  const [minStars, setMinStars] = useState(
+    defaultValues?.minStars ? String(defaultValues.minStars) : ""
+  );
+  const [hireable, setHireable] = useState(defaultValues?.hireable || false);
+  const [sort, setSort] = useState(defaultValues?.sort || "score");
 
   function apply() {
     onFilterChange({
@@ -61,6 +68,9 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
     onFilterChange({});
   }
 
+  const hasActiveFilters =
+    selectedLanguages.length > 0 || location || minStars || hireable;
+
   return (
     <div className="w-full">
       <button
@@ -69,9 +79,9 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filters
-        {selectedLanguages.length > 0 && (
+        {hasActiveFilters && (
           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-            {selectedLanguages.length}
+            {selectedLanguages.length + (location ? 1 : 0) + (minStars ? 1 : 0) + (hireable ? 1 : 0)}
           </span>
         )}
       </button>
@@ -84,7 +94,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             </h3>
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-700"
+              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-700 transition-colors"
             >
               <X className="h-3 w-3" /> Clear all
             </button>
@@ -112,7 +122,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
                   Location
@@ -122,7 +132,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. San Francisco"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 dark:border-neutral-700"
+                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
                 />
               </div>
               <div>
@@ -134,12 +144,12 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                   value={minStars}
                   onChange={(e) => setMinStars(e.target.value)}
                   placeholder="e.g. 100"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 dark:border-neutral-700"
+                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -158,7 +168,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="rounded-lg border border-neutral-200 bg-transparent px-2 py-1 text-sm outline-none dark:border-neutral-700"
+                  className="rounded-lg border border-neutral-200 bg-transparent px-2 py-1 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
                 >
                   <option value="score">Relevance</option>
                   <option value="stars">Stars</option>

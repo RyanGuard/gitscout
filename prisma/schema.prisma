@@ -33,6 +33,7 @@ model Developer {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   syncedAt        DateTime @default(now())
+  lastSyncError   String?
 
   languages    LanguageStat[]
   repositories Repository[]

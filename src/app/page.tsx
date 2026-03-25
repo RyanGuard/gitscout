@@ -27,19 +27,19 @@ export default function Home() {
     <div className="flex flex-1 flex-col items-center justify-center px-4">
       <div className="w-full max-w-3xl text-center">
         <div className="mb-6 flex items-center justify-center gap-3">
-          <GitBranch className="h-12 w-12" />
-          <h1 className="text-5xl font-bold tracking-tight">GitScout</h1>
+          <GitBranch className="h-10 w-10 sm:h-12 sm:w-12" />
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">GitScout</h1>
         </div>
-        <p className="mb-8 text-lg text-neutral-600 dark:text-neutral-400">
+        <p className="mb-8 text-base text-neutral-600 sm:text-lg dark:text-neutral-400">
           Discover talented developers. Search by language, location, or expertise.
         </p>
 
-        <div className="flex justify-center mb-12">
+        <div className="mx-auto mb-12 w-full max-w-2xl">
           <SearchInput onSearch={handleSearch} />
         </div>
 
         {stats && stats.totalDevelopers > 0 && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:grid-cols-4">
             <StatCard
               label="Developers"
               value={formatNumber(stats.totalDevelopers)}
@@ -63,14 +63,14 @@ export default function Home() {
           </div>
         )}
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3 text-sm text-neutral-500">
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-sm text-neutral-500 sm:gap-3">
           <span>Try:</span>
           {["rust developers", "San Francisco", "machine learning", "TypeScript"].map(
             (term) => (
               <button
                 key={term}
                 onClick={() => handleSearch(term)}
-                className="rounded-full border border-neutral-200 px-3 py-1 transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-neutral-700"
+                className="rounded-full border border-neutral-200 px-3 py-1 transition-all duration-200 hover:border-blue-300 hover:text-blue-600 hover:-translate-y-px dark:border-neutral-700"
               >
                 {term}
               </button>
