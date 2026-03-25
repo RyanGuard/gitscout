@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveDeveloperId } from "@/lib/resolveDevId";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -30,9 +31,20 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { developerId } = await request.json();
-  if (!developerId) {
+  const { developerId: rawDevId } = await request.json();
+  if (!rawDevId) {
     return Response.json({ error: "developerId required" }, { status: 400 });
+  }
+
+  // Auto-index GitHub-only profiles (gh-XXXX) before favoriting
+  let developerId: string;
+  try {
+    developerId = await resolveDeveloperId(rawDevId);
+  } catch (err) {
+    return Response.json(
+      { error: err instanceof Error ? err.message : "Failed to resolve developer" },
+      { status: 400 }
+    );
   }
 
   const favorite = await prisma.favorite.create({

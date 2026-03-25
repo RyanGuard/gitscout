@@ -270,9 +270,10 @@ function computeConfidence(input: ScoringInput): { confidence: "high" | "medium"
     return { confidence: "high", modifier: 1.0 };
   }
   if (input.publicRepos >= 5 && input.totalContributions >= 50) {
-    return { confidence: "medium", modifier: 0.75 };
+    return { confidence: "medium", modifier: 0.9 };
   }
-  return { confidence: "low", modifier: 0.5 };
+  // Low confidence = estimated, but don't crush the score
+  return { confidence: "low", modifier: 0.75 };
 }
 
 // ═══ TIER ASSIGNMENT ═══

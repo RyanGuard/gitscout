@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveDeveloperId } from "@/lib/resolveDevId";
 
 const VALID_STAGES = ["identified", "enriched", "contacted", "replied", "interested", "passed"];
 
@@ -22,9 +23,20 @@ export async function POST(
     return Response.json({ error: "List not found" }, { status: 404 });
   }
 
-  const { developerId, stage, tags } = await request.json();
-  if (!developerId) {
+  const { developerId: rawDevId, stage, tags } = await request.json();
+  if (!rawDevId) {
     return Response.json({ error: "developerId is required" }, { status: 400 });
+  }
+
+  // Auto-index GitHub-only profiles (gh-XXXX) before adding to list
+  let developerId: string;
+  try {
+    developerId = await resolveDeveloperId(rawDevId);
+  } catch (err) {
+    return Response.json(
+      { error: err instanceof Error ? err.message : "Failed to resolve developer" },
+      { status: 400 }
+    );
   }
 
   if (stage && !VALID_STAGES.includes(stage)) {

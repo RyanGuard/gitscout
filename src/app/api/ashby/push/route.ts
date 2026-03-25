@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createCandidate, createApplication } from "@/lib/ashby";
+import { resolveDeveloperId } from "@/lib/resolveDevId";
 
 // POST — push a developer to Ashby as a candidate
 export async function POST(request: Request) {
@@ -24,6 +25,17 @@ export async function POST(request: Request) {
     );
   }
 
+  // Auto-index GitHub-only profiles (gh-XXXX) before pushing
+  let resolvedId: string;
+  try {
+    resolvedId = await resolveDeveloperId(developerId);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to resolve developer" },
+      { status: 400 }
+    );
+  }
+
   const connection = await prisma.ashbyConnection.findUnique({
     where: { userId: session.user.id },
   });
@@ -36,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   const developer = await prisma.developer.findUnique({
-    where: { id: developerId },
+    where: { id: resolvedId },
     include: { contactInfo: true },
   });
 

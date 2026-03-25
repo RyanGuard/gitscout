@@ -222,9 +222,9 @@ function computeConfidence(
     return { value: 1.0, label: "high" };
   }
   if (nonFork.length >= 5 && totalContribs >= 50) {
-    return { value: 0.75, label: "medium" };
+    return { value: 0.9, label: "medium" };
   }
-  return { value: 0.5, label: "low" };
+  return { value: 0.75, label: "low" };
 }
 
 // ═══════════════════════════════════════════════════════

@@ -1,0 +1,71 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "GitScout" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e5]
+        - generic [ref=e9]: GitScout
+      - navigation [ref=e10]:
+        - link "Search" [ref=e11] [cursor=pointer]:
+          - /url: /search
+          - generic [ref=e12]: Search
+        - link "Match" [ref=e13] [cursor=pointer]:
+          - /url: /match
+          - generic [ref=e14]: Match
+        - link "Lists" [ref=e15] [cursor=pointer]:
+          - /url: /lists
+          - generic [ref=e16]: Lists
+        - button "Sign in" [ref=e17]:
+          - img [ref=e18]
+          - text: Sign in
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - img [ref=e24]
+        - textbox "Search developers — try 'rust engineers in San Francisco' or 'karpathy'" [ref=e27]
+        - generic [ref=e28]:
+          - generic [ref=e29]: ⌘K
+          - button "Search" [ref=e30]
+      - complementary [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Filters" [level=3] [ref=e35]
+          - generic [ref=e36]:
+            - text: Sort by
+            - generic [ref=e37]:
+              - button "Score" [ref=e38]
+              - button "Followers" [ref=e39]
+              - button "Stars" [ref=e40]
+              - button "Newest" [ref=e41]
+          - generic [ref=e42]:
+            - text: Languages
+            - generic [ref=e43]:
+              - button "TypeScript" [ref=e44]
+              - button "JavaScript" [ref=e45]
+              - button "Python" [ref=e46]
+              - button "Rust" [ref=e47]
+              - button "Go" [ref=e48]
+              - button "Java" [ref=e49]
+              - button "C++" [ref=e50]
+              - button "Ruby" [ref=e51]
+              - button "PHP" [ref=e52]
+              - button "Swift" [ref=e53]
+              - button "Kotlin" [ref=e54]
+              - button "C#" [ref=e55]
+              - button "Scala" [ref=e56]
+              - button "Elixir" [ref=e57]
+          - generic [ref=e58]:
+            - text: Location
+            - textbox "e.g. San Francisco" [ref=e59]
+          - generic [ref=e60]:
+            - text: Min Stars
+            - spinbutton [ref=e61]
+          - generic [ref=e63] [cursor=pointer]:
+            - checkbox "Open to work only" [ref=e64]
+            - text: Open to work only
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]
+  - alert [ref=e75]
+```

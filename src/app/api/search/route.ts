@@ -161,6 +161,35 @@ const ROLE_TO_LANGUAGES: Record<string, string[]> = {
   platform: ["go", "python", "java"],
 };
 
+// Role keywords → search terms to inject back into the GitHub query
+// (so "frontend engineer" doesn't become empty after stripping role + filler words)
+const ROLE_SEARCH_TERMS: Record<string, string> = {
+  frontend: "frontend",
+  "front-end": "frontend",
+  fullstack: "fullstack",
+  "full-stack": "fullstack",
+  backend: "backend",
+  "back-end": "backend",
+  mobile: "mobile",
+  ios: "ios",
+  android: "android",
+  devops: "devops",
+  infrastructure: "infrastructure",
+  infra: "infrastructure",
+  sre: "sre",
+  ml: "machine learning",
+  "machine learning": "machine learning",
+  ai: "artificial intelligence",
+  data: "data",
+  "data science": "data science",
+  systems: "systems",
+  embedded: "embedded",
+  blockchain: "blockchain",
+  web3: "web3",
+  security: "security",
+  platform: "platform",
+};
+
 // Words to strip from the query (not useful for GitHub search)
 const FILLER_WORDS = new Set([
   "developers", "developer", "engineers", "engineer", "devs", "dev",
@@ -177,6 +206,7 @@ function parseNaturalQuery(raw: string): {
   languages: string[];
   location: string | null;
   roleDetected: string | null;
+  roleSearchTerm: string | null;
   minFollowers: number;
 } {
   let text = raw.trim();
@@ -239,7 +269,10 @@ function parseNaturalQuery(raw: string): {
     }
   }
 
-  return { searchTerms: remainingTerms, languages, location, roleDetected, minFollowers };
+  // If a role was detected, grab its search term so we can inject it back into the query
+  const roleSearchTerm = roleDetected ? (ROLE_SEARCH_TERMS[roleDetected] || roleDetected) : null;
+
+  return { searchTerms: remainingTerms, languages, location, roleDetected, roleSearchTerm, minFollowers };
 }
 
 // Build a GitHub users search query string from our filters
@@ -258,6 +291,10 @@ function buildGitHubQuery(params: {
   // Add remaining search terms (names, keywords not recognized as language/location)
   if (parsed.searchTerms.length > 0) {
     parts.push(parsed.searchTerms.join(" "));
+  } else if (parsed.roleSearchTerm) {
+    // Role-only query (e.g. "frontend engineer") — inject the role keyword back
+    // so GitHub has something to search on beyond just language + followers filters
+    parts.push(parsed.roleSearchTerm);
   }
 
   // Merge languages: explicit filter + extracted from query
@@ -480,7 +517,10 @@ export async function GET(request: Request) {
       return { ...githubUserToProfile(full), source: "github" as const };
     }
 
-    // Minimal profile from search result (no bio, no followers count, etc.)
+    // Minimal profile from search result (no full data available)
+    // Use search position as a weak relevance signal (GitHub sorts by best match)
+    const positionIndex = githubUsers.indexOf(ghUser);
+    const positionScore = Math.max(5, 25 - positionIndex);
     return {
       id: `gh-${ghUser.id}`,
       githubId: ghUser.id,
@@ -500,7 +540,8 @@ export async function GET(request: Request) {
       primaryLanguage: null as string | null,
       totalCommits: 0,
       totalStars: 0,
-      score: 0,
+      score: positionScore,
+      tier: "Limited Data",
       languages: [] as { language: string; bytes: number; repoCount: number; percentage: number }[],
       repositories: [] as { id: string; name: string; fullName: string; description: string | null; language: string | null; stars: number; forks: number; topics: string[]; pushedAt: string | null }[],
       source: "github" as const,
