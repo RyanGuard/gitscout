@@ -14,10 +14,141 @@ import { Badge } from "@/components/ui/Badge";
 import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
 import { FavoriteButton } from "@/components/auth/FavoriteButton";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { GitHubUser, GitHubRepo } from "@/types";
+
+const GITHUB_API = "https://api.github.com";
+
+function githubHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "GitScout/1.0",
+  };
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+  return headers;
+}
+
+// Fetch a developer: local DB first, then GitHub live
+async function getDeveloper(username: string) {
+  // Check local DB first
+  const local = await prisma.developer.findUnique({
+    where: { username },
+    include: {
+      languages: { orderBy: { percentage: "desc" } },
+      repositories: { orderBy: { stars: "desc" } },
+    },
+  });
+
+  if (local) {
+    return {
+      source: "local" as const,
+      id: local.id,
+      githubId: local.githubId,
+      username: local.username,
+      name: local.name,
+      email: local.email,
+      avatarUrl: local.avatarUrl,
+      bio: local.bio,
+      company: local.company,
+      location: local.location,
+      blog: local.blog,
+      twitterUsername: local.twitterUsername,
+      publicRepos: local.publicRepos,
+      followers: local.followers,
+      following: local.following,
+      hireable: local.hireable,
+      primaryLanguage: local.primaryLanguage,
+      totalCommits: local.totalCommits,
+      totalStars: local.totalStars,
+      score: local.score,
+      languages: local.languages,
+      repositories: local.repositories.map((r) => ({
+        id: r.id,
+        name: r.name,
+        fullName: r.fullName,
+        description: r.description,
+        language: r.language,
+        stars: r.stars,
+        forks: r.forks,
+        topics: r.topics,
+        pushedAt: r.pushedAt?.toISOString() ?? null,
+      })),
+    };
+  }
+
+  // Not in DB — fetch live from GitHub
+  const [userRes, reposRes] = await Promise.all([
+    fetch(`${GITHUB_API}/users/${username}`, { headers: githubHeaders(), next: { revalidate: 300 } }),
+    fetch(`${GITHUB_API}/users/${username}/repos?per_page=20&sort=stars&direction=desc`, { headers: githubHeaders(), next: { revalidate: 300 } }),
+  ]);
+
+  if (!userRes.ok) return null;
+
+  const user: GitHubUser = await userRes.json();
+  const repos: GitHubRepo[] = reposRes.ok ? await reposRes.json() : [];
+  const nonForkRepos = repos.filter((r) => !r.fork && !r.archived);
+
+  // Compute language stats from repos
+  const langMap = new Map<string, { count: number; stars: number }>();
+  for (const repo of nonForkRepos) {
+    if (!repo.language) continue;
+    const existing = langMap.get(repo.language) || { count: 0, stars: 0 };
+    existing.count++;
+    existing.stars += repo.stargazers_count;
+    langMap.set(repo.language, existing);
+  }
+  const totalWeight = Array.from(langMap.values()).reduce((s, v) => s + v.stars + v.count, 0);
+  const languages = Array.from(langMap.entries())
+    .map(([language, { count, stars }]) => ({
+      language,
+      bytes: stars * 1000 + count * 1000,
+      repoCount: count,
+      percentage: totalWeight > 0 ? ((stars + count) / totalWeight) * 100 : 0,
+    }))
+    .sort((a, b) => b.percentage - a.percentage);
+
+  const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+
+  return {
+    source: "github" as const,
+    id: `gh-${user.id}`,
+    githubId: user.id,
+    username: user.login,
+    name: user.name,
+    email: user.email,
+    avatarUrl: user.avatar_url,
+    bio: user.bio,
+    company: user.company,
+    location: user.location,
+    blog: user.blog,
+    twitterUsername: user.twitter_username,
+    publicRepos: user.public_repos,
+    followers: user.followers,
+    following: user.following,
+    hireable: user.hireable ?? false,
+    primaryLanguage: languages[0]?.language ?? null,
+    totalCommits: 0,
+    totalStars: totalStars,
+    score: 0,
+    languages,
+    repositories: nonForkRepos.slice(0, 20).map((r) => ({
+      id: String(r.id),
+      name: r.name,
+      fullName: r.full_name,
+      description: r.description,
+      language: r.language,
+      stars: r.stargazers_count,
+      forks: r.forks_count,
+      topics: r.topics,
+      pushedAt: r.pushed_at,
+    })),
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -26,10 +157,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username } = await params;
 
-  const developer = await prisma.developer.findUnique({
-    where: { username },
-    select: { name: true, username: true, bio: true, avatarUrl: true },
-  });
+  const developer = await getDeveloper(username);
 
   if (!developer) {
     return {
@@ -68,14 +196,7 @@ export default async function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-
-  const developer = await prisma.developer.findUnique({
-    where: { username },
-    include: {
-      languages: { orderBy: { percentage: "desc" } },
-      repositories: { orderBy: { stars: "desc" } },
-    },
-  });
+  const developer = await getDeveloper(username);
 
   if (!developer) notFound();
 
@@ -87,6 +208,13 @@ export default async function ProfilePage({
       >
         &larr; Back to search
       </Link>
+
+      {/* Source badge */}
+      {developer.source === "github" && (
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+          Live from GitHub — this developer hasn&apos;t been indexed yet. Data may be limited.
+        </div>
+      )}
 
       {/* Profile header */}
       <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
@@ -105,6 +233,11 @@ export default async function ProfilePage({
               {developer.hireable && (
                 <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   Hireable
+                </Badge>
+              )}
+              {developer.score > 0 && (
+                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  Score: {developer.score}
                 </Badge>
               )}
             </div>
@@ -173,15 +306,19 @@ export default async function ProfilePage({
               </span>
             </div>
 
-            <a
-              href={`https://github.com/${developer.username}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-            >
-              View on GitHub <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-            <FavoriteButton developerId={developer.id} className="mt-0" />
+            <div className="mt-4 flex gap-2">
+              <a
+                href={`https://github.com/${developer.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+              >
+                View on GitHub <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+              {developer.source === "local" && (
+                <FavoriteButton developerId={developer.id} />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -204,13 +341,7 @@ export default async function ProfilePage({
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {developer.repositories.map((repo) => (
-              <RepoCard
-                key={repo.id}
-                repo={{
-                  ...repo,
-                  pushedAt: repo.pushedAt?.toISOString() ?? null,
-                }}
-              />
+              <RepoCard key={repo.id} repo={repo} />
             ))}
           </div>
         </div>
