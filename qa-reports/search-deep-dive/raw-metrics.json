@@ -1,0 +1,1731 @@
+[
+  {
+    "testId": 1,
+    "testName": "TypeScript developers in San Francisco",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco"
+    },
+    "loadTimeMs": 1324,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 47.3,
+    "medianDevScore": 49.9,
+    "minDevScore": 23.7,
+    "maxDevScore": 63.3,
+    "tierDistribution": {
+      "Solid": 2,
+      "Emerging": 14,
+      "Limited Data": 4
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 9,
+    "hireableCount": 1,
+    "avgFollowers": 1584,
+    "avgStars": 13049,
+    "avgRepos": 71,
+    "languageDistribution": {
+      "JavaScript": 2,
+      "Jupyter Notebook": 1,
+      "Python": 1,
+      "TypeScript": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 18,
+      "local": 2
+    },
+    "topDevelopers": [
+      {
+        "username": "oktadev",
+        "score": 63.3,
+        "tier": "Solid",
+        "followers": 514,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alchemyplatform",
+        "score": 61.4,
+        "tier": "Solid",
+        "followers": 1031,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mahseema",
+        "score": 56,
+        "tier": "Emerging",
+        "followers": 6315,
+        "location": "San Francisco"
+      },
+      {
+        "username": "alxhub",
+        "score": 55.3,
+        "tier": "Emerging",
+        "followers": 1221,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "voiceflow",
+        "score": 55.1,
+        "tier": "Emerging",
+        "followers": 324,
+        "location": "San Francisco, CA"
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"typescript\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 2,
+    "testName": "Python developers in Austin",
+    "query": "Python developers in Austin",
+    "queryParams": {
+      "q": "Python developers in Austin"
+    },
+    "loadTimeMs": 629,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 53.8,
+    "medianDevScore": 52.1,
+    "minDevScore": 44.6,
+    "maxDevScore": 65.6,
+    "tierDistribution": {
+      "Solid": 4,
+      "Emerging": 16
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 12,
+    "companyCount": 13,
+    "hireableCount": 6,
+    "avgFollowers": 1079,
+    "avgStars": 0,
+    "avgRepos": 101,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "ContinuumIO",
+        "score": 65.6,
+        "tier": "Solid",
+        "followers": 2834,
+        "location": "Austin, TX"
+      },
+      {
+        "username": "JessicaSachs",
+        "score": 63.9,
+        "tier": "Solid",
+        "followers": 1616,
+        "location": "Austin, TX"
+      },
+      {
+        "username": "mrocklin",
+        "score": 63.5,
+        "tier": "Solid",
+        "followers": 1861,
+        "location": "Austin, TX"
+      },
+      {
+        "username": "pry0cc",
+        "score": 60.3,
+        "tier": "Solid",
+        "followers": 1423,
+        "location": "Austin, TX"
+      },
+      {
+        "username": "ruotianluo",
+        "score": 59.6,
+        "tier": "Emerging",
+        "followers": 1498,
+        "location": "Austin"
+      }
+    ],
+    "issues": [
+      "Only 0/20 (0%) match expected language \"python\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 3,
+    "testName": "Rust developers in Berlin",
+    "query": "Rust developers in Berlin",
+    "queryParams": {
+      "q": "Rust developers in Berlin"
+    },
+    "loadTimeMs": 463,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 70,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 51.9,
+    "medianDevScore": 50.3,
+    "minDevScore": 33.2,
+    "maxDevScore": 64.8,
+    "tierDistribution": {
+      "Solid": 7,
+      "Emerging": 12,
+      "Limited Data": 1
+    },
+    "emailCount": 6,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 7,
+    "hireableCount": 4,
+    "avgFollowers": 684,
+    "avgStars": 0,
+    "avgRepos": 162,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "jamesmunns",
+        "score": 64.8,
+        "tier": "Solid",
+        "followers": 1128,
+        "location": "Berlin, DE"
+      },
+      {
+        "username": "skade",
+        "score": 64.3,
+        "tier": "Solid",
+        "followers": 775,
+        "location": "Berlin"
+      },
+      {
+        "username": "withoutboats",
+        "score": 63.9,
+        "tier": "Solid",
+        "followers": 2047,
+        "location": "Berlin"
+      },
+      {
+        "username": "spacejam",
+        "score": 63.5,
+        "tier": "Solid",
+        "followers": 2514,
+        "location": "Berlin"
+      },
+      {
+        "username": "XAMPPRocky",
+        "score": 61,
+        "tier": "Solid",
+        "followers": 766,
+        "location": "Berlin"
+      }
+    ],
+    "issues": [
+      "Only 0/20 (0%) match expected language \"rust\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 4,
+    "testName": "Go developers in Seattle",
+    "query": "Go developers in Seattle",
+    "queryParams": {
+      "q": "Go developers in Seattle"
+    },
+    "loadTimeMs": 631,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 358,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 55.9,
+    "medianDevScore": 56.8,
+    "minDevScore": 20.8,
+    "maxDevScore": 76.5,
+    "tierDistribution": {
+      "Strong": 1,
+      "Solid": 5,
+      "Emerging": 13,
+      "Limited Data": 1
+    },
+    "emailCount": 13,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 14,
+    "hireableCount": 4,
+    "avgFollowers": 2123,
+    "avgStars": 155,
+    "avgRepos": 185,
+    "languageDistribution": {
+      "Go": 2,
+      "C": 1
+    },
+    "sourceDistribution": {
+      "github": 19,
+      "local": 1
+    },
+    "topDevelopers": [
+      {
+        "username": "schollz",
+        "score": 76.5,
+        "tier": "Strong",
+        "followers": 3555,
+        "location": "Seattle, WA"
+      },
+      {
+        "username": "ahmetb",
+        "score": 71.6,
+        "tier": "Solid",
+        "followers": 8798,
+        "location": "Seattle, WA"
+      },
+      {
+        "username": "d4l3k",
+        "score": 64.7,
+        "tier": "Solid",
+        "followers": 632,
+        "location": "Seattle/Vancouver"
+      },
+      {
+        "username": "ashleymcnamara",
+        "score": 64.3,
+        "tier": "Solid",
+        "followers": 1939,
+        "location": "Seattle"
+      },
+      {
+        "username": "brendandburns",
+        "score": 61.9,
+        "tier": "Solid",
+        "followers": 3361,
+        "location": "Seattle, WA"
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"go\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 5,
+    "testName": "React developers in New York",
+    "query": "React developers in New York",
+    "queryParams": {
+      "q": "React developers in New York"
+    },
+    "loadTimeMs": 515,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 61.3,
+    "medianDevScore": 62.2,
+    "minDevScore": 53,
+    "maxDevScore": 70.6,
+    "tierDistribution": {
+      "Solid": 12,
+      "Emerging": 8
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 13,
+    "hireableCount": 1,
+    "avgFollowers": 6009,
+    "avgStars": 0,
+    "avgRepos": 110,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "jaredpalmer",
+        "score": 70.6,
+        "tier": "Solid",
+        "followers": 10256,
+        "location": "New York, NY"
+      },
+      {
+        "username": "acdlite",
+        "score": 68.3,
+        "tier": "Solid",
+        "followers": 14909,
+        "location": "New York"
+      },
+      {
+        "username": "jxnblk",
+        "score": 67.8,
+        "tier": "Solid",
+        "followers": 6096,
+        "location": "New York City"
+      },
+      {
+        "username": "shiffman",
+        "score": 67.4,
+        "tier": "Solid",
+        "followers": 19510,
+        "location": "New York, NY"
+      },
+      {
+        "username": "tmcw",
+        "score": 66.8,
+        "tier": "Solid",
+        "followers": 3699,
+        "location": "brooklyn new york"
+      }
+    ],
+    "issues": [
+      "Only 0/20 (0%) match expected language \"javascript\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 6,
+    "testName": "Machine learning engineers",
+    "query": "machine learning engineers",
+    "queryParams": {
+      "q": "machine learning engineers"
+    },
+    "loadTimeMs": 551,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 3,
+    "matchQuality": "Weak",
+    "avgDevScore": 56.8,
+    "medianDevScore": 59,
+    "minDevScore": 10.6,
+    "maxDevScore": 68.4,
+    "tierDistribution": {
+      "Solid": 8,
+      "Emerging": 10,
+      "Limited Data": 2
+    },
+    "emailCount": 5,
+    "locationCount": 12,
+    "bioCount": 20,
+    "companyCount": 9,
+    "hireableCount": 4,
+    "avgFollowers": 5485,
+    "avgStars": 4,
+    "avgRepos": 171,
+    "languageDistribution": {
+      "Python": 2
+    },
+    "sourceDistribution": {
+      "github": 19,
+      "local": 1
+    },
+    "topDevelopers": [
+      {
+        "username": "ogrisel",
+        "score": 68.4,
+        "tier": "Solid",
+        "followers": 4920,
+        "location": "Paris, France"
+      },
+      {
+        "username": "ageron",
+        "score": 67.5,
+        "tier": "Solid",
+        "followers": 17241,
+        "location": "Auckland"
+      },
+      {
+        "username": "jindongwang",
+        "score": 66.7,
+        "tier": "Solid",
+        "followers": 5307,
+        "location": "Beijing, China"
+      },
+      {
+        "username": "omarsar",
+        "score": 66.2,
+        "tier": "Solid",
+        "followers": 4110,
+        "location": null
+      },
+      {
+        "username": "Germey",
+        "score": 65.9,
+        "tier": "Solid",
+        "followers": 7848,
+        "location": null
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"python\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 7,
+    "testName": "Developers in Buenos Aires",
+    "query": "developers in Buenos Aires",
+    "queryParams": {
+      "q": "developers in Buenos Aires"
+    },
+    "loadTimeMs": 413,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 7,
+    "matchQuality": "Good",
+    "avgDevScore": 54.7,
+    "medianDevScore": 54.9,
+    "minDevScore": 39.5,
+    "maxDevScore": 72.5,
+    "tierDistribution": {
+      "Solid": 4,
+      "Emerging": 15,
+      "Limited Data": 1
+    },
+    "emailCount": 11,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 9,
+    "hireableCount": 4,
+    "avgFollowers": 1415,
+    "avgStars": 0,
+    "avgRepos": 121,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "goncy",
+        "score": 72.5,
+        "tier": "Solid",
+        "followers": 4963,
+        "location": "Quilmes, Buenos Aires, Argentina"
+      },
+      {
+        "username": "bevacqua",
+        "score": 66.4,
+        "tier": "Solid",
+        "followers": 4841,
+        "location": "Buenos Aires, Argentina"
+      },
+      {
+        "username": "lambdaclass",
+        "score": 63.7,
+        "tier": "Solid",
+        "followers": 754,
+        "location": "Buenos Aires, Argentina"
+      },
+      {
+        "username": "gvolpe",
+        "score": 60.3,
+        "tier": "Solid",
+        "followers": 892,
+        "location": "Buenos Aires, Argentina"
+      },
+      {
+        "username": "andresriancho",
+        "score": 59.8,
+        "tier": "Emerging",
+        "followers": 984,
+        "location": "Buenos Aires, Argentina"
+      }
+    ],
+    "issues": [],
+    "notes": ""
+  },
+  {
+    "testId": 8,
+    "testName": "Empty search",
+    "query": "",
+    "queryParams": {
+      "q": ""
+    },
+    "loadTimeMs": 251,
+    "httpStatus": 200,
+    "resultCount": 0,
+    "totalAvailable": 0,
+    "relevanceScore": 10,
+    "matchQuality": "Excellent",
+    "avgDevScore": 0,
+    "medianDevScore": 0,
+    "minDevScore": 0,
+    "maxDevScore": 0,
+    "tierDistribution": {},
+    "emailCount": 0,
+    "locationCount": 0,
+    "bioCount": 0,
+    "companyCount": 0,
+    "hireableCount": 0,
+    "avgFollowers": 0,
+    "avgStars": 0,
+    "avgRepos": 0,
+    "languageDistribution": {},
+    "sourceDistribution": {},
+    "topDevelopers": [],
+    "issues": [],
+    "notes": "Correctly returns empty results for empty query"
+  },
+  {
+    "testId": 9,
+    "testName": "JavaScript developers (comparison)",
+    "query": "javascript developers",
+    "queryParams": {
+      "q": "javascript developers"
+    },
+    "loadTimeMs": 578,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 6,
+    "matchQuality": "Fair",
+    "avgDevScore": 63.2,
+    "medianDevScore": 71.4,
+    "minDevScore": 20.8,
+    "maxDevScore": 79.5,
+    "tierDistribution": {
+      "Strong": 7,
+      "Solid": 9,
+      "Limited Data": 4
+    },
+    "emailCount": 12,
+    "locationCount": 16,
+    "bioCount": 15,
+    "companyCount": 11,
+    "hireableCount": 6,
+    "avgFollowers": 56330,
+    "avgStars": 5407,
+    "avgRepos": 282,
+    "languageDistribution": {
+      "TypeScript": 9,
+      "C": 1,
+      "JavaScript": 12,
+      "CSS": 5,
+      "HTML": 3,
+      "Lua": 2,
+      "Rust": 1,
+      "Java": 1,
+      "PHP": 2,
+      "Vue": 1,
+      "Dockerfile": 1,
+      "Swift": 1,
+      "Kotlin": 1,
+      "Go": 2,
+      "Makefile": 1,
+      "Shell": 1,
+      "Elm": 1
+    },
+    "sourceDistribution": {
+      "github": 12,
+      "local": 8
+    },
+    "topDevelopers": [
+      {
+        "username": "lucidrains",
+        "score": 79.5,
+        "tier": "Strong",
+        "followers": 58919,
+        "location": "San Francisco"
+      },
+      {
+        "username": "addyosmani",
+        "score": 78.2,
+        "tier": "Strong",
+        "followers": 45399,
+        "location": "Mountain View, California"
+      },
+      {
+        "username": "antfu",
+        "score": 78,
+        "tier": "Strong",
+        "followers": 38969,
+        "location": "undefined"
+      },
+      {
+        "username": "adrianhajdin",
+        "score": 77.3,
+        "tier": "Strong",
+        "followers": 36516,
+        "location": "Croatia"
+      },
+      {
+        "username": "kamranahmedse",
+        "score": 76.4,
+        "tier": "Strong",
+        "followers": 39686,
+        "location": "United Kingdom"
+      }
+    ],
+    "issues": [],
+    "notes": "JS results: 20, TS results: 20, Overlap: 0 (0%)"
+  },
+  {
+    "testId": 9,
+    "testName": "TypeScript developers (comparison)",
+    "query": "typescript developers",
+    "queryParams": {
+      "q": "typescript developers"
+    },
+    "loadTimeMs": 425,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 7,
+    "matchQuality": "Good",
+    "avgDevScore": 59.9,
+    "medianDevScore": 64.7,
+    "minDevScore": 23.7,
+    "maxDevScore": 70,
+    "tierDistribution": {
+      "Solid": 14,
+      "Emerging": 3,
+      "Limited Data": 3
+    },
+    "emailCount": 6,
+    "locationCount": 12,
+    "bioCount": 16,
+    "companyCount": 7,
+    "hireableCount": 2,
+    "avgFollowers": 12352,
+    "avgStars": 60237,
+    "avgRepos": 309,
+    "languageDistribution": {
+      "TypeScript": 28,
+      "Python": 12,
+      "Go": 2,
+      "C#": 3,
+      "Java": 4,
+      "Jupyter Notebook": 3,
+      "Shell": 5,
+      "MDX": 3,
+      "Nix": 1,
+      "Rust": 5,
+      "Solidity": 1,
+      "C": 3,
+      "JavaScript": 13,
+      "C++": 3,
+      "PowerShell": 1,
+      "Vue": 2,
+      "HTML": 5,
+      "PHP": 1,
+      "Svelte": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "local": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "modelcontextprotocol",
+        "score": 70,
+        "tier": "Solid",
+        "followers": 44849,
+        "location": null
+      },
+      {
+        "username": "langchain-ai",
+        "score": 70,
+        "tier": "Solid",
+        "followers": 17440,
+        "location": "United States of America"
+      },
+      {
+        "username": "openclaw",
+        "score": 70,
+        "tier": "Solid",
+        "followers": 17187,
+        "location": null
+      },
+      {
+        "username": "bluesky-social",
+        "score": 70,
+        "tier": "Solid",
+        "followers": 8699,
+        "location": null
+      },
+      {
+        "username": "worldcoin",
+        "score": 69.6,
+        "tier": "Solid",
+        "followers": 8056,
+        "location": null
+      }
+    ],
+    "issues": [],
+    "notes": "JS results: 20, TS results: 20, Overlap: 0 (0%)"
+  },
+  {
+    "testId": 10,
+    "testName": "Developers in San Francisco",
+    "query": "developers in San Francisco",
+    "queryParams": {
+      "q": "developers in San Francisco"
+    },
+    "loadTimeMs": 684,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 7,
+    "matchQuality": "Good",
+    "avgDevScore": 60.2,
+    "medianDevScore": 66.8,
+    "minDevScore": 23.7,
+    "maxDevScore": 79.5,
+    "tierDistribution": {
+      "Strong": 1,
+      "Solid": 14,
+      "Emerging": 1,
+      "Limited Data": 4
+    },
+    "emailCount": 9,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 13,
+    "hireableCount": 4,
+    "avgFollowers": 19821,
+    "avgStars": 15159,
+    "avgRepos": 138,
+    "languageDistribution": {
+      "TypeScript": 3,
+      "JavaScript": 4,
+      "Elixir": 1,
+      "HTML": 3,
+      "CSS": 1,
+      "Go": 2,
+      "Java": 1,
+      "Python": 4,
+      "Jupyter Notebook": 2,
+      "TeX": 1,
+      "Emacs Lisp": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 16,
+      "local": 4
+    },
+    "topDevelopers": [
+      {
+        "username": "lucidrains",
+        "score": 79.5,
+        "tier": "Strong",
+        "followers": 58919,
+        "location": "San Francisco"
+      },
+      {
+        "username": "netlify",
+        "score": 73.8,
+        "tier": "Solid",
+        "followers": 12697,
+        "location": "San Francisco"
+      },
+      {
+        "username": "t3dotgg",
+        "score": 71.9,
+        "tier": "Solid",
+        "followers": 17740,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mbostock",
+        "score": 70.5,
+        "tier": "Solid",
+        "followers": 23366,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "cloudflare",
+        "score": 70.2,
+        "tier": "Solid",
+        "followers": 12327,
+        "location": "San Francisco, London, Austin, Lisbon, Singapore"
+      }
+    ],
+    "issues": [],
+    "notes": "SF: 20 results, \"SF\": 20 results, \"Bay Area\": 20 results. Overlap SF/sf: 20, SF/BA: 20, sf/BA: 20"
+  },
+  {
+    "testId": 10,
+    "testName": "Developers in SF",
+    "query": "developers in SF",
+    "queryParams": {
+      "q": "developers in SF"
+    },
+    "loadTimeMs": 444,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 7,
+    "matchQuality": "Good",
+    "avgDevScore": 60.2,
+    "medianDevScore": 66.8,
+    "minDevScore": 23.7,
+    "maxDevScore": 79.5,
+    "tierDistribution": {
+      "Strong": 1,
+      "Solid": 14,
+      "Emerging": 1,
+      "Limited Data": 4
+    },
+    "emailCount": 9,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 13,
+    "hireableCount": 4,
+    "avgFollowers": 19821,
+    "avgStars": 15159,
+    "avgRepos": 138,
+    "languageDistribution": {
+      "TypeScript": 3,
+      "JavaScript": 4,
+      "Elixir": 1,
+      "HTML": 3,
+      "CSS": 1,
+      "Go": 2,
+      "Java": 1,
+      "Python": 4,
+      "Jupyter Notebook": 2,
+      "TeX": 1,
+      "Emacs Lisp": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 16,
+      "local": 4
+    },
+    "topDevelopers": [
+      {
+        "username": "lucidrains",
+        "score": 79.5,
+        "tier": "Strong",
+        "followers": 58919,
+        "location": "San Francisco"
+      },
+      {
+        "username": "netlify",
+        "score": 73.8,
+        "tier": "Solid",
+        "followers": 12697,
+        "location": "San Francisco"
+      },
+      {
+        "username": "t3dotgg",
+        "score": 71.9,
+        "tier": "Solid",
+        "followers": 17740,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mbostock",
+        "score": 70.5,
+        "tier": "Solid",
+        "followers": 23366,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "cloudflare",
+        "score": 70.2,
+        "tier": "Solid",
+        "followers": 12327,
+        "location": "San Francisco, London, Austin, Lisbon, Singapore"
+      }
+    ],
+    "issues": [],
+    "notes": "SF: 20 results, \"SF\": 20 results, \"Bay Area\": 20 results. Overlap SF/sf: 20, SF/BA: 20, sf/BA: 20"
+  },
+  {
+    "testId": 10,
+    "testName": "Developers in Bay Area",
+    "query": "developers in Bay Area",
+    "queryParams": {
+      "q": "developers in Bay Area"
+    },
+    "loadTimeMs": 412,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 7,
+    "matchQuality": "Good",
+    "avgDevScore": 60.2,
+    "medianDevScore": 66.8,
+    "minDevScore": 23.7,
+    "maxDevScore": 79.5,
+    "tierDistribution": {
+      "Strong": 1,
+      "Solid": 14,
+      "Emerging": 1,
+      "Limited Data": 4
+    },
+    "emailCount": 9,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 13,
+    "hireableCount": 4,
+    "avgFollowers": 19821,
+    "avgStars": 15159,
+    "avgRepos": 138,
+    "languageDistribution": {
+      "TypeScript": 3,
+      "JavaScript": 4,
+      "Elixir": 1,
+      "HTML": 3,
+      "CSS": 1,
+      "Go": 2,
+      "Java": 1,
+      "Python": 4,
+      "Jupyter Notebook": 2,
+      "TeX": 1,
+      "Emacs Lisp": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 16,
+      "local": 4
+    },
+    "topDevelopers": [
+      {
+        "username": "lucidrains",
+        "score": 79.5,
+        "tier": "Strong",
+        "followers": 58919,
+        "location": "San Francisco"
+      },
+      {
+        "username": "netlify",
+        "score": 73.8,
+        "tier": "Solid",
+        "followers": 12697,
+        "location": "San Francisco"
+      },
+      {
+        "username": "t3dotgg",
+        "score": 71.9,
+        "tier": "Solid",
+        "followers": 17740,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mbostock",
+        "score": 70.5,
+        "tier": "Solid",
+        "followers": 23366,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "cloudflare",
+        "score": 70.2,
+        "tier": "Solid",
+        "followers": 12327,
+        "location": "San Francisco, London, Austin, Lisbon, Singapore"
+      }
+    ],
+    "issues": [],
+    "notes": "SF: 20 results, \"SF\": 20 results, \"Bay Area\": 20 results. Overlap SF/sf: 20, SF/BA: 20, sf/BA: 20"
+  },
+  {
+    "testId": 11,
+    "testName": "torvalds (known user)",
+    "query": "torvalds",
+    "queryParams": {
+      "q": "torvalds"
+    },
+    "loadTimeMs": 425,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 156,
+    "relevanceScore": 10,
+    "matchQuality": "Excellent",
+    "avgDevScore": 41,
+    "medianDevScore": 40.6,
+    "minDevScore": 28.2,
+    "maxDevScore": 70.5,
+    "tierDistribution": {
+      "Solid": 1,
+      "Emerging": 10,
+      "Limited Data": 9
+    },
+    "emailCount": 6,
+    "locationCount": 15,
+    "bioCount": 19,
+    "companyCount": 10,
+    "hireableCount": 5,
+    "avgFollowers": 14925,
+    "avgStars": 11830,
+    "avgRepos": 74,
+    "languageDistribution": {
+      "C": 2,
+      "OpenSCAD": 1
+    },
+    "sourceDistribution": {
+      "github": 19,
+      "local": 1
+    },
+    "topDevelopers": [
+      {
+        "username": "Alex313031",
+        "score": 70.5,
+        "tier": "Solid",
+        "followers": 1863,
+        "location": "USA"
+      },
+      {
+        "username": "preethamb97",
+        "score": 59.4,
+        "tier": "Emerging",
+        "followers": 2000,
+        "location": "Bangalore, IN"
+      },
+      {
+        "username": "N3TC4T",
+        "score": 49.5,
+        "tier": "Emerging",
+        "followers": 147,
+        "location": null
+      },
+      {
+        "username": "tomasbjerre",
+        "score": 45.3,
+        "tier": "Emerging",
+        "followers": 138,
+        "location": "Karlskrona"
+      },
+      {
+        "username": "pmt",
+        "score": 45.1,
+        "tier": "Emerging",
+        "followers": 272,
+        "location": "United States"
+      }
+    ],
+    "issues": [],
+    "notes": "Found torvalds: score=30.5, tier=Limited Data, followers=292673, location=Portland, OR"
+  },
+  {
+    "testId": 12,
+    "testName": "FakeLanguage123 (nonsense query)",
+    "query": "FakeLanguage123",
+    "queryParams": {
+      "q": "FakeLanguage123"
+    },
+    "loadTimeMs": 276,
+    "httpStatus": 200,
+    "resultCount": 0,
+    "totalAvailable": 0,
+    "relevanceScore": 8,
+    "matchQuality": "Good",
+    "avgDevScore": 0,
+    "medianDevScore": 0,
+    "minDevScore": 0,
+    "maxDevScore": 0,
+    "tierDistribution": {},
+    "emailCount": 0,
+    "locationCount": 0,
+    "bioCount": 0,
+    "companyCount": 0,
+    "hireableCount": 0,
+    "avgFollowers": 0,
+    "avgStars": 0,
+    "avgRepos": 0,
+    "languageDistribution": {},
+    "sourceDistribution": {},
+    "topDevelopers": [],
+    "issues": [],
+    "notes": "Correctly returns empty/minimal results for nonsense query"
+  },
+  {
+    "testId": 13,
+    "testName": "Elixir in Portland",
+    "query": "Elixir in Portland",
+    "queryParams": {
+      "q": "Elixir in Portland"
+    },
+    "loadTimeMs": 441,
+    "httpStatus": 200,
+    "resultCount": 6,
+    "totalAvailable": 6,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 39,
+    "medianDevScore": 39.6,
+    "minDevScore": 27.6,
+    "maxDevScore": 45.4,
+    "tierDistribution": {
+      "Emerging": 3,
+      "Limited Data": 3
+    },
+    "emailCount": 0,
+    "locationCount": 6,
+    "bioCount": 2,
+    "companyCount": 2,
+    "hireableCount": 1,
+    "avgFollowers": 87,
+    "avgStars": 0,
+    "avgRepos": 61,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 6
+    },
+    "topDevelopers": [
+      {
+        "username": "doawoo",
+        "score": 45.4,
+        "tier": "Emerging",
+        "followers": 123,
+        "location": "Portland, OR"
+      },
+      {
+        "username": "jeffweiss",
+        "score": 44.6,
+        "tier": "Emerging",
+        "followers": 88,
+        "location": "Portland, OR"
+      },
+      {
+        "username": "binaryseed",
+        "score": 41.1,
+        "tier": "Emerging",
+        "followers": 57,
+        "location": "Portland, OR"
+      },
+      {
+        "username": "lancehalvorsen",
+        "score": 38,
+        "tier": "Limited Data",
+        "followers": 154,
+        "location": "Portland, OR"
+      },
+      {
+        "username": "zberkom",
+        "score": 37.5,
+        "tier": "Limited Data",
+        "followers": 31,
+        "location": "Portland, OR"
+      }
+    ],
+    "issues": [
+      "Only 0/6 (0%) match expected language \"elixir\""
+    ],
+    "notes": ""
+  },
+  {
+    "testId": 14,
+    "testName": "Rapid consecutive searches (stress test)",
+    "query": "python developers | rust developers | go developers | javascript developers | typescript developers",
+    "queryParams": {
+      "queries": "python developers,rust developers,go developers,javascript developers,typescript developers"
+    },
+    "loadTimeMs": 530,
+    "httpStatus": 200,
+    "resultCount": 100,
+    "totalAvailable": 0,
+    "relevanceScore": 8,
+    "matchQuality": "Good",
+    "avgDevScore": 0,
+    "medianDevScore": 0,
+    "minDevScore": 0,
+    "maxDevScore": 0,
+    "tierDistribution": {},
+    "emailCount": 0,
+    "locationCount": 0,
+    "bioCount": 0,
+    "companyCount": 0,
+    "hireableCount": 0,
+    "avgFollowers": 0,
+    "avgStars": 0,
+    "avgRepos": 0,
+    "languageDistribution": {},
+    "sourceDistribution": {},
+    "topDevelopers": [],
+    "issues": [],
+    "notes": "5 concurrent searches. Avg: 530ms, Max: 625ms, Failed: 0/5. Details: python developers=200(580ms,20), rust developers=200(574ms,20), go developers=200(625ms,20), javascript developers=200(486ms,20), typescript developers=200(385ms,20)"
+  },
+  {
+    "testId": 15,
+    "testName": "Consistency check — run 1",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco"
+    },
+    "loadTimeMs": 476,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 47.3,
+    "medianDevScore": 49.9,
+    "minDevScore": 23.7,
+    "maxDevScore": 63.3,
+    "tierDistribution": {
+      "Solid": 2,
+      "Emerging": 14,
+      "Limited Data": 4
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 9,
+    "hireableCount": 1,
+    "avgFollowers": 1584,
+    "avgStars": 13049,
+    "avgRepos": 71,
+    "languageDistribution": {
+      "JavaScript": 2,
+      "Jupyter Notebook": 1,
+      "Python": 1,
+      "TypeScript": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 18,
+      "local": 2
+    },
+    "topDevelopers": [
+      {
+        "username": "oktadev",
+        "score": 63.3,
+        "tier": "Solid",
+        "followers": 514,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alchemyplatform",
+        "score": 61.4,
+        "tier": "Solid",
+        "followers": 1031,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mahseema",
+        "score": 56,
+        "tier": "Emerging",
+        "followers": 6315,
+        "location": "San Francisco"
+      },
+      {
+        "username": "alxhub",
+        "score": 55.3,
+        "tier": "Emerging",
+        "followers": 1221,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "voiceflow",
+        "score": 55.1,
+        "tier": "Emerging",
+        "followers": 324,
+        "location": "San Francisco, CA"
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"typescript\""
+    ],
+    "notes": "Run 1: 20 results (476ms), Run 2: 20 results (449ms). Overlap: 20/20 (100%)"
+  },
+  {
+    "testId": 15,
+    "testName": "Consistency check — run 2",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco"
+    },
+    "loadTimeMs": 449,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 47.3,
+    "medianDevScore": 49.9,
+    "minDevScore": 23.7,
+    "maxDevScore": 63.3,
+    "tierDistribution": {
+      "Solid": 2,
+      "Emerging": 14,
+      "Limited Data": 4
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 9,
+    "hireableCount": 1,
+    "avgFollowers": 1584,
+    "avgStars": 13049,
+    "avgRepos": 71,
+    "languageDistribution": {
+      "JavaScript": 2,
+      "Jupyter Notebook": 1,
+      "Python": 1,
+      "TypeScript": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 18,
+      "local": 2
+    },
+    "topDevelopers": [
+      {
+        "username": "oktadev",
+        "score": 63.3,
+        "tier": "Solid",
+        "followers": 514,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alchemyplatform",
+        "score": 61.4,
+        "tier": "Solid",
+        "followers": 1031,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mahseema",
+        "score": 56,
+        "tier": "Emerging",
+        "followers": 6315,
+        "location": "San Francisco"
+      },
+      {
+        "username": "alxhub",
+        "score": 55.3,
+        "tier": "Emerging",
+        "followers": 1221,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "voiceflow",
+        "score": 55.1,
+        "tier": "Emerging",
+        "followers": 324,
+        "location": "San Francisco, CA"
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"typescript\""
+    ],
+    "notes": "Run 1: 20 results (476ms), Run 2: 20 results (449ms). Overlap: 20/20 (100%)"
+  },
+  {
+    "testId": 16,
+    "testName": "Sort by followers",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco",
+      "sort": "followers"
+    },
+    "loadTimeMs": 679,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 47.3,
+    "medianDevScore": 49.9,
+    "minDevScore": 23.7,
+    "maxDevScore": 63.3,
+    "tierDistribution": {
+      "Solid": 2,
+      "Emerging": 14,
+      "Limited Data": 4
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 15,
+    "companyCount": 9,
+    "hireableCount": 1,
+    "avgFollowers": 1584,
+    "avgStars": 13049,
+    "avgRepos": 71,
+    "languageDistribution": {
+      "JavaScript": 2,
+      "Jupyter Notebook": 1,
+      "Python": 1,
+      "TypeScript": 1,
+      "MATLAB": 1
+    },
+    "sourceDistribution": {
+      "github": 18,
+      "local": 2
+    },
+    "topDevelopers": [
+      {
+        "username": "oktadev",
+        "score": 63.3,
+        "tier": "Solid",
+        "followers": 514,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alchemyplatform",
+        "score": 61.4,
+        "tier": "Solid",
+        "followers": 1031,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mahseema",
+        "score": 56,
+        "tier": "Emerging",
+        "followers": 6315,
+        "location": "San Francisco"
+      },
+      {
+        "username": "alxhub",
+        "score": 55.3,
+        "tier": "Emerging",
+        "followers": 1221,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "voiceflow",
+        "score": 55.1,
+        "tier": "Emerging",
+        "followers": 324,
+        "location": "San Francisco, CA"
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"typescript\""
+    ],
+    "notes": "Sort: followers | Top: oktadev (score=63.3, followers=514) | #10: reworkd (score=50.1, followers=1197) | Last: trekhleb (score=23.7, followers=17793) | Total results: 20"
+  },
+  {
+    "testId": 16,
+    "testName": "Sort by stars",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco",
+      "sort": "stars"
+    },
+    "loadTimeMs": 712,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 43.7,
+    "medianDevScore": 43.8,
+    "minDevScore": 27.4,
+    "maxDevScore": 63.3,
+    "tierDistribution": {
+      "Solid": 2,
+      "Emerging": 10,
+      "Limited Data": 8
+    },
+    "emailCount": 10,
+    "locationCount": 20,
+    "bioCount": 13,
+    "companyCount": 8,
+    "hireableCount": 3,
+    "avgFollowers": 224,
+    "avgStars": 0,
+    "avgRepos": 116,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "oktadev",
+        "score": 63.3,
+        "tier": "Solid",
+        "followers": 514,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alchemyplatform",
+        "score": 61.4,
+        "tier": "Solid",
+        "followers": 1031,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "alxhub",
+        "score": 55.3,
+        "tier": "Emerging",
+        "followers": 1221,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "voiceflow",
+        "score": 55.1,
+        "tier": "Emerging",
+        "followers": 324,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "scttcper",
+        "score": 52.7,
+        "tier": "Emerging",
+        "followers": 327,
+        "location": "San Francisco"
+      }
+    ],
+    "issues": [
+      "Only 0/20 (0%) match expected language \"typescript\""
+    ],
+    "notes": "Sort: stars | Top: oktadev (score=63.3, followers=514) | #10: semiotic-ai (score=46.7, followers=33) | Last: mhconradt (score=27.4, followers=22) | Total results: 20"
+  },
+  {
+    "testId": 16,
+    "testName": "Sort by joined",
+    "query": "TypeScript developers in San Francisco",
+    "queryParams": {
+      "q": "TypeScript developers in San Francisco",
+      "sort": "joined"
+    },
+    "loadTimeMs": 590,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 239,
+    "relevanceScore": 5,
+    "matchQuality": "Fair",
+    "avgDevScore": 25.9,
+    "medianDevScore": 24.7,
+    "minDevScore": 6.5,
+    "maxDevScore": 48.9,
+    "tierDistribution": {
+      "Emerging": 1,
+      "Limited Data": 19
+    },
+    "emailCount": 9,
+    "locationCount": 20,
+    "bioCount": 14,
+    "companyCount": 10,
+    "hireableCount": 2,
+    "avgFollowers": 16,
+    "avgStars": 0,
+    "avgRepos": 25,
+    "languageDistribution": {},
+    "sourceDistribution": {
+      "github": 20
+    },
+    "topDevelopers": [
+      {
+        "username": "LXGIC-Studios",
+        "score": 48.9,
+        "tier": "Emerging",
+        "followers": 17,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "MusaCap",
+        "score": 39.2,
+        "tier": "Limited Data",
+        "followers": 12,
+        "location": "San Francisco"
+      },
+      {
+        "username": "rorkai",
+        "score": 36.2,
+        "tier": "Limited Data",
+        "followers": 83,
+        "location": "San Francisco, CA"
+      },
+      {
+        "username": "mescottbeeker",
+        "score": 35.7,
+        "tier": "Limited Data",
+        "followers": 26,
+        "location": "San Francisco, California "
+      },
+      {
+        "username": "samdickson22",
+        "score": 35.5,
+        "tier": "Limited Data",
+        "followers": 16,
+        "location": "San Francisco Bay Area, San Luis Obispo"
+      }
+    ],
+    "issues": [
+      "Only 0/20 (0%) match expected language \"typescript\""
+    ],
+    "notes": "Sort: joined | Top: LXGIC-Studios (score=48.9, followers=17) | #10: ksinder (score=26.4, followers=13) | Last: admin-crmantra-git (score=6.5, followers=5) | Total results: 20"
+  },
+  {
+    "testId": 17,
+    "testName": "Python + Machine Learning",
+    "query": "Python machine learning",
+    "queryParams": {
+      "q": "Python machine learning"
+    },
+    "loadTimeMs": 1363,
+    "httpStatus": 200,
+    "resultCount": 20,
+    "totalAvailable": 1000,
+    "relevanceScore": 3,
+    "matchQuality": "Weak",
+    "avgDevScore": 56.8,
+    "medianDevScore": 59,
+    "minDevScore": 10.6,
+    "maxDevScore": 68.4,
+    "tierDistribution": {
+      "Solid": 8,
+      "Emerging": 10,
+      "Limited Data": 2
+    },
+    "emailCount": 5,
+    "locationCount": 12,
+    "bioCount": 20,
+    "companyCount": 9,
+    "hireableCount": 4,
+    "avgFollowers": 5485,
+    "avgStars": 4,
+    "avgRepos": 171,
+    "languageDistribution": {
+      "Python": 2
+    },
+    "sourceDistribution": {
+      "github": 19,
+      "local": 1
+    },
+    "topDevelopers": [
+      {
+        "username": "ogrisel",
+        "score": 68.4,
+        "tier": "Solid",
+        "followers": 4920,
+        "location": "Paris, France"
+      },
+      {
+        "username": "ageron",
+        "score": 67.5,
+        "tier": "Solid",
+        "followers": 17241,
+        "location": "Auckland"
+      },
+      {
+        "username": "jindongwang",
+        "score": 66.7,
+        "tier": "Solid",
+        "followers": 5307,
+        "location": "Beijing, China"
+      },
+      {
+        "username": "omarsar",
+        "score": 66.2,
+        "tier": "Solid",
+        "followers": 4110,
+        "location": null
+      },
+      {
+        "username": "Germey",
+        "score": 65.9,
+        "tier": "Solid",
+        "followers": 7848,
+        "location": null
+      }
+    ],
+    "issues": [
+      "Only 1/20 (5%) match expected language \"python\""
+    ],
+    "notes": "ML ecosystem signals: 25 across 20 devs. Signals: ogrisel:ML, ageron:TensorFlow, ageron:ML, jindongwang:ML, omarsar:ML, Germey:ML, LAION-AI:ML, Borda:ML, philipperemy:ML, NeuralNine:ML, sb2nov:ML, Visualize-ML:ML, scikit-learn:ML, sgugger:HuggingFace, sgugger:ML, xenova:HuggingFace, xenova:ML, googlecolab:ML, richzhang:ML, yaringal:ML..."
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "category": "empty-state",
+    "detail": "Screenshot captured"
+  },
+  {
+    "category": "empty-state",
+    "detail": "Page title: \"GitScout - Discover Talented Developers\""
+  },
+  {
+    "category": "empty-state",
+    "detail": "Main heading: \"none\""
+  },
+  {
+    "category": "empty-state",
+    "detail": "Has search input: true"
+  },
+  {
+    "category": "empty-state",
+    "detail": "Has filters: false"
+  },
+  {
+    "category": "empty-state",
+    "detail": "Has empty message: false"
+  },
+  {
+    "category": "empty-state",
+    "detail": "Has results count: false"
+  },
+  {
+    "category": "empty-state",
+    "detail": "Visible body text (first 500 chars): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only"
+  },
+  {
+    "category": "loading-state",
+    "detail": "Screenshot captured (after submit click + 200ms)"
+  },
+  {
+    "category": "loading-state",
+    "detail": "Has spinner: false"
+  },
+  {
+    "category": "loading-state",
+    "detail": "Has skeletons: true"
+  },
+  {
+    "category": "loading-state",
+    "detail": "Has loading text: false"
+  },
+  {
+    "category": "results-state",
+    "detail": "Screenshot captured"
+  },
+  {
+    "category": "results-state",
+    "detail": "Current URL: http://localhost:3000/search?q=TypeScript+San+Francisco"
+  },
+  {
+    "category": "results-state",
+    "detail": "Profile links found: 0"
+  },
+  {
+    "category": "results-state",
+    "detail": "Full results page text (first 2000 chars):\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\nSearch failed"
+  },
+  {
+    "category": "card-fields",
+    "detail": "First card raw HTML (first 3000 chars):\nNO CARD FOUND"
+  },
+  {
+    "category": "filters",
+    "detail": "Selects: []"
+  },
+  {
+    "category": "filters",
+    "detail": "Buttons: [\n  {\n    \"text\": \"Sign in\",\n    \"ariaLabel\": null,\n    \"className\": \"flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-\"\n  },\n  {\n    \"text\": \"Search\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700\"\n  },\n  {\n    \"text\": \"Score\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-blue-600 text-white\"\n  },\n  {\n    \"text\": \"Followers\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n  },\n  {\n    \"text\": \"Stars\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n  },\n  {\n    \"text\": \"Newest\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n  },\n  {\n    \"text\": \"TypeScript\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"JavaScript\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Python\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Rust\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Go\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Java\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"C++\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Ruby\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"PHP\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Swift\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Kotlin\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"C#\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Scala\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Elixir\",\n    \"ariaLabel\": null,\n    \"className\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n  },\n  {\n    \"text\": \"Filters\",\n    \"ariaLabel\": null,\n    \"className\": \"flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-medium tex\"\n  }\n]"
+  },
+  {
+    "category": "filters",
+    "detail": "Inputs: [\n  {\n    \"type\": \"text\",\n    \"name\": \"Search developers — try 'rust engineers in San Francisco' or 'karpathy'\",\n    \"value\": \"TypeScript San Francisco\",\n    \"placeholder\": \"Search developers — try 'rust engineers in San Francisco' or 'karpathy'\"\n  },\n  {\n    \"type\": \"text\",\n    \"name\": \"e.g. San Francisco\",\n    \"value\": \"\",\n    \"placeholder\": \"e.g. San Francisco\"\n  },\n  {\n    \"type\": \"number\",\n    \"name\": \"e.g. 100\",\n    \"value\": \"\",\n    \"placeholder\": \"e.g. 100\"\n  },\n  {\n    \"type\": \"checkbox\",\n    \"name\": \"unnamed\",\n    \"value\": \"on\",\n    \"placeholder\": \"\"\n  }\n]"
+  },
+  {
+    "category": "filters",
+    "detail": "Checkboxes: [\n  {\n    \"type\": \"checkbox\",\n    \"name\": \"\",\n    \"checked\": false,\n    \"label\": \"Open to work only\"\n  }\n]"
+  },
+  {
+    "category": "error-state",
+    "detail": "Empty query screenshot captured"
+  },
+  {
+    "category": "error-state",
+    "detail": "Long query screenshot captured"
+  },
+  {
+    "category": "error-state",
+    "detail": "Long query result text (first 500): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
+  },
+  {
+    "category": "error-state",
+    "detail": "XSS attempt screenshot captured"
+  },
+  {
+    "category": "error-state",
+    "detail": "XSS query result text (first 500): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
+  },
+  {
+    "category": "error-state",
+    "detail": "XSS check: {\"inlineScripts\":10,\"documentContainsScript\":true}"
+  },
+  {
+    "category": "interaction",
+    "detail": "First profile link href: null"
+  },
+  {
+    "category": "interaction",
+    "detail": "Save/favorite button candidates: 4"
+  },
+  {
+    "category": "interaction",
+    "detail": "Heart/save buttons found: []"
+  },
+  {
+    "category": "interaction",
+    "detail": "Custom dropdown elements: 0"
+  },
+  {
+    "category": "interaction",
+    "detail": "Sort elements found: []"
+  },
+  {
+    "category": "responsive",
+    "detail": "1440px screenshot captured"
+  },
+  {
+    "category": "responsive",
+    "detail": "1440px layout: {\"columns\":1,\"hasHScroll\":false,\"headerVisible\":true,\"hasHamburger\":false,\"bodyWidth\":1440,\"scrollWidth\":1440}"
+  },
+  {
+    "category": "responsive",
+    "detail": "1280px screenshot captured"
+  },
+  {
+    "category": "responsive",
+    "detail": "1280px layout: {\"columns\":1,\"hasHScroll\":false,\"headerVisible\":true,\"hasHamburger\":false,\"bodyWidth\":1280,\"scrollWidth\":1280}"
+  },
+  {
+    "category": "responsive",
+    "detail": "768px screenshot captured"
+  },
+  {
+    "category": "responsive",
+    "detail": "768px layout: {\"columns\":1,\"hasHScroll\":false,\"headerVisible\":true,\"hasHamburger\":false,\"bodyWidth\":768,\"scrollWidth\":768}"
+  },
+  {
+    "category": "responsive",
+    "detail": "375px screenshot captured"
+  },
+  {
+    "category": "responsive",
+    "detail": "375px layout: {\"columns\":1,\"hasHScroll\":true,\"headerVisible\":true,\"hasHamburger\":false,\"bodyWidth\":375,\"scrollWidth\":435}"
+  },
+  {
+    "category": "dark-theme",
+    "detail": "Theme state: {\n  \"toggleButtons\": [\n    {\n      \"text\": \"Sign in\",\n      \"label\": null,\n      \"class\": \"flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-\"\n    },\n    {\n      \"text\": \"Followers\",\n      \"label\": null,\n      \"class\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n    },\n    {\n      \"text\": \"Stars\",\n      \"label\": null,\n      \"class\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n    },\n    {\n      \"text\": \"Newest\",\n      \"label\": null,\n      \"class\": \"rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover\"\n    },\n    {\n      \"text\": \"TypeScript\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"JavaScript\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Python\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Rust\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Go\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Java\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"C++\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Ruby\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"PHP\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Swift\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Kotlin\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"C#\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Scala\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Elixir\",\n      \"label\": null,\n      \"class\": \"rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h\"\n    },\n    {\n      \"text\": \"Filters\",\n      \"label\": null,\n      \"class\": \"flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-medium tex\"\n    }\n  ],\n  \"htmlClass\": \"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased\",\n  \"bodyClass\": \"min-h-full flex flex-col bg-neutral-50 dark:bg-neutral-950\",\n  \"hasDarkClass\": true,\n  \"prefDark\": false\n}"
+  },
+  {
+    "category": "dark-theme",
+    "detail": "Screenshot with prefers-color-scheme: dark"
+  },
+  {
+    "category": "dark-theme",
+    "detail": "Dark mode check: {\"htmlClass\":\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased\",\"bodyBg\":\"rgb(10, 10, 10)\",\"bodyColor\":\"rgb(237, 237, 237)\",\"hasDarkClass\":false}"
+  },
+  {
+    "category": "a11y",
+    "detail": "Accessibility: {\n  \"totalImages\": 0,\n  \"imagesWithoutAlt\": 0,\n  \"imagesWithoutAltSrcs\": [],\n  \"totalButtons\": 22,\n  \"buttonsWithoutLabel\": 0,\n  \"totalInputs\": 4,\n  \"inputsWithoutLabel\": 1,\n  \"focusableElements\": 31\n}"
+  },
+  {
+    "category": "console",
+    "detail": "Console errors: [\"Failed to load resource: the server responded with a status of 500 (Internal Server Error)\"]"
+  }
+]

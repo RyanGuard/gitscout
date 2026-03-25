@@ -1,0 +1,94 @@
+{
+  "states": {
+    "empty": {
+      "url": "http://localhost:3000/search",
+      "hasSearchBar": true,
+      "hasFilters": true,
+      "bodySnippet": "GitScoutSearchMatchListsSign in⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersself.__next_r=\"q0M9vTquIcrolg1JFDl79\"(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"9:I[\\\"[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\\\",[\\\"/_next/static/chunks/node_modules_034t3jw._.js\\\",\\\"/_next/static/chunks/src_"
+    },
+    "loading": {
+      "captured": true,
+      "note": "Screenshot taken 300ms after search submit to catch loading indicators"
+    },
+    "results": {
+      "url": "http://localhost:3000/search?q=TypeScript+San+Francisco",
+      "resultCountText": "0 developer",
+      "hasCards": 0
+    },
+    "error": {
+      "note": "Triggered by blocking /api/search requests",
+      "hasErrorMessage": true,
+      "visibleText": "GitScoutSearchMatchLists⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersSearch failed. Please try again.self.__next_r=\"nJTecetyJ0lAL2sYkQq8N\"(self.__next_f=self.__next_f||[]).push(["
+    }
+  },
+  "cardFields": [],
+  "interactions": {
+    "clickResult": {
+      "navigatedTo": "http://localhost:3000/search?q=TypeScript+San+Francisco",
+      "expectedProfile": "/profile/mahseema",
+      "success": false
+    },
+    "browserBack": {
+      "returnedTo": "about:blank",
+      "preservedQuery": false,
+      "success": false
+    },
+    "saveButton": {
+      "found": true,
+      "count": 4,
+      "note": "Save buttons exist but none found on result cards directly"
+    },
+    "filterChange": {
+      "type": "language",
+      "urlAfter": "http://localhost:3000/search?q=TypeScript+San+Francisco&languages=Python",
+      "urlChanged": true
+    },
+    "hireableFilter": {
+      "urlAfter": "http://localhost:3000/search?q=TypeScript+San+Francisco&languages=Python&hireable=true",
+      "applied": true
+    },
+    "locationFilter": {
+      "urlAfter": "http://localhost:3000/search?q=New+York&languages=Python&hireable=true",
+      "applied": true
+    },
+    "sort": {
+      "optionsFound": 2,
+      "starsUrl": "http://localhost:3000/search?q=TypeScript+San+Francisco&sort=stars",
+      "followersUrl": "http://localhost:3000/search?q=TypeScript+San+Francisco&sort=followers"
+    }
+  },
+  "responsive": {
+    "desktop-1440": {
+      "viewport": "1440x900",
+      "horizontalOverflow": false,
+      "bodyScrollWidth": 1440,
+      "filtersVisible": true
+    },
+    "desktop-1280": {
+      "viewport": "1280x800",
+      "horizontalOverflow": false,
+      "bodyScrollWidth": 1280,
+      "filtersVisible": true
+    },
+    "tablet-768": {
+      "viewport": "768x1024",
+      "horizontalOverflow": false,
+      "bodyScrollWidth": 768,
+      "filtersVisible": true
+    },
+    "mobile-375": {
+      "viewport": "375x812",
+      "horizontalOverflow": true,
+      "bodyScrollWidth": 455,
+      "filtersVisible": true
+    }
+  },
+  "darkTheme": {
+    "method": "prefers-color-scheme: dark (system preference)",
+    "manualToggle": false,
+    "bgColor": "rgba(0, 0, 0, 0)",
+    "textColor": "rgb(237, 237, 237)",
+    "darkModeActive": true
+  },
+  "issues": []
+}

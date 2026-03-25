@@ -1,0 +1,84 @@
+{
+  "cardFields": {
+    "totalCards": 0,
+    "sampleCards": []
+  },
+  "interactions": {
+    "errorState": {
+      "hasErrorMessage": true,
+      "errorText": "Errorself."
+    },
+    "saveButtons": [
+      {
+        "text": "",
+        "ariaLabel": "Enable sounds",
+        "classes": "relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transit",
+        "hasSvg": true,
+        "innerHTML": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" strok"
+      },
+      {
+        "text": "Sign in",
+        "ariaLabel": null,
+        "classes": "flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-",
+        "hasSvg": true,
+        "innerHTML": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" strok"
+      },
+      {
+        "text": "Filters",
+        "ariaLabel": null,
+        "classes": "flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1.5 tex",
+        "hasSvg": true,
+        "innerHTML": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" strok"
+      },
+      {
+        "text": "",
+        "ariaLabel": "Open Next.js Dev Tools",
+        "classes": "",
+        "hasSvg": true,
+        "innerHTML": "<svg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" fill=\"none\"><g transform=\"translate(8.5, 13)\"><path "
+      }
+    ],
+    "sortStars": {
+      "url": "http://localhost:3000/search?q=TypeScript+San+Francisco&sort=stars",
+      "resultCount": 0
+    },
+    "languageFilter": {
+      "url": "http://localhost:3000/search?q=TypeScript+San+Francisco&languages=Python",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "resultsChanged": false
+    },
+    "pagination": {
+      "hasNext": false,
+      "hasPrevious": false,
+      "pageInfo": "not found"
+    }
+  },
+  "issues": [],
+  "desktop-1440": {
+    "bodyScrollWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false
+  },
+  "desktop-1280": {
+    "bodyScrollWidth": 1280,
+    "viewportWidth": 1280,
+    "overflow": false
+  },
+  "tablet-768": {
+    "bodyScrollWidth": 768,
+    "viewportWidth": 768,
+    "overflow": false
+  },
+  "mobile-375": {
+    "bodyScrollWidth": 435,
+    "viewportWidth": 375,
+    "overflow": true
+  },
+  "darkColors": {
+    "bodyBg": "rgb(10, 10, 10)",
+    "bodyText": "rgb(237, 237, 237)",
+    "cardBg": "N/A",
+    "cardBorder": "N/A"
+  }
+}
