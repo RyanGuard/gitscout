@@ -138,6 +138,21 @@ const KNOWN_LOCATIONS = [
   "são paulo", "lagos", "kyiv", "warsaw", "remote",
 ];
 
+// GitHub doesn't recognize informal location names — map to actual cities
+const LOCATION_ALIASES: Record<string, string> = {
+  "bay area": "San Francisco",
+  "sf": "San Francisco",
+  "silicon valley": "San Francisco",
+  "nyc": "New York",
+  "la": "Los Angeles",
+  "socal": "Los Angeles",
+  "norcal": "San Francisco",
+  "dmv": "Washington",
+  "dfw": "Dallas",
+  "rdu": "Raleigh",
+  "pnw": "Seattle",
+};
+
 // Role keywords → inferred languages (the key insight for quality results)
 const ROLE_TO_LANGUAGES: Record<string, string[]> = {
   frontend: ["javascript", "typescript"],
@@ -293,14 +308,16 @@ function buildGitHubQuery(params: {
   // Parse natural language from the main query
   const parsed = parseNaturalQuery(params.q);
 
-  // Add remaining search terms (names, keywords not recognized as language/location)
+  // Add remaining search terms — but NOT role keywords when we have location
+  // (adding "platform" to a location+language query kills results on GitHub)
   if (parsed.searchTerms.length > 0) {
     parts.push(parsed.searchTerms.join(" "));
-  } else if (parsed.roleSearchTerm) {
-    // Role-only query (e.g. "frontend engineer") — inject the role keyword back
-    // so GitHub has something to search on beyond just language + followers filters
+  } else if (parsed.roleSearchTerm && !parsed.location && !params.location) {
+    // Role-only query with NO location — inject the keyword so GitHub has something
     parts.push(parsed.roleSearchTerm);
   }
+  // When we have role + location, the language filter alone is sufficient
+  // (e.g. "platform engineers in Bay Area" → language:go location:"San Francisco")
 
   // Merge languages: explicit filter + extracted from query
   const allLanguages = [
@@ -309,12 +326,13 @@ function buildGitHubQuery(params: {
   ];
   const uniqueLanguages = [...new Set(allLanguages)];
   if (uniqueLanguages.length > 0) {
-    // GitHub user search supports one language filter
     parts.push(`language:${uniqueLanguages[0]}`);
   }
 
   // Merge location: explicit filter takes priority, then extracted
-  const loc = params.location || parsed.location;
+  // Apply alias to convert informal names to GitHub-recognized cities
+  const rawLoc = params.location || parsed.location;
+  const loc = rawLoc ? (LOCATION_ALIASES[rawLoc.toLowerCase()] || rawLoc) : null;
   if (loc) {
     parts.push(`location:"${loc}"`);
   }
@@ -323,12 +341,14 @@ function buildGitHubQuery(params: {
     parts.push(`repos:>=${Math.max(1, Math.floor(params.minStars / 50))}`);
   }
 
-  // Quality floor — higher for role searches (50+), lower for generic (5+)
-  parts.push(`followers:>=${parsed.minFollowers}`);
+  // Quality floor — lower when location is specified (smaller pools)
+  // Role-only (no location): 50+ followers for quality
+  // Role + location: 10+ followers to avoid missing good devs in smaller markets
+  const followerFloor = loc ? Math.min(parsed.minFollowers, 10) : parsed.minFollowers;
+  parts.push(`followers:>=${followerFloor}`);
 
   // Ensure we have enough query substance for GitHub to accept
-  // (GitHub requires at least some text or structured query)
-  if (parsed.searchTerms.length === 0 && !loc) {
+  if (parsed.searchTerms.length === 0 && !loc && !parsed.roleSearchTerm) {
     parts.push("repos:>10");
   }
 
