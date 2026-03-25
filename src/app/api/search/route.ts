@@ -122,6 +122,9 @@ function buildGitHubQuery(params: {
     parts.push(`repos:>=${Math.max(1, Math.floor(params.minStars / 50))}`);
   }
 
+  // Always filter for real developers (not empty accounts)
+  parts.push("followers:>=5");
+
   // If we have nothing useful, fall back to the raw query
   if (parts.length === 0 && params.q) {
     parts.push(params.q);
@@ -186,9 +189,8 @@ export async function GET(request: Request) {
 
   const ghSort =
     sort === "stars" ? "repositories"
-    : sort === "followers" ? "followers"
     : sort === "joined" ? "joined"
-    : ""; // default: best match
+    : "followers"; // default: most followed first
 
   const ghParams = new URLSearchParams({
     q: ghQuery,
@@ -228,9 +230,9 @@ export async function GET(request: Request) {
   const localByGithubId = new Map(localDevs.map((d) => [d.githubId, d]));
 
   // --- 3. Fetch full profiles from GitHub for users we DON'T have locally ---
-  // (parallel fetch, but limit to avoid rate limits)
+  // With GITHUB_TOKEN we get 5000 req/hr — fetching 20-30 profiles per search is fine
   const unknownUsers = githubUsers.filter((u) => !localByGithubId.has(u.id));
-  const profileFetches = unknownUsers.slice(0, 10).map(async (u) => {
+  const profileFetches = unknownUsers.map(async (u) => {
     try {
       const res = await fetch(`${GITHUB_API}/users/${u.login}`, {
         headers: githubHeaders(),
@@ -319,6 +321,23 @@ export async function GET(request: Request) {
       repositories: [] as { id: string; name: string; fullName: string; description: string | null; language: string | null; stars: number; forks: number; topics: string[]; pushedAt: string | null }[],
       source: "github" as const,
     };
+  });
+
+  // --- 5. Sort by quality — best developers first ---
+  developers.sort((a, b) => {
+    // Local (indexed + scored) profiles always rank above GitHub-only
+    if (a.source === "local" && b.source !== "local") return -1;
+    if (b.source === "local" && a.source !== "local") return 1;
+
+    // For local profiles, use our computed score
+    if (a.source === "local" && b.source === "local") {
+      return (b.score || 0) - (a.score || 0);
+    }
+
+    // For GitHub profiles, rank by followers * 2 + repos
+    const aQuality = (a.followers || 0) * 2 + (a.publicRepos || 0);
+    const bQuality = (b.followers || 0) * 2 + (b.publicRepos || 0);
+    return bQuality - aQuality;
   });
 
   return Response.json({
