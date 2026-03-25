@@ -18,6 +18,13 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
+      authorization: {
+        params: {
+          // Force GitHub to show the account picker every time
+          // so other users don't accidentally sign in as you
+          prompt: "consent",
+        },
+      },
     }),
   ],
   callbacks: {
