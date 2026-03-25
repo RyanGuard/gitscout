@@ -188,15 +188,15 @@ function SearchPageInner() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Search developers — try 'rust engineers in San Francisco' or 'karpathy'"
-          className="w-full rounded-xl border border-neutral-200 bg-white py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+          className="w-full rounded-xl border border-neutral-200/50 bg-white py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400/60 focus:border-indigo-400/50 focus:shadow-lg focus:shadow-indigo-500/5 dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:text-white"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          <kbd className="hidden sm:inline-flex items-center rounded border border-neutral-200 px-1.5 py-0.5 text-[10px] text-neutral-400 dark:border-neutral-700">
+          <kbd className="hidden sm:inline-flex items-center rounded border border-neutral-200/50 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 dark:border-neutral-700/50">
             ⌘K
           </kbd>
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
           >
             Search
           </button>
@@ -226,8 +226,8 @@ function SearchPageInner() {
                     onClick={() => updateFilter("sort", opt.value)}
                     className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
                       (filters.sort || "score") === opt.value
-                        ? "bg-blue-600 text-white"
-                        : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-400 dark:hover:bg-neutral-700/60"
                     }`}
                   >
                     {opt.label}
@@ -246,8 +246,8 @@ function SearchPageInner() {
                     onClick={() => toggleLanguage(lang)}
                     className={`rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       filters.languages?.includes(lang)
-                        ? "bg-blue-600 text-white"
-                        : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-400 dark:hover:bg-neutral-700/60"
                     }`}
                   >
                     {lang}
@@ -264,7 +264,7 @@ function SearchPageInner() {
                 value={filters.location || ""}
                 onChange={(e) => updateFilter("location", e.target.value)}
                 placeholder="e.g. San Francisco"
-                className="mt-1.5 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 dark:border-neutral-700"
+                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50"
               />
             </div>
 
@@ -276,7 +276,7 @@ function SearchPageInner() {
                 value={filters.minStars || ""}
                 onChange={(e) => updateFilter("minStars", e.target.value ? parseInt(e.target.value) : undefined)}
                 placeholder="e.g. 100"
-                className="mt-1.5 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 dark:border-neutral-700"
+                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50"
               />
             </div>
 
@@ -320,7 +320,7 @@ function SearchPageInner() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 lg:hidden"
+                className="flex items-center gap-1.5 rounded-lg border border-neutral-200/50 px-2.5 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:bg-neutral-800/50 lg:hidden"
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 Filters
@@ -334,7 +334,7 @@ function SearchPageInner() {
           </div>
 
           {searchError && (
-            <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+            <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200/50 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/30 dark:bg-red-950/50 dark:text-red-300">
               <span>{searchError}</span>
               <button
                 onClick={() => { setSearchError(null); if (query) doSearch(query, 1, filters); }}
@@ -355,7 +355,7 @@ function SearchPageInner() {
                   <button
                     key={term}
                     onClick={() => { setInputValue(term); router.push(`/search?q=${encodeURIComponent(term)}`); }}
-                    className="rounded-full border border-neutral-200 px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-neutral-700 dark:text-neutral-400"
+                    className="rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-500"
                   >
                     {term}
                   </button>
