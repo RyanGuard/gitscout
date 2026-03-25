@@ -14,9 +14,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0a0a0f;
     --foreground: #ededed;
   }
+}
+
+/* Force dark when class is applied */
+.dark {
+  --background: #0a0a0f;
+  --foreground: #ededed;
 }
 
 body {

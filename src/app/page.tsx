@@ -238,12 +238,12 @@ const MARKETS = [
 
 // Role lanes
 const ROLE_LANES = [
-  { label: "Frontend", query: "react typescript frontend", langs: ["TypeScript", "JavaScript"], icon: "🎨", signal: "High demand" },
-  { label: "Backend", query: "go python backend api", langs: ["Go", "Python"], icon: "⚙️", signal: "Growing" },
-  { label: "ML / AI", query: "python machine learning AI", langs: ["Python"], icon: "🧠", signal: "Surging" },
-  { label: "Infra / DevOps", query: "kubernetes terraform infrastructure", langs: ["Go", "Python"], icon: "☁️", signal: "Steady" },
-  { label: "Rust Systems", query: "rust systems performance", langs: ["Rust"], icon: "🦀", signal: "Hot" },
-  { label: "Mobile", query: "swift kotlin mobile", langs: ["Swift", "Kotlin"], icon: "📱", signal: "Stable" },
+  { label: "Frontend", query: "react typescript frontend", langs: ["TypeScript", "JavaScript"], icon: Code, iconColor: "text-blue-400", signal: "High demand", signalColor: "text-amber-400" },
+  { label: "Backend", query: "go python backend api", langs: ["Go", "Python"], icon: GitFork, iconColor: "text-emerald-400", signal: "Growing", signalColor: "text-emerald-400" },
+  { label: "ML / AI", query: "python machine learning AI", langs: ["Python"], icon: Sparkles, iconColor: "text-violet-400", signal: "Surging", signalColor: "text-red-400" },
+  { label: "Infra / DevOps", query: "kubernetes terraform infrastructure", langs: ["Go", "Python"], icon: Globe, iconColor: "text-cyan-400", signal: "Steady", signalColor: "text-neutral-400" },
+  { label: "Rust Systems", query: "rust systems performance", langs: ["Rust"], icon: Zap, iconColor: "text-orange-400", signal: "Hot", signalColor: "text-red-400" },
+  { label: "Mobile", query: "swift kotlin mobile", langs: ["Swift", "Kotlin"], icon: Target, iconColor: "text-pink-400", signal: "Stable", signalColor: "text-neutral-400" },
 ];
 
 function Dashboard() {
@@ -277,7 +277,9 @@ function Dashboard() {
     if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
   }
 
-  const firstName = session?.user?.name?.split(" ")[0] || "there";
+  // Use display name, not username — fall back gracefully
+  const rawName = session?.user?.name || "";
+  const firstName = rawName.includes(" ") ? rawName.split(" ")[0] : (rawName || "there");
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
@@ -331,23 +333,26 @@ function Dashboard() {
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-            {ROLE_LANES.map((role) => (
-              <button
-                key={role.label}
-                onClick={() => search(role.query)}
-                className="group relative overflow-hidden rounded-xl border border-neutral-200/50 bg-white p-3.5 text-left transition-all duration-200 hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 dark:border-neutral-700/50 dark:bg-neutral-900/60 dark:hover:border-indigo-500/30"
-              >
-                <div className="text-xl mb-2">{role.icon}</div>
-                <p className="text-sm font-semibold text-neutral-900 dark:text-white">{role.label}</p>
-                <div className="mt-1 flex items-center gap-1.5">
-                  {role.langs.map((l) => (
-                    <span key={l} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: getLanguageColor(l) }} />
-                  ))}
-                  <span className="text-[10px] text-neutral-400">{role.signal}</span>
-                </div>
-                <ArrowRight className="absolute right-3 top-3.5 h-3.5 w-3.5 text-neutral-300 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 dark:text-neutral-600" />
-              </button>
-            ))}
+            {ROLE_LANES.map((role) => {
+              const Icon = role.icon;
+              return (
+                <button
+                  key={role.label}
+                  onClick={() => search(role.query)}
+                  className="group relative overflow-hidden rounded-xl border border-neutral-200/50 bg-white p-3.5 text-left transition-all duration-200 hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/40 dark:hover:border-indigo-500/30 dark:hover:bg-neutral-900/60"
+                >
+                  <Icon className={`h-5 w-5 mb-2 ${role.iconColor}`} />
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{role.label}</p>
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    {role.langs.map((l) => (
+                      <span key={l} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: getLanguageColor(l) }} />
+                    ))}
+                    <span className={`text-[10px] font-medium ${role.signalColor}`}>{role.signal}</span>
+                  </div>
+                  <ArrowRight className="absolute right-3 top-3.5 h-3.5 w-3.5 text-neutral-300 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 dark:text-neutral-600" />
+                </button>
+              );
+            })}
           </div>
         </section>
 
