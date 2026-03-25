@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { GitBranch, Search, ExternalLink } from "lucide-react";
+import { GitBranch, Search } from "lucide-react";
+import { AuthButton } from "@/components/auth/AuthButton";
 
 export function Header() {
   return (
@@ -17,16 +18,7 @@ export function Header() {
             <Search className="h-4 w-4 sm:hidden" />
             <span>Search</span>
           </Link>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-          >
-            <span className="hidden sm:inline">GitHub</span>
-            <ExternalLink className="h-3.5 w-3.5 hidden sm:block" />
-            <span className="sm:hidden">GitHub</span>
-          </a>
+          <AuthButton />
         </nav>
       </div>
     </header>

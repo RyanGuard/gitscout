@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { LanguageBar } from "@/components/profile/LanguageBar";
 import { RepoCard } from "@/components/profile/RepoCard";
+import { FavoriteButton } from "@/components/auth/FavoriteButton";
 import { formatNumber } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -180,6 +181,7 @@ export default async function ProfilePage({
             >
               View on GitHub <ExternalLink className="h-3.5 w-3.5" />
             </a>
+            <FavoriteButton developerId={developer.id} className="mt-0" />
           </div>
         </div>
       </div>
