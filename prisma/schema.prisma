@@ -24,9 +24,12 @@ model Developer {
   following       Int      @default(0)
   hireable        Boolean  @default(false)
   primaryLanguage String?
-  totalCommits    Int      @default(0)
-  totalStars      Int      @default(0)
-  score           Float    @default(0)
+  totalCommits      Int      @default(0)
+  totalStars        Int      @default(0)
+  recentActivity    Int      @default(0)
+  languageDiversity Int      @default(0)
+  avgRepoQuality    Float    @default(0)
+  score             Float    @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   syncedAt        DateTime @default(now())

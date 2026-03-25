@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { computeScore } from "@/lib/scoring";
+import { fetchContributions } from "@/pipeline/graphql";
 import type { GitHubUser, GitHubRepo } from "@/types";
 
 const GITHUB_API = "https://api.github.com";
@@ -63,16 +65,6 @@ function computeLanguageStats(repos: GitHubRepo[]) {
     .sort((a, b) => b.percentage - a.percentage);
 }
 
-function computeScore(user: GitHubUser, repos: GitHubRepo[]): number {
-  const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
-  return (
-    totalStars * 2 +
-    user.followers * 1.5 +
-    user.public_repos * 0.5 +
-    (user.hireable ? 10 : 0)
-  );
-}
-
 async function syncOneUser(username: string) {
   const user = await fetchGitHubUser(username);
   if (!user) return null;
@@ -81,7 +73,17 @@ async function syncOneUser(username: string) {
   const nonForkRepos = repos.filter((r) => !r.fork && !r.archived);
   const languageStats = computeLanguageStats(repos);
   const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
-  const score = computeScore(user, repos);
+
+  // Fetch commit data via GraphQL (falls back to null if no token or on error)
+  const contributions = await fetchContributions(username);
+
+  const {
+    score,
+    totalCommits,
+    recentActivity,
+    languageDiversity,
+    avgRepoQuality,
+  } = computeScore({ user, repos, contributions });
 
   const developer = await prisma.developer.upsert({
     where: { githubId: user.id },
@@ -102,7 +104,10 @@ async function syncOneUser(username: string) {
       hireable: user.hireable ?? false,
       primaryLanguage: languageStats[0]?.language ?? null,
       totalStars,
-      totalCommits: 0,
+      totalCommits,
+      recentActivity,
+      languageDiversity,
+      avgRepoQuality,
       score,
     },
     update: {
@@ -121,6 +126,10 @@ async function syncOneUser(username: string) {
       hireable: user.hireable ?? false,
       primaryLanguage: languageStats[0]?.language ?? null,
       totalStars,
+      totalCommits,
+      recentActivity,
+      languageDiversity,
+      avgRepoQuality,
       score,
       syncedAt: new Date(),
     },
