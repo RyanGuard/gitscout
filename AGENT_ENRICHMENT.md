@@ -1,8 +1,8 @@
-# Agent Task: Profile Enrichment — Email Mining, Contact Info & Company Normalization
+# Agent Task: Profile Enrichment — Apollo.io, Email Mining, Contact Info & Company Normalization
 
 ## Your Job
 
-Build a profile enrichment system that extracts real contact information from GitHub data. Mine email addresses from public commits, normalize company names, extract social links from bios/blogs, and infer seniority. This makes developer profiles actionable for recruiting — you can't reach out to someone if you only have their GitHub username.
+Build a profile enrichment system that combines Apollo.io's people API with free GitHub-based data mining to build complete candidate profiles. The primary enrichment source is **Apollo.io** (API key provided), supplemented by commit email mining, company normalization, social link extraction, and seniority inference. This makes developer profiles actionable for recruiting — you can't reach out to someone if you only have their GitHub username.
 
 ---
 
@@ -14,12 +14,84 @@ Build a profile enrichment system that extracts real contact information from Gi
 - **Auth:** NextAuth v4. Use `getServerSession(authOptions)` server-side.
 - **Existing Developer fields:** `email` (from GitHub profile, often null), `company` (free text like "@google"), `blog`, `twitterUsername`, `location`
 - **GitHub Token:** `GITHUB_TOKEN` env var available for authenticated API calls (5000 req/hr).
+- **Apollo API Key:** `APOLLO_API_KEY` env var. Already set in `.env`.
 
 ---
 
-## Enrichment Sources (All Free, No Third-Party APIs)
+## Enrichment Sources
 
-### 1. Commit Email Mining
+### 1. Apollo.io People Match (PRIMARY — use first)
+
+Apollo's `/v1/people/match` endpoint enriches profiles given identifying info. It returns: email, phone, LinkedIn URL, title, company, employment history, seniority, photo, and social links.
+
+**API Details:**
+- **Endpoint:** `POST https://api.apollo.io/v1/people/match`
+- **Auth:** Header `X-Api-Key: {APOLLO_API_KEY}`
+- **Content-Type:** `application/json`
+
+**Matching strategies (try in order, use the first that returns a rich result):**
+
+1. **By name + company** (best match rate when GitHub has company field):
+   ```json
+   {
+     "first_name": "Sindre",
+     "last_name": "Sorhus",
+     "organization_name": "Vercel"
+   }
+   ```
+
+2. **By LinkedIn URL** (if we already have it from GitHub bio/blog):
+   ```json
+   {
+     "linkedin_url": "https://linkedin.com/in/sindresorhus"
+   }
+   ```
+
+3. **By email** (if we mined one from commits):
+   ```json
+   {
+     "email": "sindresorhus@gmail.com"
+   }
+   ```
+
+4. **By GitHub URL** (lowest match rate but worth trying):
+   ```json
+   {
+     "github_url": "https://github.com/sindresorhus"
+   }
+   ```
+
+**Response fields to extract:**
+```typescript
+interface ApolloPersonMatch {
+  email: string | null;
+  phone_numbers: Array<{ sanitized_number: string }> | null;
+  linkedin_url: string | null;
+  twitter_url: string | null;
+  title: string | null;
+  headline: string | null;
+  photo_url: string | null;
+  seniority: string | null;
+  organization_name: string | null;
+  employment_history: Array<{
+    organization_name: string;
+    title: string | null;
+    current: boolean;
+    start_date: string | null;
+  }>;
+}
+```
+
+**Rate limits:** Apollo allows ~100 matches/month on free tier. Enrichment is on-demand (user clicks "Enrich"), not bulk.
+
+**Implementation:**
+- Create `src/lib/apollo.ts` — Apollo API client
+- Function: `enrichFromApollo(developer)` → returns enriched data or null
+- Try matching strategies in order: name+company → LinkedIn URL → email → GitHub URL
+- Parse `name` to split into first_name/last_name
+- Parse `company` field: strip `@` prefix for organization_name
+
+### 2. Commit Email Mining (FREE — supplement Apollo)
 GitHub exposes author email in public commits. The REST API endpoint:
 ```
 GET /repos/{owner}/{repo}/commits?author={username}&per_page=5
@@ -31,7 +103,7 @@ Each commit has `commit.author.email`. Filter out:
 
 Often developers use their real email in commits even if their profile email is hidden.
 
-### 2. Company Normalization
+### 3. Company Normalization
 The `company` field on GitHub is free-text. Examples:
 - `@google` → "Google"
 - `Google Inc.` → "Google"
@@ -43,7 +115,7 @@ The `company` field on GitHub is free-text. Examples:
 
 Build a normalizer that handles @ prefixes, common suffixes (Inc, Inc., LLC, Corp), and known company aliases.
 
-### 3. Social Link Extraction
+### 4. Social Link Extraction
 Parse the `blog` and `bio` fields for URLs:
 - LinkedIn: `linkedin.com/in/{handle}`
 - Twitter/X: `twitter.com/{handle}` or `x.com/{handle}`
@@ -52,7 +124,7 @@ Parse the `blog` and `bio` fields for URLs:
 - Medium: `medium.com/@{handle}`
 - Personal site: anything else that's a URL
 
-### 4. Seniority Inference
+### 5. Seniority Inference
 Estimate seniority from GitHub signals:
 - **Account age** (years since `created_at`)
 - **Total contributions** (commits, PRs, issues)
@@ -66,9 +138,15 @@ Map to levels: `junior`, `mid`, `senior`, `staff`, `principal`
 
 ## Files to Create
 
+### Apollo Client:
+- **`src/lib/apollo.ts`** — Apollo.io API client. Functions:
+  - `enrichFromApollo(params: { name?: string, company?: string, email?: string, linkedinUrl?: string, githubUsername?: string })` — Tries multiple match strategies in order. Returns enriched person data or null.
+  - Reads `APOLLO_API_KEY` from `process.env`.
+  - Handles rate limits gracefully (returns null if 429).
+
 ### Enrichment Pipeline:
-- **`src/pipeline/enrichment.ts`** — Core enrichment module. Functions:
-  - `enrichDeveloper(developerId: string)` — Orchestrates all enrichment for one developer. Fetches commit emails, normalizes company, extracts social links, infers seniority. Updates ContactInfo + Developer records.
+- **`src/pipeline/enrichment.ts`** — Core enrichment orchestrator. Functions:
+  - `enrichDeveloper(developerId: string)` — Orchestrates all enrichment for one developer. Order: (1) mine commit emails, (2) extract social links from bio/blog, (3) call Apollo with best available data, (4) normalize company, (5) infer seniority. Merges all sources into ContactInfo. Apollo data takes priority over inferred data when both exist.
   - `mineCommitEmails(username: string, repos: string[])` — Fetches recent commits from top repos, extracts unique email addresses.
   - `normalizeCompany(rawCompany: string | null)` — Cleans up company field.
   - `extractSocialLinks(bio: string | null, blog: string | null)` — Parses URLs from text.
@@ -97,16 +175,21 @@ model ContactInfo {
   developerId     String    @unique
   emails          String[]  @default([])
   primaryEmail    String?
+  phone           String?
   linkedinUrl     String?
   twitterUrl      String?
   mastodonUrl     String?
   devtoUrl        String?
   mediumUrl       String?
   personalSite    String?
+  photoUrl        String?
   currentTitle    String?
+  headline        String?
   normalizedCompany String?
   seniorityLevel  String?
   timezone        String?
+  employmentHistory Json?
+  apolloId        String?
   enrichedAt      DateTime?
   enrichmentSource String?
   developer       Developer @relation(fields: [developerId], references: [id], onDelete: Cascade)
@@ -151,14 +234,25 @@ Also add to existing `Developer` model:
 
 ## Acceptance Criteria
 
-### 1. Commit Email Mining Works
+### 1. Apollo Enrichment Works
+- When a user clicks "Enrich", the system calls Apollo with the best available matching data.
+- If GitHub has `name` + `company`, try name+company match first.
+- If a LinkedIn URL was found in bio/blog, try LinkedIn match.
+- If a commit email was mined, try email match.
+- Fallback: try GitHub URL match.
+- Apollo data (email, phone, LinkedIn, title, seniority, employment history) is stored in ContactInfo.
+- Apollo data takes priority over inferred data: if Apollo returns a title, use it over inferred seniority.
+- `enrichmentSource` is set to `"apollo"` when Apollo returns data, `"github"` when only GitHub data was used.
+- If Apollo returns 429 (rate limited) or errors, continue with GitHub-only enrichment — don't fail.
+
+### 2. Commit Email Mining Works
 - For a developer with public repos, `mineCommitEmails` fetches commits from their top 3 repos (by stars).
 - Extracts unique email addresses, filtering out GitHub noreply addresses.
 - Stores all found emails in `ContactInfo.emails[]`.
-- Sets `primaryEmail` to the most common non-noreply email found.
-- If no emails found, `emails` is empty and `primaryEmail` is null — don't error.
+- Sets `primaryEmail` to Apollo email if available, otherwise the most common commit email.
+- If no emails found from any source, `emails` is empty and `primaryEmail` is null — don't error.
 
-### 2. Company Normalization
+### 3. Company Normalization
 - `@google` → "Google"
 - `Google, Inc.` → "Google"
 - `@vercel` → "Vercel"
@@ -166,7 +260,7 @@ Also add to existing `Developer` model:
 - Unknown company → cleaned version (remove @, trim, title case)
 - `null` / empty → null
 
-### 3. Social Link Extraction
+### 4. Social Link Extraction
 - Given a bio like "Rust developer. https://linkedin.com/in/johndoe | @johndoe on Twitter"
   - Extracts LinkedIn URL
   - Extracts Twitter URL
@@ -175,29 +269,32 @@ Also add to existing `Developer` model:
 - Given a blog URL like "https://johndoe.com"
   - Stores it as personal site
 
-### 4. Seniority Inference
+### 5. Seniority Inference
 - Account > 10 years, 5000+ commits, 1000+ stars → "staff" or "principal"
 - Account > 6 years, 1000+ commits, 200+ stars → "senior"
 - Account > 3 years, 200+ commits → "mid"
 - Account < 3 years or < 50 commits → "junior"
 - These thresholds should be constants at the top of the file for easy tuning.
 
-### 5. Enrichment UI
+### 6. Enrichment UI
 - Profile page shows an "Enrich Profile" button for non-enriched developers.
 - Button only visible to logged-in users.
 - Clicking triggers enrichment — shows loading state.
 - After enrichment, ContactCard appears with all discovered info.
+- If Apollo returned data: show email, phone, LinkedIn, title, company, employment history.
 - Email addresses have a "Copy" button.
 - LinkedIn/Twitter/etc. are clickable links.
+- Phone number shown if available (from Apollo).
 - If already enriched, show the data directly (no button needed) with "Re-enrich" option.
 - Show "Enriched {timeAgo}" timestamp.
 
-### 6. Rate Limit Awareness
-- Commit email mining makes ~3 API calls per developer (one per repo, 5 commits each).
-- Use the same `GITHUB_TOKEN` as the main pipeline.
-- If rate limited, return partial results (whatever was mined before the limit) rather than erroring.
+### 7. Rate Limit Awareness
+- Apollo: ~100 matches/month on free tier. If 429 returned, skip Apollo and use GitHub-only data.
+- GitHub commit mining: ~3 API calls per developer (one per repo, 5 commits each).
+- Use the same `GITHUB_TOKEN` as the main pipeline for GitHub calls.
+- If rate limited on either service, return partial results rather than erroring.
 
-### 7. Build Must Pass
+### 8. Build Must Pass
 - `npm run build` with zero errors.
 - `npx prisma generate && npx prisma db push` after schema changes.
 
@@ -258,3 +355,35 @@ Also add to existing `Developer` model:
   ```
 
 - **Schema changes:** After modifying `prisma/schema.prisma`, run `npx prisma generate && npx prisma db push`.
+
+- **Apollo API client pattern:**
+  ```typescript
+  // src/lib/apollo.ts
+  const APOLLO_API = "https://api.apollo.io/v1";
+
+  async function apolloMatch(body: Record<string, string>): Promise<ApolloPersonMatch | null> {
+    const apiKey = process.env.APOLLO_API_KEY;
+    if (!apiKey) return null;
+
+    const res = await fetch(`${APOLLO_API}/people/match`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": apiKey,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.person || null;
+  }
+  ```
+
+- **Apollo response nesting:** The person object is under `data.person`. Employment history is `person.employment_history[]`. Phone is in `person.phone_numbers[0].sanitized_number`. Organization details are in `person.organization`.
+
+- **Name splitting:** GitHub `name` field is full name. Split on first space: `"Sindre Sorhus"` → `first_name: "Sindre"`, `last_name: "Sorhus"`. Handle single names (no space) by putting the whole name in `first_name`.
+
+- **Enrichment order matters:** Mine commit emails and extract social links BEFORE calling Apollo. This way you can pass a mined email or extracted LinkedIn URL to Apollo for better match quality.
+
+- **`employmentHistory` as Prisma `Json`:** Store the raw Apollo employment history array as JSON. Prisma's `Json` type maps to PostgreSQL's `jsonb`.
