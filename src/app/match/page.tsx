@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { JobInput } from "@/components/match/JobInput";
 import { RequirementsEditor } from "@/components/match/RequirementsEditor";
 import { MatchCard } from "@/components/match/MatchCard";
@@ -20,6 +22,8 @@ interface MatchResponse {
 }
 
 export default function MatchPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [requirements, setRequirements] = useState<ParsedRequirements | null>(null);
   const [results, setResults] = useState<MatchResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,6 +55,19 @@ export default function MatchPage() {
       setLoading(false);
     }
   }, [requirements]);
+
+  // Auth guard
+  if (status === "loading") {
+    return (
+      <div className="flex flex-1 items-center justify-center py-20">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-indigo-600" />
+      </div>
+    );
+  }
+  if (status === "unauthenticated") {
+    router.push("/api/auth/signin?callbackUrl=/match");
+    return null;
+  }
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
