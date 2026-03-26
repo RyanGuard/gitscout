@@ -232,9 +232,68 @@ export async function POST(request: Request) {
       )
     );
 
+    // Chain: fetch news for this company (non-blocking — best effort)
+    let newsResult: { events?: object[]; flightRisk?: string; summary?: string } = {};
+    try {
+      const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
+      const newsRes = await fetch(`${baseUrl}/api/market-map/enrich-news`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_id,
+          company_name: body.company_name || company_domain.split(".")[0],
+        }),
+      });
+      if (newsRes.ok) {
+        newsResult = await newsRes.json();
+      }
+    } catch {
+      // News enrichment failure is non-fatal
+    }
+
+    // Chain: auto-classify candidates if we have a role brief
+    let classifyResult: { classified?: number; highRisk?: number } = {};
+    if (candidates.length > 0 && (role_title || role_stack?.length)) {
+      try {
+        const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
+        const classifyRes = await fetch(`${baseUrl}/api/market-map/classify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            map_id,
+            company_id,
+            role_brief: {
+              title: role_title,
+              level: role_level,
+              stack: role_stack,
+              geography,
+            },
+            candidates: candidates.map((c) => ({
+              id: c.id,
+              name: c.name,
+              title: c.title,
+              seniority: c.seniority,
+              city: c.city,
+            })),
+            company_news: newsResult.summary || null,
+            company_news_events: newsResult.events || [],
+            company_growth_rate: companyInfo?.annual_revenue_printed || null,
+          }),
+        });
+        if (classifyRes.ok) {
+          classifyResult = await classifyRes.json();
+        }
+      } catch {
+        // Classification failure is non-fatal
+      }
+    }
+
     return Response.json({
       companyId: company_id,
       candidatesFound: candidates.length,
+      candidatesClassified: classifyResult.classified || 0,
+      highFlightRisk: classifyResult.highRisk || 0,
+      companyFlightRisk: newsResult.flightRisk || "low",
       companyInfo: companyInfo
         ? {
             headcount: updateData.headcount,
