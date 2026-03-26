@@ -8,12 +8,12 @@ export default function NotFound() {
       <h1 className="mt-4 text-2xl font-bold text-neutral-800 dark:text-neutral-200">
         Page not found
       </h1>
-      <p className="mt-2 text-neutral-500">
+      <p className="mt-2 text-neutral-500 dark:text-neutral-400">
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <Link
         href="/"
-        className="mt-6 inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        className="mt-6 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
       >
         Go home
       </Link>

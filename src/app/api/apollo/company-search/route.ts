@@ -27,26 +27,34 @@ export async function GET(request: Request) {
   }
 
   try {
-    const res = await fetch("https://api.apollo.io/v1/organizations/search", {
+    const res = await fetch("https://api.apollo.io/api/v1/mixed_companies/search", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": apiKey,
+      },
       body: JSON.stringify({
-        api_key: apiKey,
         q_organization_name: q,
         per_page: 5,
       }),
     });
 
     if (!res.ok) {
+      const errorBody = await res.text().catch(() => "");
+      console.error(`[apollo] Company search failed: ${res.status} ${errorBody.slice(0, 200)}`);
       return Response.json({ error: `Apollo returned ${res.status}` }, { status: 502 });
     }
 
     const data = await res.json();
-    const results = (data.organizations || []).map((org: Record<string, unknown>) => ({
+    const accounts = data.accounts || data.organizations || [];
+    const results = accounts.map((org: Record<string, unknown>) => ({
       company_name: org.name || "",
-      company_domain: org.primary_domain || org.website_url || "",
+      company_domain: org.domain || org.primary_domain || org.website_url || "",
       headcount: org.estimated_num_employees || null,
       hq_city: org.city || null,
+      hq_country: org.country || null,
+      funding_stage: org.latest_funding_stage || null,
+      industry: org.industry || null,
       apollo_org_id: org.id || null,
     }));
 

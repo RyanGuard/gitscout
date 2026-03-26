@@ -22,6 +22,7 @@ export async function GET(
 ) {
   const { username } = await params;
 
+  try {
   // Fetch fresh data from GitHub for accurate scoring
   const [userRes, reposRes] = await Promise.all([
     fetch(`${GITHUB_API}/users/${username}`, { headers: githubHeaders() }),
@@ -84,5 +85,16 @@ export async function GET(
       technical: { score: result.technicalScore, max: 10, label: "Technical Depth", description: "Language breadth, repo complexity" },
       reputation: { score: result.reputationScore, max: 10, label: "Reputation", description: "Followers, community standing" },
     },
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+    },
   });
+  } catch (error) {
+    console.error("[score] Error:", error instanceof Error ? error.message : error);
+    return Response.json(
+      { error: "Failed to compute score. Try again." },
+      { status: 500 }
+    );
+  }
 }
