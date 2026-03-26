@@ -44,11 +44,24 @@ export async function GET(
   const user: GitHubUser = await userRes.json();
   const repos: GitHubRepo[] = reposRes.ok ? await reposRes.json() : [];
 
-  // Fetch deep signals (GraphQL + merged PR search)
-  const contributions = await fetchContributions(username);
+  // Fetch deep signals (GraphQL + merged PR search + package data)
+  const [contributions, pkgRes] = await Promise.all([
+    fetchContributions(username),
+    fetch(`${_request.url.replace(/\/api\/score\/.*/, "/api/enrich/packages")}?username=${username}`).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]);
+
+  // Build package data for scoring
+  const packages = pkgRes?.registries ? {
+    totalDownloads: Object.values(pkgRes.registries as Record<string, { totalDownloads?: number }>).reduce(
+      (sum: number, reg) => sum + (reg.totalDownloads || 0), 0
+    ),
+    packageCount: Object.values(pkgRes.registries as Record<string, { packages?: unknown[] }>).reduce(
+      (sum: number, reg) => sum + (reg.packages?.length || 0), 0
+    ),
+  } : null;
 
   // Compute full 5-pillar score
-  const result = computeScore({ user, repos, contributions });
+  const result = computeScore({ user, repos, contributions, packages });
 
   // Also update local DB if developer is indexed
   const local = await prisma.developer.findUnique({

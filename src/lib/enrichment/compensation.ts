@@ -66,7 +66,9 @@ export function detectSeniority(signals: {
   const stars = signals.totalStars || 0;
   const score = signals.score || 0;
 
-  if (score >= 85 || followers >= 5000 || stars >= 10000 || age >= 12)
+  if (score >= 90 || followers >= 50000 || stars >= 50000 || age >= 15)
+    return { level: "principal", confidence: "low" };
+  if (score >= 75 || followers >= 5000 || stars >= 10000 || age >= 12)
     return { level: "staff", confidence: "low" };
   if (score >= 65 || followers >= 1000 || stars >= 2000 || age >= 7)
     return { level: "senior", confidence: "low" };
@@ -148,6 +150,16 @@ export function detectLocationTier(location: string | null): { tier: LocationTie
 const FAANG_COMPANIES = [
   "google", "alphabet", "meta", "facebook", "apple", "amazon", "microsoft",
   "netflix", "nvidia", "openai", "anthropic", "deepmind",
+  "tesla", "uber", "airbnb", "salesforce", "oracle", "adobe", "intel",
+  "bloomberg", "palantir", "coinbase", "doordash", "instacart", "lyft",
+  "twitch", "github", "linkedin",
+];
+
+// Major foundations and non-profit tech orgs — comp is lower but prestige is high
+const FOUNDATION_COMPANIES = [
+  "linux foundation", "mozilla", "apache", "eclipse foundation",
+  "cloud native", "cncf", "open source", "free software",
+  "python software", "rust foundation", "node.js",
 ];
 
 const UNICORN_COMPANIES = [
@@ -174,6 +186,8 @@ export function detectCompanyTier(company: string | null): { tier: string; multi
     return { tier: "unicorn", multiplier: 1.20, label: "Unicorn" };
   if (SERIES_BD.some((s) => c.includes(s)))
     return { tier: "growth", multiplier: 1.05, label: "Growth Stage" };
+  if (FOUNDATION_COMPANIES.some((f) => c.includes(f)))
+    return { tier: "foundation", multiplier: 0.85, label: "Foundation / Non-Profit" };
 
   // If company name exists, assume mid-market
   return { tier: "mid", multiplier: 1.0, label: "Mid-Market" };

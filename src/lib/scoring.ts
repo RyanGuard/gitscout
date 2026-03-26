@@ -14,10 +14,16 @@
 import type { GitHubUser, GitHubRepo } from "@/types";
 import type { ContributionData } from "@/pipeline/graphql";
 
+export interface PackageData {
+  totalDownloads: number;
+  packageCount: number;
+}
+
 export interface ScoreInput {
   user: GitHubUser;
   repos: GitHubRepo[];
   contributions: ContributionData | null;
+  packages?: PackageData | null;
 }
 
 export interface ScoreOutput {
@@ -56,7 +62,7 @@ function tieredScore(value: number, tiers: [number, number][]): number {
 // ═══════════════════════════════════════════════════════
 // PILLAR 1: IMPACT (30%) — Does their code matter to others?
 // ═══════════════════════════════════════════════════════
-function scoreImpact(repos: GitHubRepo[], contributions: ContributionData | null): number {
+function scoreImpact(repos: GitHubRepo[], contributions: ContributionData | null, packages?: PackageData | null): number {
   const nonFork = repos.filter((r) => !r.fork && !r.archived);
 
   // Stars — capped per repo at 60% of pillar to prevent single-repo inflation
@@ -79,7 +85,21 @@ function scoreImpact(repos: GitHubRepo[], contributions: ContributionData | null
   // Sponsorship bonus
   const sponsorBonus = (contributions?.isSponsorable && contributions.sponsorCount > 0) ? 1.5 : 0;
 
-  return Math.min(10, starsScore * 0.55 + forksScore * 0.35 + sponsorBonus);
+  // Package maintainer bonus — millions of downloads = massive real-world impact
+  let packageBonus = 0;
+  if (packages && packages.totalDownloads > 0) {
+    packageBonus = tieredScore(packages.totalDownloads, [
+      [1000, 0.5],       // 1K downloads
+      [10000, 1],        // 10K
+      [100000, 2],       // 100K
+      [1000000, 3],      // 1M
+      [10000000, 4],     // 10M
+      [100000000, 5],    // 100M
+      [1000000000, 6],   // 1B — npm ecosystem maintainers
+    ]);
+  }
+
+  return Math.min(10, starsScore * 0.45 + forksScore * 0.25 + packageBonus * 0.2 + sponsorBonus);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -257,11 +277,11 @@ function getTier(score: number): string {
 // ═══════════════════════════════════════════════════════
 // MAIN SCORING FUNCTION
 // ═══════════════════════════════════════════════════════
-export function computeScore({ user, repos, contributions }: ScoreInput): ScoreOutput {
+export function computeScore({ user, repos, contributions, packages }: ScoreInput): ScoreOutput {
   const nonForkRepos = repos.filter((r) => !r.fork && !r.archived);
 
   // Compute each pillar (0-10 scale)
-  const impact = scoreImpact(repos, contributions);
+  const impact = scoreImpact(repos, contributions, packages);
   const contribution = scoreContribution(contributions);
   const consistency = scoreConsistency(repos, contributions);
   const technical = scoreTechnical(repos);
