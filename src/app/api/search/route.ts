@@ -605,15 +605,19 @@ export async function GET(request: Request) {
     };
   });
 
-  // --- 5. Sort results ---
+  // --- 5. Filter out empty profiles (failed fetches) and sort ---
+  const validDevelopers = developers.filter(
+    (d) => d.name || d.followers > 0 || d.publicRepos > 0 || d.source === "local"
+  );
+
   // Only re-sort by score when user selected "score" sort (or default)
   // For followers/stars/joined, GitHub already sorted by that — preserve order
   if (sort === "score") {
-    developers.sort((a, b) => (b.score || 0) - (a.score || 0));
+    validDevelopers.sort((a, b) => (b.score || 0) - (a.score || 0));
   }
 
   return Response.json({
-    developers,
+    developers: validDevelopers,
     total: githubTotal,
     page,
     totalPages: Math.ceil(githubTotal / limit),
