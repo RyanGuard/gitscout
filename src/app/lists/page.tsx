@@ -31,7 +31,7 @@ export default function ListsPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/");
+      router.push("/api/auth/signin?callbackUrl=/lists");
       return;
     }
     if (session?.user?.id) fetchLists();

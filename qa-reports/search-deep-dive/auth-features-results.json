@@ -1,0 +1,302 @@
+[
+  {
+    "section": "Homepage",
+    "test": "Sign In button visible",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "section": "Auth",
+    "test": "Sign In click destination",
+    "status": "INFO",
+    "detail": "Navigated to: https://github.com/login?client_id=Ov23li9bemieLwQjrMLw&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23li9bemieLwQjrMLw%26prompt%3Dconsent%26redirect_uri%3Dhttps%253A%252F%252Fgitscout-beta.vercel.app%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail%26state%3DAl2eIrmVvNUW58r_ARJIiP7HYiIZyfpofXLrGAEfysU"
+  },
+  {
+    "section": "Auth",
+    "test": "Redirects to auth provider",
+    "status": "PASS",
+    "detail": "https://github.com/login?client_id=Ov23li9bemieLwQjrMLw&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23li9bemieLwQjrMLw%26prompt%3Dconsent%26redirect_uri%3Dhttps%253A%252F%252Fgitscout-beta.vercel.app%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail%26state%3DAl2eIrmVvNUW58r_ARJIiP7HYiIZyfpofXLrGAEfysU"
+  },
+  {
+    "section": "Auth Guard",
+    "test": "/favorites shows auth prompt",
+    "status": "PASS",
+    "detail": "Page shows sign-in message"
+  },
+  {
+    "section": "Auth Guard",
+    "test": "/lists behavior logged out",
+    "status": "INFO",
+    "detail": "URL: http://localhost:3000/, title: GitScout - Discover Talented Developers, 404: true, auth prompt: true"
+  },
+  {
+    "section": "Auth Guard",
+    "test": "/settings behavior logged out",
+    "status": "INFO",
+    "detail": "URL: http://localhost:3000/, 404: true, auth prompt: true"
+  },
+  {
+    "section": "Auth Guard",
+    "test": "/match behavior logged out",
+    "status": "INFO",
+    "detail": "URL: http://localhost:3000/match, has content: true, length: 14075"
+  },
+  {
+    "section": "Navigation",
+    "test": "search page loads",
+    "status": "PASS",
+    "detail": "URL: http://localhost:3000/search"
+  },
+  {
+    "section": "Navigation",
+    "test": "match page loads",
+    "status": "PASS",
+    "detail": "URL: http://localhost:3000/match"
+  },
+  {
+    "section": "Navigation",
+    "test": "lists page loads",
+    "status": "PASS",
+    "detail": "URL: http://localhost:3000/"
+  },
+  {
+    "section": "Navigation",
+    "test": "map page loads",
+    "status": "PASS",
+    "detail": "URL: http://localhost:3000/map"
+  },
+  {
+    "section": "Theme",
+    "test": "Initial theme detected",
+    "status": "INFO",
+    "detail": "dark"
+  },
+  {
+    "section": "Theme",
+    "test": "Theme toggles",
+    "status": "PASS",
+    "detail": "dark → light"
+  },
+  {
+    "section": "Responsive",
+    "test": "Desktop nav (1280px)",
+    "status": "INFO",
+    "detail": "Visible links: GitScout, Search, Match, Lists, Map"
+  },
+  {
+    "section": "Responsive",
+    "test": "Tablet nav (768px)",
+    "status": "INFO",
+    "detail": "Visible links: GitScout, Search, Match, Lists, Map"
+  },
+  {
+    "section": "Responsive",
+    "test": "Hamburger at 768px",
+    "status": "PASS",
+    "detail": "Menu button visible"
+  },
+  {
+    "section": "Responsive",
+    "test": "Mobile nav (375px)",
+    "status": "INFO",
+    "detail": "Visible links: GitScout, Search, Match, Lists, Map, "
+  },
+  {
+    "section": "Responsive",
+    "test": "Nav items collapse on mobile",
+    "status": "WARN",
+    "detail": "Desktop: 5 links, Mobile: 6 links"
+  },
+  {
+    "section": "Auth API",
+    "test": "GitHub provider configured",
+    "status": "PASS",
+    "detail": "Provider ID: github, Name: GitHub"
+  },
+  {
+    "section": "Auth API",
+    "test": "GitHub signin URL",
+    "status": "INFO",
+    "detail": "https://gitscout-beta.vercel.app/api/auth/signin/github"
+  },
+  {
+    "section": "Auth API",
+    "test": "GitHub callback URL",
+    "status": "INFO",
+    "detail": "https://gitscout-beta.vercel.app/api/auth/callback/github"
+  },
+  {
+    "section": "Auth API",
+    "test": "CSRF token generates",
+    "status": "PASS",
+    "detail": "Token length: 64 chars"
+  },
+  {
+    "section": "404 Handling",
+    "test": "/nonexistent returns 404",
+    "status": "PASS",
+    "detail": "Title: \"GitScout - Discover Talented Developers\", Has 404: true, Content preview: \"GitScoutSearchMatchListsMapSign inPage not foundThe page you're looking for doesn't exist or has bee\""
+  },
+  {
+    "section": "404 Handling",
+    "test": "/profile/ returns 404",
+    "status": "PASS",
+    "detail": "Title: \"GitScout - Discover Talented Developers\", Has 404: true, Content preview: \"GitScoutSearchMatchListsMapSign inPage not foundThe page you're looking for doesn't exist or has bee\""
+  },
+  {
+    "section": "404 Handling",
+    "test": "/map/nonexistent returns 404",
+    "status": "PASS",
+    "detail": "Title: \"GitScout - Discover Talented Developers\", Has 404: true, Content preview: \"GitScoutSearchMatchListsMapSign inPage not foundThe page you're looking for doesn't exist or has bee\""
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Homepage — title",
+    "status": "PASS",
+    "detail": "GitScout - Discover Talented Developers"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Homepage — description",
+    "status": "PASS",
+    "detail": "Search and discover talented developers on GitHub. Filter by language, location, and expertise."
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Homepage — og:title",
+    "status": "PASS",
+    "detail": "GitScout - Discover Talented Developers"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Homepage — og:description",
+    "status": "PASS",
+    "detail": "Search and discover talented developers on GitHub. Filter by language, location, and expertise."
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Homepage — viewport",
+    "status": "PASS",
+    "detail": "width=device-width, initial-scale=1"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Search — title",
+    "status": "PASS",
+    "detail": "GitScout - Discover Talented Developers"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Search — description",
+    "status": "PASS",
+    "detail": "Search and discover talented developers on GitHub. Filter by language, location, and expertise."
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Search — og:title",
+    "status": "PASS",
+    "detail": "GitScout - Discover Talented Developers"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Search — og:description",
+    "status": "PASS",
+    "detail": "Search and discover talented developers on GitHub. Filter by language, location, and expertise."
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Search — viewport",
+    "status": "PASS",
+    "detail": "width=device-width, initial-scale=1"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Profile (torvalds) — title",
+    "status": "FAIL",
+    "detail": "MISSING"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Profile (torvalds) — description",
+    "status": "WARN",
+    "detail": "MISSING"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Profile (torvalds) — og:title",
+    "status": "WARN",
+    "detail": "MISSING"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Profile (torvalds) — og:description",
+    "status": "WARN",
+    "detail": "MISSING"
+  },
+  {
+    "section": "Meta Tags",
+    "test": "Profile (torvalds) — viewport",
+    "status": "PASS",
+    "detail": "width=device-width, initial-scale=1"
+  },
+  {
+    "section": "Favicon",
+    "test": "Favicon link tags present",
+    "status": "PASS",
+    "detail": "Found 1: http://localhost:3000/favicon.ico?favicon.0x3dzn~oxb6tn.ico"
+  },
+  {
+    "section": "Favicon",
+    "test": "icon loads",
+    "status": "PASS",
+    "detail": "Status: 200, URL: http://localhost:3000/favicon.ico?favicon.0x3dzn~oxb6tn.ico"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Homepage (/)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Search (/search)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Profile (torvalds) (/profile/torvalds)",
+    "status": "FAIL",
+    "detail": "1 errors: %o\n\n%s DriverAdapterError: MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js:1919:150)\n    at processFullStringR"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Map (/map)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Lists (/lists)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Match (/match)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Settings (/settings)",
+    "status": "PASS",
+    "detail": "No console errors"
+  },
+  {
+    "section": "Console Errors",
+    "test": "Favorites (/favorites)",
+    "status": "PASS",
+    "detail": "No console errors"
+  }
+]

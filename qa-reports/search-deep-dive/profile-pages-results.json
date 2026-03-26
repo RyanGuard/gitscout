@@ -1,0 +1,590 @@
+{
+  "results": [
+    {
+      "section": "Profile: torvalds",
+      "test": "Page load",
+      "status": "PASS",
+      "details": "Loaded on attempt 1",
+      "timestamp": "2026-03-26T21:39:22.743Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Avatar image present",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.845Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Developer name displayed",
+      "status": "PASS",
+      "details": "Found: \"Linus Torvalds\"",
+      "timestamp": "2026-03-26T21:39:25.858Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Username visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.858Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Score displayed",
+      "status": "PASS",
+      "details": "Score: Score: 36",
+      "timestamp": "2026-03-26T21:39:25.859Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Company/org info",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.859Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Location info",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.859Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Bio/description present",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.859Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "GitHub profile link",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.861Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "GitHub link opens in new tab",
+      "status": "PASS",
+      "details": "target=\"_blank\" rel=\"noopener noreferrer\"",
+      "timestamp": "2026-03-26T21:39:25.866Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Follower stat visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.866Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Repo stat visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.866Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Star stat visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.866Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Score pillars visible (5 expected)",
+      "status": "FAIL",
+      "details": "Found 0/5: ",
+      "timestamp": "2026-03-26T21:39:25.867Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Score visualization bars",
+      "status": "PASS",
+      "details": "Found 2 bar elements",
+      "timestamp": "2026-03-26T21:39:25.870Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Bars have animation/transition",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.870Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Languages section present",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.871Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Programming languages listed",
+      "status": "PASS",
+      "details": "Found: C",
+      "timestamp": "2026-03-26T21:39:25.871Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Repository cards displayed",
+      "status": "WARN",
+      "details": "Found 0 repo elements",
+      "timestamp": "2026-03-26T21:39:25.873Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Linux repo visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.873Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Buttons inventory",
+      "status": "INFO",
+      "details": "Found 5: Sign in | Find Similar | Share Card",
+      "timestamp": "2026-03-26T21:39:25.875Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Scouting Report button",
+      "status": "WARN",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.875Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Outreach Draft button",
+      "status": "WARN",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.875Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Find Similar button",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.875Z"
+    },
+    {
+      "section": "Profile: torvalds",
+      "test": "Share Card button",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:25.875Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Page load",
+      "status": "PASS",
+      "details": "Loaded on attempt 1",
+      "timestamp": "2026-03-26T21:39:31.147Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Avatar image present",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.256Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Developer name/username displayed",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.257Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Bio text present",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.257Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Location info",
+      "status": "WARN",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.257Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Personal website link",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.262Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Website opens in new tab",
+      "status": "PASS",
+      "details": "target=\"_blank\"",
+      "timestamp": "2026-03-26T21:39:34.263Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Expected languages found",
+      "status": "PASS",
+      "details": "Found: TypeScript, JavaScript, Swift",
+      "timestamp": "2026-03-26T21:39:34.263Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Repository cards displayed",
+      "status": "WARN",
+      "details": "Found 0",
+      "timestamp": "2026-03-26T21:39:34.265Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "Score pillars visible",
+      "status": "WARN",
+      "details": "0/5",
+      "timestamp": "2026-03-26T21:39:34.266Z"
+    },
+    {
+      "section": "Profile: sindresorhus",
+      "test": "GitHub profile link",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:34.268Z"
+    },
+    {
+      "section": "404 Page",
+      "test": "HTTP status code",
+      "status": "WARN",
+      "details": "Got 200",
+      "timestamp": "2026-03-26T21:39:39.658Z"
+    },
+    {
+      "section": "404 Page",
+      "test": "404 message displayed",
+      "status": "PASS",
+      "details": "Error message found",
+      "timestamp": "2026-03-26T21:39:39.661Z"
+    },
+    {
+      "section": "404 Page",
+      "test": "Back navigation link",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:39.665Z"
+    },
+    {
+      "section": "404 Page",
+      "test": "No leaked profile content",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:39:39.665Z"
+    },
+    {
+      "section": "XSS Protection",
+      "test": "XSS vector: <script>alert(1)</script>",
+      "status": "PASS",
+      "details": "No script execution",
+      "timestamp": "2026-03-26T21:39:41.999Z"
+    },
+    {
+      "section": "XSS Protection",
+      "test": "XSS vector: img onerror",
+      "status": "PASS",
+      "details": "No script execution",
+      "timestamp": "2026-03-26T21:39:44.187Z"
+    },
+    {
+      "section": "XSS Protection",
+      "test": "XSS vector: javascript: URI",
+      "status": "PASS",
+      "details": "No script execution",
+      "timestamp": "2026-03-26T21:39:46.367Z"
+    },
+    {
+      "section": "XSS Protection",
+      "test": "XSS vector: onmouseover",
+      "status": "PASS",
+      "details": "No script execution",
+      "timestamp": "2026-03-26T21:39:48.557Z"
+    },
+    {
+      "section": "XSS Protection",
+      "test": "Script tag not rendered as HTML",
+      "status": "PASS",
+      "details": "Properly escaped",
+      "timestamp": "2026-03-26T21:39:48.607Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Scouting Report — button",
+      "status": "FAIL",
+      "details": "Not found on page",
+      "timestamp": "2026-03-26T21:39:56.809Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Draft Outreach — button",
+      "status": "FAIL",
+      "details": "Not found",
+      "timestamp": "2026-03-26T21:40:05.004Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Find Similar — clicked",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:40:13.215Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Find Similar — response",
+      "status": "PASS",
+      "details": "Navigated to http://localhost:3000/search?q=C&similarTo=torvalds&similarName=Linus+Torvalds&locationSkipped=true",
+      "timestamp": "2026-03-26T21:40:16.219Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Share Card — clicked",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:40:24.588Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "Share Card — modal appeared",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:40:26.592Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "GitHub link",
+      "status": "PASS",
+      "details": "href=\"https://github.com/torvalds\" target=\"_blank\"",
+      "timestamp": "2026-03-26T21:40:34.112Z"
+    },
+    {
+      "section": "Action Buttons",
+      "test": "GitHub link — new tab",
+      "status": "PASS",
+      "details": "target=\"_blank\"",
+      "timestamp": "2026-03-26T21:40:34.112Z"
+    },
+    {
+      "section": "Enrich Button",
+      "test": "Enrich button",
+      "status": "WARN",
+      "details": "Not found — may require auth or indexing",
+      "timestamp": "2026-03-26T21:40:42.275Z"
+    },
+    {
+      "section": "Favorite Button",
+      "test": "Favorite button",
+      "status": "WARN",
+      "details": "Not found on page",
+      "timestamp": "2026-03-26T21:40:50.504Z"
+    },
+    {
+      "section": "Push to Ashby",
+      "test": "Push to Ashby button",
+      "status": "WARN",
+      "details": "Not found",
+      "timestamp": "2026-03-26T21:40:58.715Z"
+    },
+    {
+      "section": "Add to List",
+      "test": "Add to List button",
+      "status": "WARN",
+      "details": "Not found",
+      "timestamp": "2026-03-26T21:41:06.935Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "desktop-1440 — no horizontal overflow",
+      "status": "PASS",
+      "details": "body=1440px viewport=1440px",
+      "timestamp": "2026-03-26T21:41:15.393Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "desktop-1440 — avatar visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:15.407Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "desktop-1440 — buttons within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:15.408Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "desktop-1440 — text within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:15.409Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "laptop-1024 — no horizontal overflow",
+      "status": "PASS",
+      "details": "body=1024px viewport=1024px",
+      "timestamp": "2026-03-26T21:41:23.774Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "laptop-1024 — avatar visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:23.789Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "laptop-1024 — buttons within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:23.790Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "laptop-1024 — text within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:23.790Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "tablet-768 — no horizontal overflow",
+      "status": "PASS",
+      "details": "body=768px viewport=768px",
+      "timestamp": "2026-03-26T21:41:32.176Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "tablet-768 — avatar visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:32.191Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "tablet-768 — buttons within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:32.192Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "tablet-768 — text within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:32.193Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "mobile-375 — no horizontal overflow",
+      "status": "PASS",
+      "details": "body=375px viewport=375px",
+      "timestamp": "2026-03-26T21:41:40.691Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "mobile-375 — avatar visible",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:40.705Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "mobile-375 — buttons within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:40.706Z"
+    },
+    {
+      "section": "Responsive",
+      "test": "mobile-375 — text within viewport",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2026-03-26T21:41:40.707Z"
+    },
+    {
+      "section": "Dark Mode",
+      "test": "Light mode captured",
+      "status": "PASS",
+      "details": "BG: rgb(10, 10, 15)",
+      "timestamp": "2026-03-26T21:41:49.081Z"
+    },
+    {
+      "section": "Dark Mode",
+      "test": "Dark mode captured",
+      "status": "PASS",
+      "details": "BG: rgb(10, 10, 15)",
+      "timestamp": "2026-03-26T21:41:57.526Z"
+    },
+    {
+      "section": "Dark Mode",
+      "test": "Light/dark themes differ",
+      "status": "FAIL",
+      "details": "Light: rgb(10, 10, 15), Dark: rgb(10, 10, 15)",
+      "timestamp": "2026-03-26T21:41:57.526Z"
+    },
+    {
+      "section": "Dark Mode",
+      "test": "Dark mode — no white backgrounds",
+      "status": "PASS",
+      "details": "All themed properly",
+      "timestamp": "2026-03-26T21:41:57.527Z"
+    },
+    {
+      "section": "Dark Mode",
+      "test": "Dark mode — text contrast",
+      "status": "INFO",
+      "details": "Text: rgb(255, 255, 255), BG: rgb(10, 10, 15)",
+      "timestamp": "2026-03-26T21:41:57.528Z"
+    },
+    {
+      "section": "External Links",
+      "test": "External links found",
+      "status": "PASS",
+      "details": "1 total (1 visible)",
+      "timestamp": "2026-03-26T21:42:05.809Z"
+    },
+    {
+      "section": "External Links",
+      "test": "All visible external links → new tab",
+      "status": "PASS",
+      "details": "All 1 links correct",
+      "timestamp": "2026-03-26T21:42:05.809Z"
+    },
+    {
+      "section": "External Links",
+      "test": "rel=\"noopener\" on _blank links",
+      "status": "PASS",
+      "details": "All secured",
+      "timestamp": "2026-03-26T21:42:05.809Z"
+    },
+    {
+      "section": "External Links",
+      "test": "Link: GitHub",
+      "status": "PASS",
+      "details": "→ https://github.com/torvalds target=\"_blank\"",
+      "timestamp": "2026-03-26T21:42:05.809Z"
+    },
+    {
+      "section": "Console",
+      "test": "Browser console errors",
+      "status": "FAIL",
+      "details": "23 total errors",
+      "timestamp": "2026-03-26T21:42:05.809Z"
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)"
+  ],
+  "networkErrors": [],
+  "timestamp": "2026-03-26T21:42:05.856Z"
+}

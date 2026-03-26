@@ -1,0 +1,173 @@
+[
+  {
+    "test": "1. Empty state loads",
+    "status": "PASS",
+    "note": "Search input visible: true, empty state content: true",
+    "screenshot": "01-search-empty-state.png",
+    "timestamp": "2026-03-26T21:34:47.952Z"
+  },
+  {
+    "test": "2. Search TypeScript San Francisco",
+    "status": "FAIL",
+    "note": "0 results in 2102ms",
+    "elapsed_ms": 2102,
+    "result_count": 0,
+    "screenshot": "02-search-results-ts-sf.png",
+    "timestamp": "2026-03-26T21:34:51.184Z"
+  },
+  {
+    "test": "3. Document card fields",
+    "status": "INFO",
+    "note": "Present: [tierBadge, emailIndicator, location, followers, stars, languages, viewedBadge, company] | Missing: [avatar, name, username, score, repos, bio, lastActive]",
+    "fields": {
+      "avatar": false,
+      "name": false,
+      "username": false,
+      "score": false,
+      "tierBadge": true,
+      "emailIndicator": true,
+      "location": true,
+      "followers": true,
+      "stars": true,
+      "repos": false,
+      "languages": true,
+      "bio": false,
+      "lastActive": false,
+      "viewedBadge": true,
+      "company": true
+    },
+    "screenshot": "03-first-card-detail.png",
+    "timestamp": "2026-03-26T21:34:51.201Z"
+  },
+  {
+    "test": "4. Click result cards",
+    "status": "FAIL",
+    "note": "No profile links found to click",
+    "timestamp": "2026-03-26T21:34:51.202Z"
+  },
+  {
+    "test": "5. Sort options",
+    "status": "PASS",
+    "note": "Sort control found (button), sort worked: true",
+    "screenshot": "05-sort-control-found.png",
+    "timestamp": "2026-03-26T21:35:04.048Z"
+  },
+  {
+    "test": "6. Language filter: TypeScript",
+    "status": "PASS",
+    "note": "Filter clicked, URL: http://localhost:3000/search?q=TypeScript+San+Francisco&languages=TypeScript",
+    "screenshot": "06-lang-filter-typescript.png",
+    "timestamp": "2026-03-26T21:35:10.073Z"
+  },
+  {
+    "test": "6. Language filter: Python",
+    "status": "PASS",
+    "note": "Filter clicked, URL: http://localhost:3000/search?q=TypeScript+San+Francisco&languages=Python",
+    "screenshot": "06-lang-filter-python.png",
+    "timestamp": "2026-03-26T21:35:13.395Z"
+  },
+  {
+    "test": "6. Language filter: Rust",
+    "status": "PASS",
+    "note": "Filter clicked, URL: http://localhost:3000/search?q=TypeScript+San+Francisco&languages=Rust",
+    "screenshot": "06-lang-filter-rust.png",
+    "timestamp": "2026-03-26T21:35:16.601Z"
+  },
+  {
+    "test": "7. Location filter",
+    "status": "WARN",
+    "note": "No dedicated location input found. Tested via URL params.",
+    "screenshot": "07-location-filter-url.png",
+    "timestamp": "2026-03-26T21:35:24.312Z"
+  },
+  {
+    "test": "8. Min Stars filter",
+    "status": "PASS",
+    "note": "Min stars filter found and set to 100",
+    "screenshot": "08-min-stars-100.png",
+    "timestamp": "2026-03-26T21:35:31.081Z"
+  },
+  {
+    "test": "9. Open to Work checkbox",
+    "status": "PASS",
+    "note": "Open to Work checkbox found and toggled",
+    "screenshot": "09-open-to-work-checked.png",
+    "timestamp": "2026-03-26T21:35:38.714Z"
+  },
+  {
+    "test": "10. Hide Viewed checkbox",
+    "status": "PASS",
+    "note": "Hide Viewed checkbox found and toggled",
+    "screenshot": "10-hide-viewed-checked.png",
+    "timestamp": "2026-03-26T21:35:40.896Z"
+  },
+  {
+    "test": "11. Cmd+K shortcut",
+    "status": "FAIL",
+    "note": "After Cmd+K: URL=http://localhost:3000/, modal=false, inputFocused=false",
+    "screenshot": "11-cmd-k-from-home.png",
+    "timestamp": "2026-03-26T21:35:43.611Z"
+  },
+  {
+    "test": "11. Cmd+K on search page",
+    "status": "WARN",
+    "note": "Input focused: false, active element: body",
+    "screenshot": "11-cmd-k-from-search.png",
+    "timestamp": "2026-03-26T21:35:47.805Z"
+  },
+  {
+    "test": "12. Edge case: empty query",
+    "status": "FAIL",
+    "note": "Error displayed on page for query: empty query",
+    "screenshot": "12-edge-empty-query.png",
+    "timestamp": "2026-03-26T21:35:52.504Z"
+  },
+  {
+    "test": "12. Edge case: single letter",
+    "status": "FAIL",
+    "note": "Error displayed on page for query: single letter",
+    "screenshot": "12-edge-single-letter.png",
+    "timestamp": "2026-03-26T21:35:57.338Z"
+  },
+  {
+    "test": "12. Edge case: 200 char query",
+    "status": "FAIL",
+    "note": "Error displayed on page for query: 200 char query",
+    "screenshot": "12-edge-200-char-query.png",
+    "timestamp": "2026-03-26T21:36:02.063Z"
+  },
+  {
+    "test": "12. Edge case: XSS script tag",
+    "status": "FAIL",
+    "note": "XSS VULNERABILITY: Script tag rendered in DOM!",
+    "screenshot": "12-edge-XSS-script-tag.png",
+    "timestamp": "2026-03-26T21:36:06.817Z"
+  },
+  {
+    "test": "12. Edge case: emoji query",
+    "status": "FAIL",
+    "note": "Error displayed on page for query: emoji query",
+    "screenshot": "12-edge-emoji-query.png",
+    "timestamp": "2026-03-26T21:36:11.551Z"
+  },
+  {
+    "test": "13.1 Pagination page 2",
+    "status": "PASS",
+    "note": "Page 1 had 20 results, page 2 has 0 results. Changed: true",
+    "screenshot": "13-pagination-page2.png",
+    "timestamp": "2026-03-26T21:36:19.031Z"
+  },
+  {
+    "test": "14. No results empty state",
+    "status": "PASS",
+    "note": "Empty message shown: true, profile links: 0",
+    "screenshot": "14-no-results.png",
+    "timestamp": "2026-03-26T21:36:23.786Z"
+  },
+  {
+    "test": "15. Rapid fire searches",
+    "status": "FAIL",
+    "note": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/search\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/search\", waiting until \"networkidle\"\u001b[22m\n",
+    "timestamp": "2026-03-26T21:36:23.792Z"
+  }
+]

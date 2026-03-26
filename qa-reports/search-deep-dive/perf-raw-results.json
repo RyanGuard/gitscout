@@ -1,0 +1,432 @@
+{
+  "homepageLoad": {
+    "min": 38,
+    "max": 62,
+    "avg": 48,
+    "median": 43,
+    "runs": [
+      61.54866699999991,
+      43.03883300000007,
+      38.33829200000014
+    ],
+    "target": 500,
+    "pass": true
+  },
+  "searchPageLoad": {
+    "min": 61,
+    "max": 92,
+    "avg": 72,
+    "median": 64,
+    "runs": [
+      63.981583,
+      60.65341699999999,
+      91.70195799999988
+    ]
+  },
+  "searchPythonAPI": {
+    "min": 191,
+    "max": 767,
+    "avg": 324,
+    "median": 220,
+    "runs": [
+      767.416667,
+      246.61320799999976,
+      219.98774999999978,
+      191.1786659999998,
+      194.82658300000003
+    ],
+    "target": 3000,
+    "pass": true
+  },
+  "searchTSSF": {
+    "min": 190,
+    "max": 315,
+    "avg": 229,
+    "median": 207,
+    "runs": [
+      315.25041599999986,
+      189.70562500000005,
+      190.59375,
+      206.58425000000034,
+      242.99641599999995
+    ]
+  },
+  "profilePageLoad": {
+    "min": 214,
+    "max": 932,
+    "avg": 520,
+    "median": 416,
+    "runs": [
+      932.0775830000002,
+      415.56974999999966,
+      213.50237500000003
+    ]
+  },
+  "scoreAPI": {
+    "min": 50,
+    "max": 59,
+    "avg": 53,
+    "median": 51,
+    "runs": [
+      59.128082999999606,
+      49.76366700000017,
+      51.43729100000019
+    ],
+    "statuses": [
+      429,
+      429,
+      429
+    ]
+  },
+  "statsAPI": {
+    "min": 172,
+    "max": 193,
+    "avg": 182,
+    "median": 180,
+    "runs": [
+      179.63025000000016,
+      193.2910839999995,
+      172.31954200000018
+    ],
+    "target": 500,
+    "pass": true
+  },
+  "concurrentSearches": {
+    "results": [
+      {
+        "query": "python",
+        "status": 200,
+        "time": 54
+      },
+      {
+        "query": "rust",
+        "status": 200,
+        "time": 61
+      },
+      {
+        "query": "go",
+        "status": 200,
+        "time": 60
+      },
+      {
+        "query": "typescript",
+        "status": 200,
+        "time": 66
+      },
+      {
+        "query": "frontend",
+        "status": 200,
+        "time": 64
+      }
+    ],
+    "totalTime": 66,
+    "allSucceeded": true
+  },
+  "sequentialSearches": {
+    "results": [
+      {
+        "query": "python",
+        "time": 51,
+        "status": 200
+      },
+      {
+        "query": "rust",
+        "time": 57,
+        "status": 200
+      },
+      {
+        "query": "go",
+        "time": 61,
+        "status": 200
+      },
+      {
+        "query": "typescript",
+        "time": 57,
+        "status": 200
+      },
+      {
+        "query": "frontend",
+        "time": 52,
+        "status": 200
+      },
+      {
+        "query": "react",
+        "time": 49,
+        "status": 200
+      },
+      {
+        "query": "node",
+        "time": 50,
+        "status": 200
+      },
+      {
+        "query": "django",
+        "time": 49,
+        "status": 200
+      },
+      {
+        "query": "kubernetes",
+        "time": 48,
+        "status": 200
+      },
+      {
+        "query": "machine learning",
+        "time": 51,
+        "status": 200
+      }
+    ],
+    "failures": 0,
+    "heapBefore": {
+      "usedJSHeapSize": 567649,
+      "totalJSHeapSize": 1048585
+    },
+    "heapAfter": {
+      "usedJSHeapSize": 585129,
+      "totalJSHeapSize": 1048585
+    },
+    "memoryGrowth": 17
+  },
+  "caching": {
+    "firstRun": 50,
+    "secondRun": 49,
+    "isFaster": true,
+    "speedupPercent": 1
+  },
+  "domNodeCount": {
+    "afterLoad": 193,
+    "afterSearch1": 206,
+    "after5Searches": 206,
+    "growth": 13,
+    "growthPercent": 7,
+    "unbounded": false
+  },
+  "bundleSize": {
+    "resources": [
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js",
+        "transferSize": 184326,
+        "decodedBodySize": 1057980,
+        "encodedBodySize": 184026,
+        "duration": 692
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_0553esy.js",
+        "transferSize": 217798,
+        "decodedBodySize": 746572,
+        "encodedBodySize": 217498,
+        "duration": 517
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js",
+        "transferSize": 151275,
+        "decodedBodySize": 742815,
+        "encodedBodySize": 150975,
+        "duration": 526
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_0jj~bj0._.js",
+        "transferSize": 86078,
+        "decodedBodySize": 500360,
+        "encodedBodySize": 85778,
+        "duration": 719
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_115brz8._.js",
+        "transferSize": 45905,
+        "decodedBodySize": 246103,
+        "encodedBodySize": 45605,
+        "duration": 287
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_04ff3d9._.js",
+        "transferSize": 21738,
+        "decodedBodySize": 178139,
+        "encodedBodySize": 21438,
+        "duration": 780
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+        "transferSize": 32109,
+        "decodedBodySize": 174634,
+        "encodedBodySize": 31809,
+        "duration": 101
+      },
+      {
+        "name": "/_next/static/chunks/src_03f0b~~._.js",
+        "transferSize": 13142,
+        "decodedBodySize": 161584,
+        "encodedBodySize": 12842,
+        "duration": 727
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js",
+        "transferSize": 28615,
+        "decodedBodySize": 144344,
+        "encodedBodySize": 28315,
+        "duration": 117
+      },
+      {
+        "name": "/_next/static/chunks/src_0z_87rc._.js",
+        "transferSize": 13305,
+        "decodedBodySize": 111601,
+        "encodedBodySize": 13005,
+        "duration": 452
+      },
+      {
+        "name": "/_next/static/chunks/turbopack-_0p44nws._.js",
+        "transferSize": 22407,
+        "decodedBodySize": 91085,
+        "encodedBodySize": 22107,
+        "duration": 367
+      },
+      {
+        "name": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0yjw1oe._.js",
+        "transferSize": 4131,
+        "decodedBodySize": 15461,
+        "encodedBodySize": 3831,
+        "duration": 94
+      },
+      {
+        "name": "/_next/static/chunks/_11yy-ge._.js",
+        "transferSize": 1712,
+        "decodedBodySize": 6310,
+        "encodedBodySize": 1412,
+        "duration": 669
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_0-4ujiy._.js",
+        "transferSize": 1037,
+        "decodedBodySize": 1984,
+        "encodedBodySize": 737,
+        "duration": 211
+      },
+      {
+        "name": "/_next/static/chunks/_0rqeker._.js",
+        "transferSize": 1056,
+        "decodedBodySize": 756,
+        "encodedBodySize": 756,
+        "duration": 193
+      },
+      {
+        "name": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_10z625~._.js",
+        "transferSize": 975,
+        "decodedBodySize": 675,
+        "encodedBodySize": 675,
+        "duration": 49
+      },
+      {
+        "name": "/_next/static/chunks/src_app_layout_tsx_004glpo._.js",
+        "transferSize": 638,
+        "decodedBodySize": 338,
+        "encodedBodySize": 338,
+        "duration": 468
+      },
+      {
+        "name": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_10mygs7._.js",
+        "transferSize": 589,
+        "decodedBodySize": 289,
+        "encodedBodySize": 289,
+        "duration": 79
+      },
+      {
+        "name": "/_next/static/chunks/src_app_page_tsx_0v2_a_3._.js",
+        "transferSize": 586,
+        "decodedBodySize": 286,
+        "encodedBodySize": 286,
+        "duration": 711
+      },
+      {
+        "name": "/_next/static/chunks/src_app_error_tsx_0v2_a_3._.js",
+        "transferSize": 541,
+        "decodedBodySize": 241,
+        "encodedBodySize": 241,
+        "duration": 670
+      },
+      {
+        "name": "/_next/static/chunks/src_app_not-found_tsx_0v2_a_3._.js",
+        "transferSize": 512,
+        "decodedBodySize": 212,
+        "encodedBodySize": 212,
+        "duration": 703
+      },
+      {
+        "name": "/_next/static/chunks/node_modules_next_dist_client_components_builtin_global-error_0v2_a_3.js",
+        "transferSize": 512,
+        "decodedBodySize": 212,
+        "encodedBodySize": 212,
+        "duration": 719
+      }
+    ],
+    "totalTransferKB": 810,
+    "totalDecodedKB": 4084,
+    "count": 22
+  },
+  "renderBlocking": {
+    "count": 1,
+    "resources": [
+      {
+        "name": "/_next/static/chunks/%5Broot-of-the-server%5D__02nfq85._.css",
+        "type": "link",
+        "duration": 11,
+        "transferSize": 17209
+      }
+    ]
+  },
+  "memoryLeaks": {
+    "snapshots": [
+      {
+        "cycle": 1,
+        "heap": 20874,
+        "domNodes": 122
+      },
+      {
+        "cycle": 2,
+        "heap": 28652,
+        "domNodes": 122
+      },
+      {
+        "cycle": 3,
+        "heap": 36116,
+        "domNodes": 122
+      },
+      {
+        "cycle": 4,
+        "heap": 42281,
+        "domNodes": 122
+      },
+      {
+        "cycle": 5,
+        "heap": 49603,
+        "domNodes": 122
+      },
+      {
+        "cycle": 6,
+        "heap": 55620,
+        "domNodes": 122
+      },
+      {
+        "cycle": 7,
+        "heap": 69972,
+        "domNodes": 122
+      },
+      {
+        "cycle": 8,
+        "heap": 69505,
+        "domNodes": 122
+      },
+      {
+        "cycle": 9,
+        "heap": 83746,
+        "domNodes": 122
+      },
+      {
+        "cycle": 10,
+        "heap": 86128,
+        "domNodes": 122
+      }
+    ],
+    "domGrowth": 0,
+    "heapGrowthKB": 65254,
+    "leakSuspected": true
+  }
+}

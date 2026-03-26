@@ -1,0 +1,86 @@
+{
+  "desktop": {
+    "homepage": {
+      "status": "captured",
+      "path": "screenshots/desktop/homepage.png"
+    },
+    "search-empty": {
+      "status": "captured",
+      "path": "screenshots/desktop/search-empty.png"
+    },
+    "search-results": {
+      "status": "captured",
+      "path": "screenshots/desktop/search-results.png"
+    },
+    "profile-torvalds": {
+      "status": "captured",
+      "path": "screenshots/desktop/profile-torvalds.png"
+    },
+    "map": {
+      "status": "captured",
+      "path": "screenshots/desktop/map.png"
+    },
+    "lists": {
+      "status": "captured",
+      "path": "screenshots/desktop/lists.png"
+    },
+    "match": {
+      "status": "captured",
+      "path": "screenshots/desktop/match.png"
+    },
+    "favorites": {
+      "status": "captured",
+      "path": "screenshots/desktop/favorites.png"
+    },
+    "settings": {
+      "status": "captured",
+      "path": "screenshots/desktop/settings.png"
+    },
+    "map-templates": {
+      "status": "captured",
+      "path": "screenshots/desktop/map-templates.png"
+    }
+  },
+  "mobile": {
+    "homepage": {
+      "status": "captured",
+      "path": "screenshots/mobile/homepage.png"
+    },
+    "search-empty": {
+      "status": "captured",
+      "path": "screenshots/mobile/search-empty.png"
+    },
+    "search-results": {
+      "status": "captured",
+      "path": "screenshots/mobile/search-results.png"
+    },
+    "profile-torvalds": {
+      "status": "captured",
+      "path": "screenshots/mobile/profile-torvalds.png"
+    },
+    "map": {
+      "status": "captured",
+      "path": "screenshots/mobile/map.png"
+    },
+    "lists": {
+      "status": "captured",
+      "path": "screenshots/mobile/lists.png"
+    },
+    "match": {
+      "status": "captured",
+      "path": "screenshots/mobile/match.png"
+    },
+    "favorites": {
+      "status": "captured",
+      "path": "screenshots/mobile/favorites.png"
+    },
+    "settings": {
+      "status": "captured",
+      "path": "screenshots/mobile/settings.png"
+    },
+    "map-templates": {
+      "status": "captured",
+      "path": "screenshots/mobile/map-templates.png"
+    }
+  }
+}

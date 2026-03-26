@@ -10,6 +10,14 @@ const MAX_CONTRIBUTORS = 200;
 const MAX_REPOS_TO_SCAN = 15;
 const MAX_ENRICHED = 50;
 
+// Timeout helper — prevents infinite hangs
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const {
@@ -162,9 +170,9 @@ export async function POST(request: Request) {
     enriched.slice(0, maxResults).map(async ({ profile, seedContribs }) => {
       const username = profile.login as string;
 
-      // GraphQL enrichment
-      const gqlData = await client.getEnrichedProfile(username);
-      const externalPRs = await client.getExternalMergedPRs(username);
+      // GraphQL enrichment (5s timeout each to prevent hangs)
+      const gqlData = await withTimeout(client.getEnrichedProfile(username), 5000, null);
+      const externalPRs = await withTimeout(client.getExternalMergedPRs(username), 5000, 0);
 
       // Extract contribution data
       const cc = (gqlData as Record<string, unknown>)?.contributionsCollection as Record<string, unknown> | undefined;

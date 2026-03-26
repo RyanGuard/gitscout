@@ -4,7 +4,7 @@ export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
   const expectedToken = process.env.PIPELINE_SECRET;
 
-  if (expectedToken && authHeader !== `Bearer ${expectedToken}`) {
+  if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

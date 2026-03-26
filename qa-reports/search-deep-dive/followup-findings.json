@@ -1,0 +1,509 @@
+{
+  "xss": {
+    "injectedScriptCount": 0,
+    "rawScriptInInnerHTML": false,
+    "hasEscapedVersion": true,
+    "inputHasXSS": true,
+    "urlHasXSS": false,
+    "urlEncoded": true,
+    "currentUrl": "http://localhost:3000/search?q=%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
+    "bodyTextSample": "GitScoutSearchMatchListsMapSign in⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyHide viewed (0)Filters0 developers foundNo developers foundTry adjusting your search query or filters.Search tipsTry broader terms like \"python\" or \"frontend\"Search by location: \"San Francisco\"Remove filters to widen resultsrequestAnimationFrame(function(){$RT=performance.now()});self.__next_r=\"eVB77qAUuN"
+  },
+  "search": {
+    "resultCount1": 20,
+    "resultCount2": 20,
+    "apiRequests": [
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/score/trekhleb",
+        "status": 429,
+        "bodyLength": 71,
+        "bodyPreview": "{\"error\":\"GitHub API rate limit exceeded. Try again in a few minutes.\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/score/trekhleb",
+        "status": 429,
+        "bodyLength": 71,
+        "bodyPreview": "{\"error\":\"GitHub API rate limit exceeded. Try again in a few minutes.\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/score/mahseema",
+        "status": 429,
+        "bodyLength": 71,
+        "bodyPreview": "{\"error\":\"GitHub API rate limit exceeded. Try again in a few minutes.\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/score/mahseema",
+        "status": 429,
+        "bodyLength": 71,
+        "bodyPreview": "{\"error\":\"GitHub API rate limit exceeded. Try again in a few minutes.\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript+San+Francisco&page=1",
+        "status": 200,
+        "bodyLength": 12443,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=a&page=1",
+        "status": 200,
+        "bodyLength": 23327,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5g060j000104l8uctbhjo1\",\"githubId\":1024025,\"username\":\"torvalds\",\"name\":\"Linus Torvalds\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/1024025?v=4\",\"bio\":null,\"company\":\"Linux Foundation\",\"location\":\"Portland, OR\",\"blog\":\"\",\"twitterUsername\":null,\"publicR"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&page=1",
+        "status": 200,
+        "bodyLength": 262,
+        "bodyPreview": "{\"developers\":[],\"total\":0,\"page\":1,\"totalPages\":0,\"query\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=%F0%9F%9A%80%F0%9F%94%A5%F0%9F%92%BB&page=1",
+        "status": 200,
+        "bodyLength": 68,
+        "bodyPreview": "{\"developers\":[],\"total\":0,\"page\":1,\"totalPages\":0,\"query\":\"🚀🔥💻\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=React&page=1",
+        "status": 200,
+        "bodyLength": 23807,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5itj9t005s04jm6zhgu079\",\"githubId\":499550,\"username\":\"yyx990803\",\"name\":\"Evan You\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/499550?v=4\",\"bio\":\"Founder @voidzero-dev, author of @vuejs and @vitejs. Connoisseur of sushi.\",\"company\":\"VoidZero\",\"location\""
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=Python&page=1",
+        "status": 200,
+        "bodyLength": 12065,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5j8agr000104jmfc6dvu87\",\"githubId\":241138,\"username\":\"karpathy\",\"name\":\"Andrej\",\"email\":\"andrej.karpathy@gmail.com\",\"avatarUrl\":\"https://avatars.githubusercontent.com/u/241138?v=4\",\"bio\":\"I like to train Deep Neural Nets on large datasets.\",\"company\":null,\"location\":\"Stanfor"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=Go&page=1",
+        "status": 200,
+        "bodyLength": 13209,
+        "bodyPreview": "{\"developers\":[{\"id\":\"gh-1123322\",\"githubId\":1123322,\"username\":\"kelseyhightower\",\"name\":null,\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/1123322?v=4\",\"bio\":null,\"company\":null,\"location\":null,\"blog\":null,\"twitterUsername\":null,\"publicRepos\":0,\"followers\":0,\"following\":0,\"hirea"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=Rust&page=1",
+        "status": 200,
+        "bodyLength": 16814,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5iuhsh00d704jmwq61i2wl\",\"githubId\":176295,\"username\":\"jonhoo\",\"name\":\"Jon Gjengset\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/176295?v=4\",\"bio\":\"Rust educational streamer. At @helsing-ai. Previously at AWS. A fan of making things secure, fast, scalabl"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=Java&page=1",
+        "status": 200,
+        "bodyLength": 8578,
+        "bodyPreview": "{\"developers\":[{\"id\":\"gh-12994887\",\"githubId\":12994887,\"username\":\"peng-zhihui\",\"name\":null,\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/12994887?v=4\",\"bio\":null,\"company\":null,\"location\":null,\"blog\":null,\"twitterUsername\":null,\"publicRepos\":0,\"followers\":0,\"following\":0,\"hireab"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript&page=1",
+        "status": 200,
+        "bodyLength": 25503,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript&page=1",
+        "status": 200,
+        "bodyLength": 25503,
+        "bodyPreview": "{\"developers\":[{\"id\":\"cmn5imaua001004jmjxgte2m6\",\"githubId\":3000285,\"username\":\"trekhleb\",\"name\":\"Oleksii Trekhleb\",\"email\":null,\"avatarUrl\":\"https://avatars.githubusercontent.com/u/3000285?v=4\",\"bio\":\"Sr Software Engineer at @uber\",\"company\":\"Uber\",\"location\":\"San Francisco Bay Area\",\"blog\":\"trekhl"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript&page=1",
+        "status": 200,
+        "bodyLength": 165,
+        "bodyPreview": "{\"developers\":[],\"total\":0,\"page\":1,\"totalPages\":0,\"query\":\"TypeScript\",\"warning\":\"GitHub API rate limit reached. Results may be incomplete. Try again in a minute.\"}"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/session",
+        "status": 200,
+        "bodyLength": 2,
+        "bodyPreview": "{}"
+      },
+      {
+        "url": "http://localhost:3000/api/search?q=TypeScript&page=1",
+        "status": 200,
+        "bodyLength": 165,
+        "bodyPreview": "{\"developers\":[],\"total\":0,\"page\":1,\"totalPages\":0,\"query\":\"TypeScript\",\"warning\":\"GitHub API rate limit reached. Results may be incomplete. Try again in a minute.\"}"
+      }
+    ]
+  },
+  "profile_1": {
+    "username": "trekhleb",
+    "loaded": true,
+    "url": "http://localhost:3000/search?q=TypeScript+San+Francisco"
+  },
+  "profile_2": {
+    "username": "mahseema",
+    "loaded": true,
+    "url": "http://localhost:3000/search?q=TypeScript+San+Francisco"
+  },
+  "profile_3": {
+    "username": "alxhub",
+    "loaded": true,
+    "url": "http://localhost:3000/search?q=TypeScript+San+Francisco"
+  },
+  "edge_empty": {
+    "hasResults": 0,
+    "hasVisibleError": true,
+    "hasGenericError": true,
+    "pageState": {
+      "title": "GitScout - Discover Talented Developers",
+      "h1": "",
+      "hasErrorBoundary": false,
+      "bodyLength": 15150,
+      "statusIndicators": []
+    }
+  },
+  "edge_single-letter": {
+    "hasResults": 20,
+    "hasVisibleError": true,
+    "hasGenericError": true,
+    "pageState": {
+      "title": "GitScout - Discover Talented Developers",
+      "h1": "",
+      "hasErrorBoundary": false,
+      "bodyLength": 16446,
+      "statusIndicators": []
+    }
+  },
+  "edge_long-200": {
+    "hasResults": 0,
+    "hasVisibleError": true,
+    "hasGenericError": true,
+    "pageState": {
+      "title": "GitScout - Discover Talented Developers",
+      "h1": "",
+      "hasErrorBoundary": false,
+      "bodyLength": 16004,
+      "statusIndicators": []
+    }
+  },
+  "edge_emoji": {
+    "hasResults": 0,
+    "hasVisibleError": true,
+    "hasGenericError": true,
+    "pageState": {
+      "title": "GitScout - Discover Talented Developers",
+      "h1": "",
+      "hasErrorBoundary": false,
+      "bodyLength": 15288,
+      "statusIndicators": []
+    }
+  },
+  "cmdK": {
+    "kbdElements": [],
+    "shortcutHints": [],
+    "hasCmdKText": false,
+    "afterCtrlK": "http://localhost:3000/"
+  },
+  "rapidFire": {
+    "elapsed": 3174,
+    "apiResponses": 5,
+    "failed": 0,
+    "errors": [],
+    "failedDetails": []
+  },
+  "pagination": {
+    "p1Count": 20,
+    "p2Count": 20,
+    "p3Count": 0,
+    "p1Links": [
+      "60.3Oleksii Trekhleb💎Open to work Viewed@trekhlebUberSr Software Engineer at @uberSan Francisco Bay Area17.8K255.7K264mo agoJavaScriptJupyter NotebookPythonTypeScript",
+      "59.3Vishwas🌱@gopinavBuilder.ioSoftware engineer and educatorIndia15.7K6.3K811y agoJavaScriptTypeScriptHTMLVue",
+      "64.1Dmitry Selikhov💎Open to work@idimetrixelevanceit💻ALWAYS HIRING, 🌍REMOTE JOBS, 💼HR, 🚀CTO, 🏗️Software Architect, 🧑‍💻Technical Lead, 👨‍💼3X Founder. 🔗Linking companies with top tech talents. @elevanceitNew York15.4K19842761y agoTypeScriptJavaScriptMDX",
+      "64.3Mosh Hamedani💎@mosh-hamedaniI train software engineers that companies love to hire. Los Angeles15.4K5.0K333y agoTypeScriptJavaScriptJavaPython",
+      "65.1Fernando Herrera💎@KlerithProfesor y Full Stack DeveloperUn simple desarrollador :)Costa Rica15.0K1.6K5638mo agoTypeScriptJavaScriptC++HTML"
+    ],
+    "p2Links": [
+      "60.3Oleksii Trekhleb💎Open to work Viewed@trekhlebUberSr Software Engineer at @uberSan Francisco Bay Area17.8K255.7K264mo agoJavaScriptJupyter NotebookPythonTypeScript",
+      "59.3Vishwas🌱@gopinavBuilder.ioSoftware engineer and educatorIndia15.7K6.3K811y agoJavaScriptTypeScriptHTMLVue",
+      "64.1Dmitry Selikhov💎Open to work@idimetrixelevanceit💻ALWAYS HIRING, 🌍REMOTE JOBS, 💼HR, 🚀CTO, 🏗️Software Architect, 🧑‍💻Technical Lead, 👨‍💼3X Founder. 🔗Linking companies with top tech talents. @elevanceitNew York15.4K19842761y agoTypeScriptJavaScriptMDX",
+      "64.3Mosh Hamedani💎@mosh-hamedaniI train software engineers that companies love to hire. Los Angeles15.4K5.0K333y agoTypeScriptJavaScriptJavaPython",
+      "65.1Fernando Herrera💎@KlerithProfesor y Full Stack DeveloperUn simple desarrollador :)Costa Rica15.0K1.6K5638mo agoTypeScriptJavaScriptC++HTML"
+    ],
+    "paginationHTML": []
+  },
+  "filterUI": {
+    "inputs": [
+      {
+        "type": "text",
+        "name": "",
+        "id": "",
+        "placeholder": "Search developers — try 'rust engineers in San Francisco' or 'karpathy'",
+        "classes": "w-full rounded-xl border border-neutral-200/50 bg-white py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400/60 focus:border-indigo-400/50 focus:shadow-lg focus:shadow-indigo-500/5 dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:text-white",
+        "ariaLabel": null,
+        "visible": true
+      },
+      {
+        "type": "text",
+        "name": "",
+        "id": "",
+        "placeholder": "e.g. San Francisco",
+        "classes": "mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50",
+        "ariaLabel": null,
+        "visible": true
+      },
+      {
+        "type": "number",
+        "name": "",
+        "id": "",
+        "placeholder": "e.g. 100",
+        "classes": "mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50",
+        "ariaLabel": null,
+        "visible": true
+      },
+      {
+        "type": "checkbox",
+        "name": "",
+        "id": "",
+        "placeholder": "",
+        "classes": "rounded accent-blue-600",
+        "ariaLabel": null,
+        "visible": true
+      },
+      {
+        "type": "checkbox",
+        "name": "",
+        "id": "",
+        "placeholder": "",
+        "classes": "rounded accent-blue-600",
+        "ariaLabel": null,
+        "visible": true
+      }
+    ],
+    "selects": [],
+    "buttons": [
+      {
+        "text": "",
+        "classes": "relative flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hove",
+        "ariaLabel": "Switch to light mode"
+      },
+      {
+        "text": "Sign in",
+        "classes": "flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-",
+        "ariaLabel": null
+      },
+      {
+        "text": "Search",
+        "classes": "rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-ind",
+        "ariaLabel": null
+      },
+      {
+        "text": "Score",
+        "classes": "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-indigo-600 text-white",
+        "ariaLabel": null
+      },
+      {
+        "text": "Followers",
+        "classes": "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover",
+        "ariaLabel": null
+      },
+      {
+        "text": "Stars",
+        "classes": "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover",
+        "ariaLabel": null
+      },
+      {
+        "text": "Newest",
+        "classes": "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-neutral-100 text-neutral-600 hover",
+        "ariaLabel": null
+      },
+      {
+        "text": "TypeScript",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "JavaScript",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Python",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Rust",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Go",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Java",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "C++",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Ruby",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "PHP",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Swift",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Kotlin",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "C#",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Scala",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Elixir",
+        "classes": "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors bg-neutral-100 text-neutral-600 h",
+        "ariaLabel": null
+      },
+      {
+        "text": "Filters",
+        "classes": "flex items-center gap-1.5 rounded-lg border border-neutral-200/50 px-2.5 py-1.5 text-xs font-medium ",
+        "ariaLabel": null
+      },
+      {
+        "text": "Retry",
+        "classes": "ml-3 shrink-0 rounded-md bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200 dark",
+        "ariaLabel": null
+      }
+    ]
+  }
+}

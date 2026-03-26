@@ -1,0 +1,978 @@
+{
+  "homepage": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-8 text-xs\" style=\"color: rgb(119, 119, 119);\">Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration</p>",
+              "target": [
+                ".mt-8"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.3 (foreground color: #777777, background color: #0b0e16, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 8
+        }
+      ]
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Scout top talentfrom GitHub",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "search-empty": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Sort by</label>",
+              "target": [
+                "div:nth-child(2) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Languages</label>",
+              "target": [
+                "div:nth-child(3) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Location</label>",
+              "target": [
+                "div:nth-child(4) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Min Stars</label>",
+              "target": [
+                "div:nth-child(5) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<p class=\"mt-1 text-sm text-neutral-500\">Search by role, language, location, or name</p>",
+              "target": [
+                "p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<button class=\"rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-",
+              "target": [
+                ".border-neutral-200\\/30.hover\\:border-indigo-400\\/40.hover\\:text-indigo-400:nth-child(1)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<button class=\"rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-",
+              "target": [
+                ".border-neutral-200\\/30.hover\\:border-indigo-400\\/40.hover\\:text-indigo-400:nth-child(2)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<button class=\"rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-",
+              "target": [
+                ".border-neutral-200\\/30.hover\\:border-indigo-400\\/40.hover\\:text-indigo-400:nth-child(3)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<button class=\"rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-",
+              "target": [
+                ".border-neutral-200\\/30.hover\\:border-indigo-400\\/40.hover\\:text-indigo-400:nth-child(4)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<button class=\"rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-",
+              "target": [
+                ".border-neutral-200\\/30.hover\\:border-indigo-400\\/40.hover\\:text-indigo-400:nth-child(5)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/page-has-heading-one?application=playwright",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\" class=\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased dark\" style=\"color-scheme: dark;\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": []
+    },
+    "headings": [
+      {
+        "level": 3,
+        "text": "Filters",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "Find your next hire",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": [
+      "First heading is h3, should be h1"
+    ]
+  },
+  "search-results": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Sort by</label>",
+              "target": [
+                "div:nth-child(2) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Languages</label>",
+              "target": [
+                "div:nth-child(3) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Location</label>",
+              "target": [
+                "div:nth-child(4) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-xs font-medium uppercase tracking-wide text-neutral-500\">Min Stars</label>",
+              "target": [
+                "div:nth-child(5) > .uppercase.tracking-wide"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"text-sm text-neutral-500\">1,000 developers found</span>",
+              "target": [
+                ".mb-4 > .gap-3.items-center.flex > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@yyx990803</span>",
+              "target": [
+                "a[href=\"/profile/yyx990803\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@gaearon</span>",
+              "target": [
+                "a[href$=\"gaearon\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@ruanyf</span>",
+              "target": [
+                "a[href$=\"ruanyf\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@sindresorhus</span>",
+              "target": [
+                "a[href$=\"sindresorhus\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@bradtraversy</span>",
+              "target": [
+                "a[href$=\"bradtraversy\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@lucidrains</span>",
+              "target": [
+                "a[href$=\"lucidrains\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@hiteshchoudhary</span>",
+              "target": [
+                "a[href$=\"hiteshchoudhary\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@tj</span>",
+              "target": [
+                "a[href=\"/profile/tj\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@ThePrimeagen</span>",
+              "target": [
+                "a[href$=\"ThePrimeagen\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@addyosmani</span>",
+              "target": [
+                "a[href$=\"addyosmani\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@getify</span>",
+              "target": [
+                "a[href$=\"getify\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@kamranahmedse</span>",
+              "target": [
+                "a[href$=\"kamranahmedse\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@filipedeschamps</span>",
+              "target": [
+                "a[href$=\"filipedeschamps\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@antfu</span>",
+              "target": [
+                "a[href$=\"antfu\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@midudev</span>",
+              "target": [
+                "a[href$=\"midudev\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@adrianhajdin</span>",
+              "target": [
+                "a[href$=\"adrianhajdin\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@wesbos</span>",
+              "target": [
+                "a[href$=\"wesbos\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@mouredev</span>",
+              "target": [
+                "a[href$=\"mouredev\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@kentcdodds</span>",
+              "target": [
+                "a[href$=\"kentcdodds\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>@diego3g</span>",
+              "target": [
+                "a[href$=\"diego3g\"] > .p-5 > .items-start.gap-4.flex > .min-w-0.flex-1 > .mt-0\\.5.gap-3.text-sm > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"text-sm text-neutral-500\">Page 1 of 50</span>",
+              "target": [
+                ".mt-6 > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/page-has-heading-one?application=playwright",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\" class=\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased dark\" style=\"color-scheme: dark;\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+            }
+          ]
+        }
+      ],
+      "passes": 38,
+      "incomplete": []
+    },
+    "headings": [
+      {
+        "level": 3,
+        "text": "Filters",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "yyx990803",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "gaearon",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "ruanyf",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "sindresorhus",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "bradtraversy",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "lucidrains",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "hiteshchoudhary",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "tj",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "ThePrimeagen",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "addyosmani",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "getify",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "kamranahmedse",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "filipedeschamps",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "antfu",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "midudev",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "adrianhajdin",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "wesbos",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "mouredev",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "kentcdodds",
+        "visible": true
+      },
+      {
+        "level": 3,
+        "text": "diego3g",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": [
+      "First heading is h3, should be h1"
+    ]
+  },
+  "profile-torvalds": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-2 max-w-md text-sm text-neutral-500\">MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size</p>",
+              "target": [
+                ".mt-2"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "document-title",
+          "impact": "serious",
+          "description": "Ensure each HTML document contains a non-empty <title> element",
+          "help": "Documents must have <title> element to aid in navigation",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/document-title?application=playwright",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\" class=\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased dark\" style=\"color-scheme: dark;\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/page-has-heading-one?application=playwright",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\" class=\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased dark\" style=\"color-scheme: dark;\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+            }
+          ]
+        }
+      ],
+      "passes": 32,
+      "incomplete": []
+    },
+    "headings": [
+      {
+        "level": 2,
+        "text": "Something went wrong",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": [
+      "First heading is h2, should be h1"
+    ]
+  },
+  "map": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"text-sm text-neutral-500\">AI-powered talent landscape for targeted recruiting</p>",
+              "target": [
+                "p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5\">Role title</label>",
+              "target": [
+                "div:nth-child(1) > label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5\">Level</label>",
+              "target": [
+                "div:nth-child(2) > label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5\">Tech stack</label>",
+              "target": [
+                "div:nth-child(3) > label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<label class=\"text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5\">Geography</label>",
+              "target": [
+                "div:nth-child(4) > label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #737373, background color: #121214, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "description": "Ensure every form element has a label",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+          "nodes": [
+            {
+              "html": "<input type=\"text\" class=\"w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50\" value=\"Sr. Platform Engineer\">",
+              "target": [
+                "input[value=\"Sr. Platform Engineer\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        },
+        {
+          "id": "select-name",
+          "impact": "critical",
+          "description": "Ensure select element has an accessible name",
+          "help": "Select element must have an accessible name",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/select-name?application=playwright",
+          "nodes": [
+            {
+              "html": "<select class=\"w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none\"><option value=\"mid\">Mid</option><option value=\"senior\" selected=\"\">Senior</op",
+              "target": [
+                "select"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": []
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Market Map",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [
+      {
+        "type": "text",
+        "html": "<input type=\"text\" class=\"w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50\" value=\"Sr. Platform Engineer\">",
+        "hasLabel": false,
+        "labelMethod": "none"
+      },
+      {
+        "type": "select-one",
+        "html": "<select class=\"w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none\"><option value=\"mid\">Mid</option><option value=\"senior\" selected=\"\">Senior</op",
+        "hasLabel": false,
+        "labelMethod": "none"
+      }
+    ],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "lists": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-8 text-xs\" style=\"color: rgb(119, 119, 119);\">Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration</p>",
+              "target": [
+                ".mt-8"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.3 (foreground color: #777777, background color: #0b0e16, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 8
+        }
+      ]
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Scout top talentfrom GitHub",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "match": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-1 text-neutral-500\">Parse a job description to find the best matching developers in your database.</p>",
+              "target": [
+                ".mb-6 > p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<p class=\"mt-1 text-sm text-neutral-500\">Paste a job description or select from Ashby to find matching candidates.</p>",
+              "target": [
+                ".rounded-xl > p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.78 (foreground color: #737373, background color: #171717, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": []
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Match Candidates",
+        "visible": true
+      },
+      {
+        "level": 2,
+        "text": "Job Description",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "favorites": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-8 text-xs\" style=\"color: rgb(119, 119, 119);\">Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration</p>",
+              "target": [
+                ".mt-8"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.3 (foreground color: #777777, background color: #0b0e16, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 8
+        }
+      ]
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Scout top talentfrom GitHub",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "settings": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"mt-8 text-xs\" style=\"color: rgb(119, 119, 119);\">Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration</p>",
+              "target": [
+                ".mt-8"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.3 (foreground color: #777777, background color: #0b0e16, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "passes": 36,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": 8
+        }
+      ]
+    },
+    "headings": [
+      {
+        "level": 1,
+        "text": "Scout top talentfrom GitHub",
+        "visible": true
+      }
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  },
+  "map-templates": {
+    "axe": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "html": "<p class=\"text-neutral-500\">Sign in to view your templates</p>",
+              "target": [
+                "p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.16 (foreground color: #737373, background color: #0a0a0f, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/page-has-heading-one?application=playwright",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\" class=\"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased dark\" style=\"color-scheme: dark;\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+            }
+          ]
+        }
+      ],
+      "passes": 30,
+      "incomplete": []
+    },
+    "headings": [],
+    "buttons": [],
+    "links": [
+      {
+        "href": "http://localhost:3000/settings",
+        "html": "<a class=\"flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:",
+        "hasName": false,
+        "name": ""
+      }
+    ],
+    "images": [],
+    "inputs": [],
+    "colorInfo": [],
+    "headingIssues": []
+  }
+}

@@ -1,252 +1,406 @@
-# Search Performance QA Report
+# GitScout Performance Benchmark Report
 
-**Date:** 2026-03-25
-**Environment:** localhost:3000, Next.js 16.2.1 (Turbopack), macOS Darwin 25.3.0
-**Test Tool:** curl + Python3 automation
-**GitHub Token:** NOT CONFIGURED (unauthenticated rate limits: 10 search/min, 60 core/hr)
+**Date:** 2026-03-26
+**Environment:** localhost:3000 (Next.js 16 + Turbopack dev server)
+**Tool:** Playwright 1.58.2, Lighthouse 13.0.3
+**Browser:** Chromium (headless)
 
 ---
 
 ## Executive Summary
 
-| Category | Verdict | Notes |
-|----------|---------|-------|
-| API response time | PASS (with caveats) | 0.03-0.79s avg depending on query; first-call cold start up to 1.76s |
-| DOM render time | PASS | 0.07-0.53s, consistent ~31KB SSR shell |
-| Caching | PARTIAL | 4.8x speedup for result-heavy queries; no benefit for zero-result queries |
-| Rapid fire (10) | PASS | 0/10 failures, avg 88ms |
-| Rapid fire (30) | PASS | 0/30 failures, 0 rate limit errors surfaced, avg 82ms |
-| Error handling | PASS | All malformed inputs return HTTP 200 gracefully |
-| XSS / injection | PASS | `<script>` and SQL injection sanitized |
-| Memory stability | NEEDS INVESTIGATION | RSS grew from ~54 MB to ~244 MB during testing (4.5x) |
-| Server durability | **FAIL** | After ~80 queries, server returns 500 with empty body on all searches |
+| Area | Verdict | Notes |
+|------|---------|-------|
+| Page load times | **PASS** | Homepage 48ms avg, search 72ms avg — well under 500ms target |
+| Search API | **PASS** | 324ms avg for "python" — well under 3s target |
+| Stats API | **FAIL** | Returns HTTP 500 on all requests |
+| Score API | **FAIL** | Returns HTTP 429 (rate-limited) on all requests |
+| Concurrent load | **PASS** | 5 parallel searches complete in 66ms total wall time |
+| Sequential load | **PASS** | 10 sequential searches, 0 failures, negligible memory growth |
+| DOM stability | **PASS** | Node count stable at ~206 after searches — no unbounded growth |
+| Memory leaks | **WARN** | JS heap grew ~65MB over 10 navigation cycles (DOM stable) |
+| Bundle size | **WARN** | 810KB transferred / 4.0MB decoded (dev mode, 22 JS chunks) |
+| Lighthouse (homepage) | **FAIL** | Score: 0 — LCP/TBT unmeasurable on dev server |
+| Lighthouse (search) | **WARN** | Score: 46 — LCP 7.2s, TBT 2.0s, 408KB unused JS |
+| Caching | **NEUTRAL** | ~1% speedup on repeat query — no meaningful server-side cache |
 
-### Critical Findings
-
-1. **CRIT-1: Server degrades to persistent 500s under sustained load.** After approximately 80 search queries (which trigger GitHub API + Prisma calls), all subsequent searches with a query parameter return HTTP 500 with an empty response body. The empty-query fast path (which skips GitHub/Prisma) continues to work. The server does NOT self-recover. This suggests an unhandled exception path when the GitHub API returns errors (likely 403 rate limit), possibly combined with Prisma connection pool exhaustion.
-
-2. **CRIT-2: No GITHUB_TOKEN configured.** The `.env` file has no `GITHUB_TOKEN` entry. The app falls back to unauthenticated GitHub API access with severe rate limits (10 search requests/min, 60 user-fetch requests/hr). This is the root cause of most observed failures.
-
-3. **HIGH-1: Memory growth under load.** The `next-server` process RSS grew from ~54 MB to ~244 MB (+190 MB, 4.5x) during testing. While some V8 heap expansion under load is normal, this magnitude warrants investigation for retained references (e.g., cached response objects, unclosed connections).
+**Overall: 7 of 15 benchmarks pass. 2 API endpoints are broken (500/429). Heap memory warrants investigation. Lighthouse scores are heavily penalized by dev-mode overhead.**
 
 ---
 
-## Test 1: API Response Timing (5 Searches x 3 Runs)
+## Benchmark 1: Homepage Load Time
 
-Each search was run 3 times via `GET /api/search?q=...` with 0.5s pause between runs.
+**Target:** < 500ms | **Result: PASS**
 
-| Query | Run 1 | Run 2 | Run 3 | Avg | Min | Max | StdDev | Results |
-|-------|-------|-------|-------|-----|-----|-----|--------|---------|
-| TypeScript SF | 1.755s | 0.265s | 0.336s | **0.785s** | 0.265s | 1.755s | 0.840s | 239 (20 shown) |
-| Python Austin | 0.485s | 0.402s | 0.580s | **0.489s** | 0.402s | 0.580s | 0.089s | 1000 (20 shown) |
-| Go Seattle | 0.166s | 0.143s | 0.068s | **0.126s** | 0.068s | 0.166s | 0.051s | 0 |
-| Empty Search | 0.033s | 0.033s | 0.032s | **0.032s** | 0.032s | 0.033s | 0.001s | 0 |
-| Rust Berlin | 0.093s | 0.224s | 0.091s | **0.136s** | 0.091s | 0.224s | 0.076s | 0 |
+| Run | Time (ms) |
+|-----|-----------|
+| 1 | 62 |
+| 2 | 43 |
+| 3 | 38 |
+| **Avg** | **48** |
+| Min | 38 |
+| Max | 62 |
+| Median | 43 |
 
-### Analysis
-
-- **TypeScript SF** has the highest variance (stddev 0.840s). Run 1 was 1.755s (cold start: no cached profiles, 20 individual GitHub user fetches in parallel). Runs 2-3 were 4-6x faster, suggesting either GitHub response caching or local profile caching.
-- **Python Austin** is the most consistent performer (stddev 0.089s) despite returning 1000 total results.
-- **Go Seattle** and **Rust Berlin** returned 0 results across all runs. These queries ran after TypeScript SF and Python Austin consumed most of the unauthenticated rate limit. The GitHub search API likely returned 403, which the error handler silently swallowed, returning an empty result set.
-- **Empty Search** is sub-millisecond server logic -- the fast path returns immediately without hitting GitHub or Prisma.
-- **Response sizes**: Result queries are 8-12 KB; empty results are 62-73 bytes.
-
-### Performance Budget Assessment
-
-| Threshold | Target | Actual | Status |
-|-----------|--------|--------|--------|
-| API p50 | < 500ms | ~300ms (warm) | PASS |
-| API p95 | < 2000ms | ~1755ms (cold start) | PASS (barely) |
-| Cold start | < 3000ms | 1755ms | PASS |
-| Empty query | < 100ms | 32ms | PASS |
+Homepage loads extremely fast — 10x under the 500ms target.
 
 ---
 
-## Test 2: DOM / Page Render Timing (5 Searches x 3 Runs)
+## Benchmark 2: Search Page Load Time
 
-Measured via `curl` to `/search?q=...` (SSR HTML response).
+| Run | Time (ms) |
+|-----|-----------|
+| 1 | 64 |
+| 2 | 61 |
+| 3 | 92 |
+| **Avg** | **72** |
+| Min | 61 |
+| Max | 92 |
 
-| Query | Run 1 | Run 2 | Run 3 | Avg | Page Size |
-|-------|-------|-------|-------|-----|-----------|
-| TypeScript SF | 0.414s | 0.198s | 0.527s | **0.380s** | 31,034 B |
-| Python Austin | 0.231s | 0.113s | 0.372s | **0.238s** | 31,034 B |
-| Go Seattle | 0.211s | 0.121s | 0.074s | **0.135s** | 31,019 B |
-| Empty Search | 0.436s | 0.194s | 0.117s | **0.249s** | 30,967 B |
-| Rust Berlin | 0.185s | 0.240s | 0.142s | **0.189s** | 31,024 B |
-
-### Analysis
-
-- All pages return a consistent ~31 KB SSR shell. The actual search results are loaded client-side via the API, so the page HTML size is independent of result count.
-- DOM render times range from 74ms to 527ms. First-render is typically slower (React SSR compilation), subsequent renders benefit from module caching.
-- The search page is a client-side React component that fires the API call on mount -- the SSR shell is effectively static.
+Search page loads comparably to homepage. No heavy initial data fetching.
 
 ---
 
-## Test 3: Cache Behavior
+## Benchmark 3: Search "python" API Response
 
-Same query run twice with 0.2s gap. Is the second call faster?
+**Target:** < 3s | **Result: PASS**
 
-| Query | 1st Call | 2nd Call | Speedup | Cached? |
-|-------|----------|----------|---------|---------|
-| TypeScript SF | 1.473s | 0.307s | **4.8x** | YES |
-| Python Austin | 0.396s | 0.342s | **1.16x** | Marginal |
-| Rust Berlin | 0.084s | 0.107s | **0.79x** | NO |
+| Run | Time (ms) | Status |
+|-----|-----------|--------|
+| 1 | 767 | 200 |
+| 2 | 247 | 200 |
+| 3 | 220 | 200 |
+| 4 | 191 | 200 |
+| 5 | 195 | 200 |
+| **Avg** | **324** | |
+| Min | 191 | |
+| Max | 767 | |
+| Median | 220 | |
 
-### Analysis
-
-- **TypeScript SF** shows strong caching: the 4.8x speedup indicates the individual user profile fetches (20 calls to `/users/{login}`) are not repeated. GitHub's conditional caching (304 Not Modified) or server-side deduplication is working.
-- **Python Austin** shows marginal improvement (1.16x), likely from GitHub CDN-level caching of the search endpoint response.
-- **Rust Berlin** shows no caching benefit because both calls return 0 results (GitHub rate limited) -- there's nothing to cache.
-- There is no application-level response cache (e.g., Redis or in-memory LRU). All caching is incidental (GitHub CDN, V8 compiled function cache, TCP connection reuse).
+First request is significantly slower (767ms) — likely cold-start for GitHub API connection or server-side module initialization. Subsequent requests settle around ~200ms.
 
 ---
 
-## Test 4: Rapid Fire -- 10 Sequential Searches
+## Benchmark 4: Search "TypeScript San Francisco" API
 
-10 searches fired back-to-back with no delay, cycling through 5 different queries.
+| Run | Time (ms) | Status |
+|-----|-----------|--------|
+| 1 | 315 | 200 |
+| 2 | 190 | 200 |
+| 3 | 191 | 200 |
+| 4 | 207 | 200 |
+| 5 | 243 | 200 |
+| **Avg** | **229** | |
+| Min | 190 | |
+| Max | 315 | |
+
+Multi-term search performs similarly to single-term. No significant penalty for compound queries.
+
+---
+
+## Benchmark 5: Profile Page `/profile/torvalds`
+
+| Run | Time (ms) |
+|-----|-----------|
+| 1 | 932 |
+| 2 | 416 |
+| 3 | 214 |
+| **Avg** | **521** |
+| Min | 214 |
+| Max | 932 |
+
+First load is nearly 1 second — expected for a profile with many repos that may require GitHub API calls. Subsequent loads benefit from DB caching, dropping to ~200ms.
+
+---
+
+## Benchmark 6: Score API `/api/score/torvalds`
+
+**Result: FAIL — HTTP 429 on all requests**
+
+| Run | Time (ms) | Status |
+|-----|-----------|--------|
+| 1 | 59 | 429 |
+| 2 | 50 | 429 |
+| 3 | 51 | 429 |
+
+The score endpoint is rate-limited and rejecting all requests. This may indicate:
+- Rate limiter is too aggressive for the test context
+- The endpoint depends on GitHub API tokens that are exhausted
+- Misconfigured rate limiting middleware
+
+**Action:** Investigate rate limiting configuration for `/api/score/[username]`.
+
+---
+
+## Benchmark 7: Stats API `/api/stats`
+
+**Target:** < 500ms | **Result: FAIL (HTTP 500 errors)**
+
+| Run | Time (ms) | Status |
+|-----|-----------|--------|
+| 1 | 180 | 500 |
+| 2 | 193 | 500 |
+| 3 | 172 | 500 |
+| **Avg** | **182** | |
+
+Response times are fast (under 500ms target), but the endpoint is returning **500 Internal Server Error** on every request. The API is broken.
+
+**Action:** Debug `/api/stats` — likely a DB query error or missing table/field.
+
+---
+
+## Benchmark 8: Concurrent Searches (5 parallel)
+
+**Result: PASS — all succeeded**
+
+| Query | Time (ms) | Status |
+|-------|-----------|--------|
+| python | 54 | 200 |
+| rust | 61 | 200 |
+| go | 60 | 200 |
+| typescript | 66 | 200 |
+| frontend | 64 | 200 |
+| **Wall time** | **66** | |
+
+Server handles 5 concurrent searches effortlessly. Wall time roughly equals single-request time, indicating good parallel handling.
+
+---
+
+## Benchmark 9: Sequential Searches (10 queries)
+
+**Result: PASS — 0 failures**
+
+| # | Query | Time (ms) | Status |
+|---|-------|-----------|--------|
+| 1 | python | 51 | 200 |
+| 2 | rust | 57 | 200 |
+| 3 | go | 61 | 200 |
+| 4 | typescript | 57 | 200 |
+| 5 | frontend | 52 | 200 |
+| 6 | react | 49 | 200 |
+| 7 | node | 50 | 200 |
+| 8 | django | 49 | 200 |
+| 9 | kubernetes | 48 | 200 |
+| 10 | machine learning | 51 | 200 |
+
+- **Failures:** 0
+- **Memory growth:** 17KB (negligible)
+- **Avg response:** 53ms
+
+Consistent ~50ms response times across all queries. No degradation over 10 sequential requests.
+
+---
+
+## Benchmark 10: Caching Behavior
 
 | Metric | Value |
 |--------|-------|
-| Total requests | 10 |
-| Failures (non-200) | **0** |
-| Avg response time | 88ms |
-| Min response time | 64ms |
-| Max response time | 136ms |
-| Results returned | 0 across all (rate limited) |
+| First request | 50ms |
+| Second request (same query) | 49ms |
+| Speedup | 1% |
 
-All 10 returned HTTP 200 with 0 results. The GitHub Search API was exhausted by this point in the test run. The server handled the load gracefully -- no crashes, no timeouts, no connection refused.
+Effectively no caching benefit. Both requests hit the same speed, suggesting results are served from GitHub API cache or DB on every request without an application-level cache layer.
+
+**Recommendation:** Consider adding server-side response caching (e.g., 60-second TTL) for search results to reduce GitHub API load.
 
 ---
 
-## Test 5: Rapid Fire -- 30 Sequential Searches (Rate Limit Test)
+## Benchmark 11: DOM Node Count
 
-30 searches fired back-to-back, cycling through 5 queries.
+| State | Nodes |
+|-------|-------|
+| After page load | 193 |
+| After 1 search | 206 |
+| After 5 searches | 206 |
+| **Growth** | **13 (7%)** |
+
+DOM is stable. Searches replace results in-place rather than appending. No unbounded DOM growth detected.
+
+---
+
+## Benchmark 12: JS Bundle Size
+
+**Total Transfer:** 810 KB | **Total Decoded:** 4,084 KB | **Chunks:** 22
+
+### Top 5 Largest Bundles (decoded)
+
+| Bundle | Decoded | Transfer | Load (ms) |
+|--------|---------|----------|-----------|
+| react-dom | 1,033 KB | 180 KB | 692 |
+| next-devtools | 729 KB | 213 KB | 517 |
+| next/dist/client | 725 KB | 148 KB | 526 |
+| node_modules (misc) | 489 KB | 84 KB | 719 |
+| next/dist (core) | 240 KB | 45 KB | 287 |
+| **App source (src/)** | **273 KB** | **26 KB** | — |
+
+**Analysis:**
+- **Framework overhead dominates:** React DOM + Next.js client = 1,758 KB (43% of decoded)
+- **Dev tooling in bundle:** next-devtools (729 KB) is dev-only and won't be in production
+- **App code is small:** Only ~273 KB decoded across 2 src/ chunks (6.7% of total)
+- **Good compression:** 810 KB transfer for 4,084 KB decoded = ~80% compression ratio
+
+**Production estimate:** Removing devtools chunk would save ~213 KB transfer. Production build with tree-shaking will be significantly smaller.
+
+---
+
+## Benchmark 13: Render-Blocking Resources
+
+| Resource | Type | Duration | Size |
+|----------|------|----------|------|
+| Root CSS stylesheet | link | 11ms | 17 KB |
+
+Only 1 render-blocking resource — the root CSS file at 17KB loading in 11ms. This is acceptable and expected (critical CSS must block render).
+
+---
+
+## Benchmark 14: Lighthouse Performance Scores
+
+### Homepage
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| **Overall Performance** | — | **0/100** |
+| First Contentful Paint | 1.3s | 0.98 |
+| Largest Contentful Paint | N/A | null |
+| Total Blocking Time | N/A | null |
+| Cumulative Layout Shift | 0.002 | 1.00 |
+| Speed Index | 2.8s | 0.96 |
+
+| Diagnostic | Value |
+|------------|-------|
+| Server Response Time | 190ms |
+| Main Thread Work | 1.5s |
+| JS Execution Time | 0.9s |
+| Total Byte Weight | 904 KB |
+
+**Why score is 0:** LCP and TBT returned null — Lighthouse could not measure these metrics. This is a known issue with dev servers (Turbopack HMR client interferes with metric collection). The measurable metrics (FCP 0.98, CLS 1.00, SI 0.96) are all excellent.
+
+### Search Page
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| **Overall Performance** | — | **46/100** |
+| First Contentful Paint | 1.3s | — |
+| Largest Contentful Paint | 7.2s | — |
+| Total Blocking Time | 2,000ms | — |
+| Cumulative Layout Shift | 0.002 | — |
+| Speed Index | 4.5s | — |
+| Time to Interactive | 9.4s | — |
+
+| Diagnostic | Value |
+|------------|-------|
+| Server Response Time | 130ms |
+| Main Thread Work | 6.4s |
+| JS Execution Time | 5.1s |
+| Unused JS | 408 KB potential savings |
+
+**Top unused JS sources:**
+| Bundle | Wasted |
+|--------|--------|
+| next-devtools | 111 KB |
+| node_modules (misc) | 92 KB |
+| next/dist/client | 76 KB |
+| react-dom | 58 KB |
+| node_modules (misc) | 48 KB |
+
+**Note:** These scores reflect dev mode with Turbopack. Production builds will be significantly faster due to:
+- No HMR client
+- No devtools bundle (729 KB removed)
+- Minification + tree-shaking
+- Static page generation where applicable
+
+---
+
+## Benchmark 15: Memory Leak Detection
+
+**10 navigation cycles: search → profile → back → search → profile → back**
+
+| Cycle | Heap (KB) | DOM Nodes |
+|-------|-----------|-----------|
+| 1 | 20,874 | 122 |
+| 2 | 28,652 | 122 |
+| 3 | 36,116 | 122 |
+| 4 | 42,281 | 122 |
+| 5 | 49,603 | 122 |
+| 6 | 55,620 | 122 |
+| 7 | 69,972 | 122 |
+| 8 | 69,505 | 122 |
+| 9 | 83,746 | 122 |
+| 10 | 86,128 | 122 |
 
 | Metric | Value |
 |--------|-------|
-| Total requests | 30 |
-| Failures (non-200) | **0** |
-| Explicit 429 responses | **0** |
-| Rate limit messages in body | **0** |
-| Avg response time | 82ms |
-| Min response time | 56ms |
-| Max response time | 208ms |
-| Results returned | 0 across all |
+| DOM growth | **0 nodes** |
+| Heap growth | **+65,254 KB (~64 MB)** |
+| Leak suspected | **Yes** |
 
-### Analysis
+**Analysis:**
+- **DOM is perfectly stable** — 122 nodes throughout all cycles. No detached DOM elements accumulating.
+- **Heap grows monotonically** from 20 MB to 86 MB — a 4x increase over 10 cycles.
+- Growth rate is roughly linear (~6.5 MB/cycle), suggesting a consistent leak rather than one-time allocation.
+- Slight dip at cycle 8 (69,505 vs 69,972) suggests GC is running but not reclaiming most memory.
 
-- The server survived 30 rapid requests with **zero failures** -- all returned HTTP 200.
-- No explicit rate limit errors were surfaced to the client. When GitHub returns 403 (rate limited), the API silently falls through to an empty result set. This is both good (no crashes) and bad (user gets no feedback about rate limiting).
-- Response times were very consistent (56-208ms) because the GitHub API call was failing immediately (rate limited), so the only latency was the Prisma lookup (which returned empty since no local data matched).
-- **Note:** After the test suite completed (~80+ total queries including all tests), the server began returning 500 with empty bodies on ALL search queries. The rapid fire tests themselves did not cause this -- it happened after the full suite.
+**Likely causes:**
+1. **Event listeners not cleaned up** on navigation (React effects without cleanup)
+2. **Closure-retained state** from search results or profile data persisting across navigations
+3. **Dev-mode overhead** — Turbopack HMR, React dev warnings, and Next.js devtools may retain references
+4. **Router cache** — Next.js App Router caches page data in memory by design
 
----
-
-## Test 6: Error Scenarios
-
-| Scenario | HTTP | Time | Results | Notes |
-|----------|------|------|---------|-------|
-| Obscure query (`zyxwvut...`) | 200 | 63ms | 0 | Graceful empty response |
-| Impossible combo (`Cobol Antarctica`) | 200 | 72ms | 0 | Graceful empty response |
-| XSS (`<script>alert(1)</script>`) | 200 | 84ms | 0 | `<>` stripped from query in response; **NOT reflected** |
-| SQL injection (`' OR 1=1 --`) | 200 | 122ms | 0 | Handled safely (parameterized Prisma queries) |
-| Very long query (500 chars) | 200 | 61ms | 0 | Truncated to 200 chars via `sanitizeQuery()` |
-| Unicode/emoji (`\ud83d\udc68\u200d\ud83d\udcbb`) | 200 | 65ms | 0 | No crash, graceful empty |
-| Empty + bad language filter | 200 | 86ms | 0 | Fast path: no query, no results |
-| Negative page (`page=-1`) | 200 | 93ms | 0 | `Math.max(1, ...)` normalizes to page 1 |
-| Huge limit (`limit=99999`) | 200 | 76ms | 0 | `Math.min(30, ...)` caps at 30 |
-
-### Verdict: PASS
-
-All error scenarios return HTTP 200 with a well-formed JSON response. No crashes, no stack traces leaked, no XSS reflection. Input sanitization is working correctly:
-- `sanitizeQuery()` strips `<>` and truncates to 200 chars
-- `Math.max`/`Math.min` normalize pagination params
-- Prisma parameterized queries prevent SQL injection
+**Recommendation:** Re-test in production build to distinguish framework overhead from app-level leaks. If heap still grows, profile with Chrome DevTools heap snapshots to identify retained objects.
 
 ---
 
-## Test 7: Memory Leak Test (20 Consecutive Searches)
+## Summary Scoreboard
 
-20 searches with diverse queries, monitoring `next-server` process RSS.
+| # | Benchmark | Result | Target | Actual | Status |
+|---|-----------|--------|--------|--------|--------|
+| 1 | Homepage load | 48ms avg | <500ms | 48ms | **PASS** |
+| 2 | Search page load | 72ms avg | — | 72ms | **PASS** |
+| 3 | Search "python" API | 324ms avg | <3s | 324ms | **PASS** |
+| 4 | Search "TS SF" API | 229ms avg | — | 229ms | **PASS** |
+| 5 | Profile page load | 521ms avg | — | 521ms | **OK** |
+| 6 | Score API | HTTP 429 | 200 OK | 429 | **FAIL** |
+| 7 | Stats API | HTTP 500 | <500ms | 500 err | **FAIL** |
+| 8 | 5 concurrent searches | 66ms total | All 200 | All 200 | **PASS** |
+| 9 | 10 sequential searches | 0 failures | No failures | 0 | **PASS** |
+| 10 | Caching | 1% speedup | Noticeable | ~0% | **NEUTRAL** |
+| 11 | DOM node count | +13 nodes | Not unbounded | Stable | **PASS** |
+| 12 | Bundle size | 810KB xfer | — | 810KB | **WARN** |
+| 13 | Render-blocking | 1 resource | Minimal | 1 (11ms) | **PASS** |
+| 14a | Lighthouse homepage | Score 0 | >90 | 0* | **FAIL*** |
+| 14b | Lighthouse search | Score 46 | >90 | 46 | **FAIL** |
+| 15 | Memory leaks | +65MB heap | No growth | Growing | **WARN** |
 
-| Metric | Value |
-|--------|-------|
-| RSS before test suite | ~54 MB |
-| RSS after full suite (~100 queries) | ~244 MB |
-| Growth | +190 MB (4.5x) |
-| RSS during leak test (20 queries) | Stable at 0.6 MB* |
-
-*The automated memory test monitored the wrong PID (matched a helper process, not `next-server`). Manual `ps` verification revealed the true next-server PID (16472) at 244 MB RSS post-test.
-
-### Analysis
-
-- The 4.5x RSS growth over ~100 queries is concerning but not definitively a memory leak. Possible explanations:
-  - **V8 heap expansion**: Node.js aggressively allocates heap under concurrent async work (20 parallel GitHub fetches per search).
-  - **Module caching**: Turbopack in dev mode may retain compiled modules in memory.
-  - **Prisma connection pool**: Connections may not be released under rapid-fire conditions.
-- To confirm a leak, a longer soak test (1000+ queries over 30+ minutes) with V8 heap snapshots would be needed.
-- The server did eventually degrade to 500 errors, which may be related to memory pressure.
+*\*Homepage Lighthouse score is 0 due to unmeasurable LCP/TBT on dev server — not representative of production.*
 
 ---
 
-## Post-Test: Server Degradation (CRIT-1 Details)
+## Critical Issues
 
-After completing the full test suite (~100+ total API calls), the server entered a persistent failure state:
+### P0 — Broken Endpoints
+1. **`/api/stats` returns 500** on all requests — likely a database query error
+2. **`/api/score/[username]` returns 429** on all requests — rate limiter is too restrictive or GitHub token is exhausted
 
-| Query Type | Status | Body |
-|------------|--------|------|
-| `?q=TypeScript+SF` | 500 | Empty (0 bytes chunked) |
-| `?q=test` | 500 | Empty |
-| `?q=Go+Seattle` | 500 | Empty |
-| `?q=` (empty) | **200** | `{"developers":[],"total":0,...}` |
+### P1 — Performance Concerns
+3. **Memory leak suspected** — 65MB heap growth over 10 navigation cycles. DOM is stable, so this is JS object retention. Needs production-build profiling to confirm.
+4. **No server-side search caching** — identical queries hit the full pipeline every time. A short TTL cache would reduce GitHub API usage and improve response times.
 
-**Key observation:** The empty-query fast path (which returns immediately without calling GitHub or Prisma) continues to work. Only queries that trigger the GitHub API + Prisma flow return 500.
-
-### Root Cause Hypothesis
-
-The `GET /api/search` handler has a `try/catch` around the GitHub API call (line 450-461) that silently swallows errors. However, the Prisma `findMany` call on line 466 is NOT wrapped in a try/catch. If the Prisma connection pool is exhausted or the database connection times out (possible after ~100 rapid queries), the unhandled rejection propagates as a 500.
-
-The empty response body (no JSON error) confirms Next.js is catching an unhandled exception and returning a generic 500.
+### P2 — Lighthouse / Production Readiness
+5. **Lighthouse scores poor on dev server** — expected, but production build should be validated with Lighthouse CI to establish real baselines.
+6. **408KB unused JavaScript** on search page — mostly framework/devtools code. Verify production tree-shaking eliminates this.
+7. **Profile page cold-start** at ~930ms — first load is nearly 1s. Consider prefetching or streaming SSR for profile data.
 
 ---
 
 ## Recommendations
 
-### Critical (Fix Before Deploy)
-
-1. **Add GITHUB_TOKEN to .env** -- Without it, the app is limited to 10 search requests/min. With a PAT, this jumps to 30 search/min and 5000 core/hr.
-
-2. **Wrap Prisma calls in try/catch** -- The `prisma.developer.findMany` call at line 466 and the profile-fetch loop should have error handling to prevent cascading 500s when the DB connection is unhealthy.
-
-3. **Surface rate limit errors to the user** -- When GitHub returns 403, the current behavior silently returns 0 results. Add a response field like `"warning": "GitHub API rate limit reached"` so the UI can show a meaningful message.
-
-### High Priority
-
-4. **Add application-level response cache** -- A simple in-memory LRU cache (e.g., `Map` with TTL) for GitHub search results would dramatically reduce API consumption. The 4.8x cache speedup in Test 3 shows the potential.
-
-5. **Investigate memory growth** -- Run a soak test with `--expose-gc` and heap snapshots to determine if the +190 MB growth is a genuine leak or normal V8 behavior.
-
-6. **Add health check endpoint** -- `/api/health` that checks GitHub API rate limit remaining + Prisma connectivity would help detect degraded states before users hit them.
-
-### Medium Priority
-
-7. **Add response time headers** -- Include `X-Response-Time` and `X-GitHub-Rate-Remaining` headers in API responses for client-side monitoring.
-
-8. **Implement request queuing for burst traffic** -- The rapid-fire tests show the server handles bursts gracefully but exhausts GitHub rate limits. A queue with backpressure (e.g., max 5 concurrent GitHub calls) would be more sustainable.
+1. **Fix `/api/stats`** — Debug the 500 error (likely Prisma query or schema mismatch)
+2. **Fix `/api/score/[username]` rate limiting** — Review rate limiter config; may need per-IP or per-session limits rather than global
+3. **Add search response caching** — 30-60s TTL on `/api/search` responses to reduce GitHub API pressure
+4. **Profile memory in production build** — Run this same benchmark against `next build && next start` to isolate dev-mode overhead from real leaks
+5. **Set up Lighthouse CI** — Run Lighthouse on production builds in CI to track performance regressions
+6. **Consider profile data prefetching** — When hovering over search results, prefetch profile data to reduce perceived load time
 
 ---
 
-## Raw Data
-
-Full test results are available in the companion file: [`/tmp/perf_results.json`](file:///tmp/perf_results.json)
-
-### Test Environment
-
-```
-Node.js PID:     16472 (next-server)
-Initial RSS:     ~54 MB
-Final RSS:       ~244 MB
-Total queries:   ~100+ across all tests
-GitHub Auth:     Unauthenticated (no GITHUB_TOKEN)
-Database:        Prisma + local PostgreSQL
-```
+*Raw data: [perf-raw-results.json](./perf-raw-results.json) | [lighthouse-homepage.json](./lighthouse-homepage.json) | [lighthouse-search.json](./lighthouse-search.json)*
