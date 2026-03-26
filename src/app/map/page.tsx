@@ -229,7 +229,7 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
   return (
     <div
       onClick={() => onSelectPerson(candidate)}
-      className={`grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-2 px-4 py-2.5 cursor-pointer transition-all text-sm
+      className={`grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-2 px-3 sm:px-4 py-2.5 cursor-pointer transition-all text-sm
         ${isActive ? "bg-indigo-500/5 border-l-2 border-l-indigo-500" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
     >
       <button
@@ -243,10 +243,10 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
         <p className="text-[11px] text-neutral-500 truncate mt-0.5">{candidate.title}</p>
       </div>
       <FlightRiskBadge risk={candidate.flightRisk} signals={candidate.flightRiskSignals} reasoning={candidate.flightRiskReasoning} />
-      <StatusDropdown status={candidate.status} onUpdate={updateStatus} />
+      <span className="hidden sm:inline-flex"><StatusDropdown status={candidate.status} onUpdate={updateStatus} /></span>
       {candidate.linkedinUrl && (
         <a href={candidate.linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
-          className="text-neutral-600 hover:text-blue-400 transition-colors">
+          className="hidden sm:inline-flex text-neutral-600 hover:text-blue-400 transition-colors">
           <Link2 className="h-3.5 w-3.5" />
         </a>
       )}
@@ -342,7 +342,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
               {company.newsSummary}
             </div>
           )}
-          <p className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-600">
+          <p className="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-neutral-600">
             {company.candidates.length} candidates
           </p>
           {company.candidates.map((c) => (
@@ -391,7 +391,7 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
           { label: "Status", val: STATUS_CONFIG[person.status]?.label || person.status },
         ].map((m) => (
           <div key={m.label} className="rounded-lg bg-neutral-800/40 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{m.label}</p>
+            <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">{m.label}</p>
             <p className="text-sm font-semibold text-white">{m.val}</p>
           </div>
         ))}
@@ -399,14 +399,14 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
 
       {person.fitReasoning && (
         <div className="mb-4 rounded-lg bg-neutral-800/30 p-3">
-          <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Fit analysis</p>
+          <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">Fit analysis</p>
           <p className="text-xs text-neutral-300">{person.fitReasoning}</p>
         </div>
       )}
 
       {person.flightRisk && person.flightRisk !== "low" && (
         <div className={`mb-4 rounded-lg p-3 ${person.flightRisk === "high" ? "bg-red-500/5 border border-red-500/10" : "bg-amber-500/5 border border-amber-500/10"}`}>
-          <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">Flight risk: {person.flightRisk}</p>
+          <p className="text-xs uppercase tracking-wider text-neutral-500 mb-2">Flight risk: {person.flightRisk}</p>
           {person.flightRiskSignals.map((s) => (
             <div key={s} className="flex items-start gap-2 mb-1 text-xs text-neutral-300">
               <Shield className="h-3 w-3 mt-0.5 shrink-0 text-amber-400" />
@@ -756,7 +756,7 @@ function MarketMapInner() {
   const totalCandidates = allCompanies.reduce((s, c) => s + c.candidates.length, 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
@@ -774,12 +774,12 @@ function MarketMapInner() {
         <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
               <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
                 className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
               <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value)}
                 className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none">
                 <option value="mid">Mid</option>
@@ -789,12 +789,12 @@ function MarketMapInner() {
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
               <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
                 className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
               <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
                 className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
             </div>
@@ -879,7 +879,7 @@ function MarketMapInner() {
               <div key={m.label} className="rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <m.icon className="h-3.5 w-3.5 text-neutral-500" />
-                  <p className="text-[10px] uppercase tracking-wider text-neutral-500">{m.label}</p>
+                  <p className="text-xs uppercase tracking-wider text-neutral-500">{m.label}</p>
                 </div>
                 <p className="text-2xl font-bold text-white tabular-nums">{m.val}</p>
               </div>
@@ -946,7 +946,7 @@ function MarketMapInner() {
               {/* Hidden companies */}
               {mapData.hiddenCompanies.length > 0 && (
                 <div className="mt-6 rounded-lg border border-neutral-800/50 bg-neutral-900/30 p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-600 mb-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-2">
                     Removed companies ({mapData.hiddenCompanies.length})
                   </p>
                   <div className="flex flex-wrap gap-2">

@@ -179,6 +179,7 @@ function SearchPageInner() {
 
   return (
     <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-6">
+      <h1 className="sr-only">Search Developers</h1>
       {/* Search bar */}
       <form onSubmit={handleSearch} className="relative mx-auto max-w-3xl mb-6">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />

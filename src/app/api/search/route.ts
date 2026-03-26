@@ -623,5 +623,10 @@ export async function GET(request: Request) {
     totalPages: Math.ceil(githubTotal / limit),
     query: sanitizeQuery(q),
     ...(warning ? { warning } : {}),
+  }, {
+    headers: {
+      // Cache for 2 minutes on CDN — same search within 2min returns cached
+      "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300",
+    },
   });
 }

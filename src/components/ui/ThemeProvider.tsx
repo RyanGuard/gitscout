@@ -32,8 +32,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (saved && ["dark", "light", "system"].includes(saved)) {
       setThemeState(saved);
     } else {
-      // Default to dark
-      setThemeState("dark");
+      // Default to system preference (respects user's OS setting)
+      setThemeState("system");
     }
   }, []);
 
