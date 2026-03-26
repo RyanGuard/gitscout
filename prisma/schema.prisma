@@ -93,6 +93,7 @@ model User {
   ashbyConnection AshbyConnection?
   ashbyPushes     AshbyPush[]
   candidateLists  CandidateList[]
+  marketMaps      MarketMap[]
 }
 
 model Account {
@@ -250,6 +251,104 @@ model CandidateTag {
 
   @@index([entryId])
   @@index([tag])
+}
+
+// --- Market Map ---
+
+model MarketMap {
+  id              String          @id @default(cuid())
+  userId          String
+  name            String
+  roleTitle       String
+  roleLevel       String?
+  roleStack       String[]        @default([])
+  roleDescription String?
+  geography       String[]        @default([])
+  compRangeMin    Int?
+  compRangeMax    Int?
+  status          String          @default("generating") // generating | ready | stale
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companies       MapCompany[]
+
+  @@index([userId])
+}
+
+model MapCompany {
+  id                String         @id @default(cuid())
+  mapId             String
+  companyName       String
+  companyDomain     String
+  tier              String         // A | B | C
+  tierOverride      Boolean        @default(false)
+  tierReasoning     String?
+  headcount         Int?
+  engHeadcount      Int?
+  hqCity            String?
+  hqCountry         String?
+  fundingStage      String?
+  fundingAmount     String?
+  growthRate        String?
+  techStack         String[]       @default([])
+  hiringVelocity    Int?
+  newsSummary       String?
+  flightRiskCompany String?        // low | medium | high
+  enrichmentStatus  String         @default("pending") // pending | enriching | complete | failed
+  apolloOrgId       String?
+  createdAt         DateTime       @default(now())
+  map               MarketMap      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  candidates        MapCandidate[]
+
+  @@index([mapId])
+  @@index([tier])
+}
+
+model MapCandidate {
+  id                String       @id @default(cuid())
+  mapId             String
+  companyId         String
+  apolloPersonId    String?
+  name              String
+  firstName         String?
+  lastName          String?
+  title             String?
+  seniority         String?
+  city              String?
+  state             String?
+  country           String?
+  linkedinUrl       String?
+  headline          String?
+  departments       String[]     @default([])
+  tenureMonths      Int?
+  yearsOfExperience Int?
+  fitScore          Int?         // 0-100, Claude-generated
+  fitReasoning      String?
+  flightRisk        String?      // low | medium | high
+  flightRiskSignals String[]     @default([])
+  status            String       @default("mapped") // mapped | shortlisted | contacted | responded | screening | rejected
+  email             String?      // null until enriched
+  phone             String?      // null until enriched
+  emailEnrichedAt   DateTime?
+  githubUrl         String?
+  gitscoutScore     Int?
+  createdAt         DateTime     @default(now())
+  company           MapCompany   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([mapId])
+  @@index([companyId])
+  @@index([status])
+}
+
+model EnrichmentCache {
+  id        String   @id @default(cuid())
+  cacheKey  String   @unique
+  cacheType String   // people_search | company_info | person_enrichment | job_postings
+  data      Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([cacheKey, expiresAt])
 }
 
 // --- Pipeline ---

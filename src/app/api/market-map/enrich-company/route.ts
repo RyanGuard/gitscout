@@ -1,0 +1,259 @@
+import { prisma } from "@/lib/prisma";
+
+const APOLLO_API = "https://api.apollo.io/v1";
+
+// Title variations for broader matching
+const TITLE_EXPANSIONS: Record<string, string[]> = {
+  "platform engineer": ["platform engineer", "infrastructure engineer", "SRE", "site reliability", "devops engineer", "cloud engineer"],
+  "frontend engineer": ["frontend engineer", "front-end developer", "UI engineer", "web developer", "react developer"],
+  "backend engineer": ["backend engineer", "back-end developer", "server engineer", "API engineer"],
+  "ml engineer": ["machine learning engineer", "ML engineer", "AI engineer", "deep learning", "data scientist"],
+  "data engineer": ["data engineer", "analytics engineer", "data platform", "ETL engineer"],
+  "mobile engineer": ["mobile engineer", "iOS developer", "android developer", "mobile developer"],
+  "devops": ["devops engineer", "SRE", "site reliability", "infrastructure engineer", "platform engineer"],
+  "security": ["security engineer", "application security", "infosec", "cybersecurity engineer"],
+};
+
+function expandTitles(roleTitle: string): string[] {
+  const lower = roleTitle.toLowerCase();
+  for (const [key, expansions] of Object.entries(TITLE_EXPANSIONS)) {
+    if (lower.includes(key)) return expansions;
+  }
+  // Default: use the title as-is plus common variations
+  return [roleTitle, `senior ${roleTitle}`, `staff ${roleTitle}`];
+}
+
+function mapSeniorityToApollo(level?: string): string[] {
+  if (!level) return ["senior", "manager"];
+  const lower = level.toLowerCase();
+  if (lower === "junior" || lower === "mid") return ["entry", "senior"];
+  if (lower === "senior") return ["senior", "manager"];
+  if (lower === "staff") return ["senior", "manager", "director"];
+  if (lower === "principal") return ["director", "vp"];
+  return ["senior", "manager"];
+}
+
+// Cache TTLs in days
+const CACHE_TTL: Record<string, number> = {
+  people_search: 7,
+  company_info: 14,
+  person_enrichment: 30,
+  job_postings: 3,
+};
+
+async function getCached(key: string): Promise<unknown | null> {
+  try {
+    const cached = await prisma.enrichmentCache.findUnique({
+      where: { cacheKey: key },
+    });
+    if (cached && cached.expiresAt > new Date()) {
+      return cached.data;
+    }
+    // Expired — delete
+    if (cached) {
+      await prisma.enrichmentCache.delete({ where: { cacheKey: key } }).catch(() => {});
+    }
+  } catch {
+    // Cache miss
+  }
+  return null;
+}
+
+async function setCache(key: string, type: string, data: unknown) {
+  const ttlDays = CACHE_TTL[type] || 7;
+  const expiresAt = new Date(Date.now() + ttlDays * 86400000);
+  try {
+    await prisma.enrichmentCache.upsert({
+      where: { cacheKey: key },
+      create: { cacheKey: key, cacheType: type, data: data as object, expiresAt },
+      update: { data: data as object, expiresAt },
+    });
+  } catch {
+    // Cache write failure is non-fatal
+  }
+}
+
+export async function POST(request: Request) {
+  const body = await request.json().catch(() => ({}));
+  const { map_id, company_id, company_domain, role_title, role_level, role_stack, geography } = body;
+
+  if (!map_id || !company_id || !company_domain) {
+    return Response.json({ error: "map_id, company_id, company_domain required" }, { status: 400 });
+  }
+
+  const apiKey = process.env.APOLLO_API_KEY;
+  if (!apiKey) {
+    return Response.json({ error: "APOLLO_API_KEY not configured" }, { status: 500 });
+  }
+
+  try {
+    // Mark company as enriching
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: { enrichmentStatus: "enriching" },
+    });
+
+    // Check cache
+    const cacheKey = `people_search:${company_domain}:${role_level || "senior"}:${(role_title || "engineer").replace(/\s+/g, "_")}`;
+    const cached = await getCached(cacheKey);
+
+    let people: Array<{
+      id: string;
+      first_name: string;
+      last_name: string;
+      name: string;
+      title: string;
+      seniority: string;
+      city: string;
+      state: string;
+      country: string;
+      linkedin_url: string;
+      headline: string;
+      departments: string[];
+    }> = [];
+
+    if (cached) {
+      people = cached as typeof people;
+    } else {
+      // Call Apollo People API Search (free — no credits consumed)
+      const titles = expandTitles(role_title || "engineer");
+      const seniorities = mapSeniorityToApollo(role_level);
+
+      const searchBody: Record<string, unknown> = {
+        api_key: apiKey,
+        organization_domains: [company_domain],
+        person_titles: titles,
+        person_seniorities: seniorities,
+        per_page: 25,
+      };
+
+      // Add location filter if provided
+      if (geography && geography.length > 0) {
+        searchBody.person_locations = geography;
+      }
+
+      const res = await fetch(`${APOLLO_API}/mixed_people/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(searchBody),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        people = (data.people || []).map((p: Record<string, unknown>) => ({
+          id: p.id || "",
+          first_name: p.first_name || "",
+          last_name: p.last_name || "",
+          name: `${p.first_name || ""} ${p.last_name || ""}`.trim(),
+          title: p.title || "",
+          seniority: p.seniority || "",
+          city: p.city || "",
+          state: p.state || "",
+          country: p.country || "",
+          linkedin_url: p.linkedin_url || "",
+          headline: p.headline || "",
+          departments: (p.departments as string[]) || [],
+        }));
+
+        // Cache the results
+        await setCache(cacheKey, "people_search", people);
+      } else {
+        console.error(`[apollo] People search failed: ${res.status} for ${company_domain}`);
+        // Try to get company info at least
+      }
+    }
+
+    // Try to get company info from Apollo
+    let companyInfo: Record<string, unknown> | null = null;
+    const compCacheKey = `company_info:${company_domain}`;
+    const cachedCompany = await getCached(compCacheKey);
+
+    if (cachedCompany) {
+      companyInfo = cachedCompany as Record<string, unknown>;
+    } else {
+      try {
+        const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?api_key=${apiKey}&domain=${company_domain}`);
+        if (orgRes.ok) {
+          const orgData = await orgRes.json();
+          companyInfo = orgData.organization || null;
+          if (companyInfo) {
+            await setCache(compCacheKey, "company_info", companyInfo);
+          }
+        }
+      } catch {
+        // Company enrichment is optional
+      }
+    }
+
+    // Update company with enriched info
+    const updateData: Record<string, unknown> = {
+      enrichmentStatus: "complete",
+    };
+
+    if (companyInfo) {
+      updateData.headcount = (companyInfo.estimated_num_employees as number) || null;
+      updateData.engHeadcount = Math.round(((companyInfo.estimated_num_employees as number) || 0) * 0.3) || null;
+      updateData.hqCity = (companyInfo.city as string) || null;
+      updateData.hqCountry = (companyInfo.country as string) || null;
+      updateData.fundingStage = (companyInfo.latest_funding_stage as string) || null;
+      updateData.fundingAmount = (companyInfo.total_funding as number)
+        ? `$${Math.round((companyInfo.total_funding as number) / 1000000)}M`
+        : null;
+      updateData.techStack = (companyInfo.technologies as string[]) || [];
+      updateData.apolloOrgId = (companyInfo.id as string) || null;
+    }
+
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: updateData,
+    });
+
+    // Insert candidates
+    const candidates = await Promise.all(
+      people.map((p) =>
+        prisma.mapCandidate.create({
+          data: {
+            mapId: map_id,
+            companyId: company_id,
+            apolloPersonId: p.id,
+            name: p.name,
+            firstName: p.first_name,
+            lastName: p.last_name,
+            title: p.title,
+            seniority: p.seniority,
+            city: p.city,
+            state: p.state,
+            country: p.country,
+            linkedinUrl: p.linkedin_url,
+            headline: p.headline,
+            departments: p.departments,
+          },
+        })
+      )
+    );
+
+    return Response.json({
+      companyId: company_id,
+      candidatesFound: candidates.length,
+      companyInfo: companyInfo
+        ? {
+            headcount: updateData.headcount,
+            engHeadcount: updateData.engHeadcount,
+            hqCity: updateData.hqCity,
+            fundingStage: updateData.fundingStage,
+            fundingAmount: updateData.fundingAmount,
+          }
+        : null,
+    });
+  } catch (error) {
+    console.error(`[market-map] Enrichment failed for ${company_domain}:`, error);
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: { enrichmentStatus: "failed" },
+    }).catch(() => {});
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Enrichment failed" },
+      { status: 500 }
+    );
+  }
+}
