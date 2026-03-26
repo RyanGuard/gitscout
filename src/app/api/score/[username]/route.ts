@@ -45,20 +45,27 @@ export async function GET(
   const repos: GitHubRepo[] = reposRes.ok ? await reposRes.json() : [];
 
   // Fetch deep signals (GraphQL + merged PR search + package data)
-  const [contributions, pkgRes] = await Promise.all([
+  const [contributions, npmData] = await Promise.all([
     fetchContributions(username),
-    fetch(`${_request.url.replace(/\/api\/score\/.*/, "/api/enrich/packages")}?username=${username}`).then(r => r.ok ? r.json() : null).catch(() => null),
+    // Direct npm registry check (no self-referential API call)
+    fetch(`https://registry.npmjs.org/-/v1/search?text=maintainer:${username}&size=5`)
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null),
   ]);
 
-  // Build package data for scoring
-  const packages = pkgRes?.registries ? {
-    totalDownloads: Object.values(pkgRes.registries as Record<string, { totalDownloads?: number }>).reduce(
-      (sum: number, reg) => sum + (reg.totalDownloads || 0), 0
-    ),
-    packageCount: Object.values(pkgRes.registries as Record<string, { packages?: unknown[] }>).reduce(
-      (sum: number, reg) => sum + (reg.packages?.length || 0), 0
-    ),
-  } : null;
+  // Build package data for scoring from npm results
+  let packages = null;
+  if (npmData?.objects?.length > 0) {
+    let totalDownloads = 0;
+    for (const obj of npmData.objects.slice(0, 5)) {
+      const pkgName = obj.package?.name;
+      if (pkgName) {
+        const dlRes = await fetch(`https://api.npmjs.org/downloads/point/last-month/${pkgName}`).then(r => r.ok ? r.json() : null).catch(() => null);
+        if (dlRes?.downloads) totalDownloads += dlRes.downloads;
+      }
+    }
+    packages = { totalDownloads, packageCount: npmData.objects.length };
+  }
 
   // Compute full 5-pillar score
   const result = computeScore({ user, repos, contributions, packages });
