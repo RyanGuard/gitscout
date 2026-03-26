@@ -10,6 +10,7 @@ export async function GET(
     where: { id },
     include: {
       companies: {
+        where: { hidden: false },
         include: {
           candidates: {
             orderBy: { fitScore: { sort: "desc", nulls: "last" } },
@@ -46,6 +47,20 @@ export async function GET(
       )
     : 0;
 
+  // Get hidden companies separately
+  const hiddenCompanies = await prisma.mapCompany.findMany({
+    where: { mapId: id, hidden: true },
+    select: { id: true, companyName: true, companyDomain: true, tier: true },
+  });
+
+  // Pipeline summary
+  const statusCounts: Record<string, number> = {};
+  for (const co of map.companies) {
+    for (const c of co.candidates) {
+      statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+    }
+  }
+
   return Response.json({
     id: map.id,
     name: map.name,
@@ -56,11 +71,13 @@ export async function GET(
     status: map.status,
     createdAt: map.createdAt.toISOString(),
     tiers,
+    hiddenCompanies,
     stats: {
       totalCompanies: map.companies.length,
       totalCandidates,
       openCandidates,
       avgFitScore,
+      statusCounts,
     },
   });
 }

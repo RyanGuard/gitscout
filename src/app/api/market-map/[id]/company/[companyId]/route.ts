@@ -8,9 +8,14 @@ export async function PATCH(
   const body = await request.json().catch(() => ({}));
 
   const updateData: Record<string, unknown> = {};
+
   if (body.tier) {
     updateData.tier = body.tier.toUpperCase();
     updateData.tierOverride = true;
+  }
+
+  if (typeof body.hidden === "boolean") {
+    updateData.hidden = body.hidden;
   }
 
   if (Object.keys(updateData).length === 0) {
@@ -22,7 +27,12 @@ export async function PATCH(
       where: { id: companyId },
       data: updateData,
     });
-    return Response.json({ id: updated.id, tier: updated.tier, tierOverride: updated.tierOverride });
+    return Response.json({
+      id: updated.id,
+      tier: updated.tier,
+      tierOverride: updated.tierOverride,
+      hidden: updated.hidden,
+    });
   } catch {
     return Response.json({ error: "Company not found" }, { status: 404 });
   }
