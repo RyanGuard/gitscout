@@ -6,8 +6,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronDown, X, Users, Building2, TrendingUp, MapPin,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
-  CheckSquare, Square, ExternalLink, Link2, Shield,
+  CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
+  GripVertical, Search, Save, Copy, Clock,
 } from "lucide-react";
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useDroppable } from "@dnd-kit/core";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -254,19 +262,34 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
 //  COMPANY CARD
 // ═══════════════════════════════════════════════════════════
 
-function CompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove }: {
+function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove }: {
   company: Company; mapId: string; tier: Tier; expanded: boolean; onToggle: () => void;
   selectedIds: Set<string>; onSelectCandidate: (id: string) => void;
   onSelectPerson: (c: Candidate) => void; activePerson: Candidate | null;
   onRemove: (id: string) => void;
 }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: company.id,
+    data: { type: "company", tier, company },
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
   const cfg = TIER_CONFIG[tier];
   const openCount = company.candidates.filter((c) => c.flightRisk === "high").length;
   const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
 
   return (
-    <div className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-indigo-500/20" : ""}`}>
+    <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-indigo-500/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-indigo-500/30 scale-[1.02]" : ""}`}>
       <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer group">
+        <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 transition-colors shrink-0 touch-none"
+          onClick={(e) => e.stopPropagation()}>
+          <GripVertical className="h-4 w-4" />
+        </button>
         <div className={`w-9 h-9 rounded-lg ${cfg.badge} border flex items-center justify-center text-sm font-bold shrink-0`}>
           {company.companyName.charAt(0)}
         </div>
@@ -431,12 +454,14 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
 //  TIER SECTION
 // ═══════════════════════════════════════════════════════════
 
-function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany }: {
+function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany }: {
   tier: Tier; companies: Company[]; mapId: string; expandedCo: string | null;
   onToggleCo: (name: string) => void; selectedIds: Set<string>;
   onSelectCandidate: (id: string) => void; onSelectPerson: (c: Candidate) => void;
   activePerson: Candidate | null; onRemoveCompany: (id: string) => void;
+  onAddCompany: (tier: Tier) => void;
 }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `tier-${tier}`, data: { tier } });
   const cfg = TIER_CONFIG[tier];
   const totalPeople = companies.reduce((a, c) => a + c.candidates.length, 0);
   const avgScore = totalPeople > 0
@@ -444,7 +469,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
     : 0;
 
   return (
-    <div>
+    <div ref={setNodeRef} className={`transition-all rounded-xl p-2 -m-2 ${isOver ? "bg-indigo-500/5 ring-1 ring-indigo-500/20" : ""}`}>
       <div className="flex items-center gap-2.5 mb-3">
         <div className={`w-2.5 h-2.5 rounded ${cfg.dot}`} />
         <span className="text-sm font-semibold text-white">{cfg.label}</span>
@@ -464,7 +489,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
       </div>
       <div className="space-y-2">
         {companies.map((co) => (
-          <CompanyCard
+          <DraggableCompanyCard
             key={co.id}
             company={co}
             mapId={mapId}
@@ -481,6 +506,12 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
         {companies.length === 0 && (
           <p className="text-xs text-neutral-600 italic py-4 text-center">No companies in this tier</p>
         )}
+        <button
+          onClick={() => onAddCompany(tier)}
+          className="w-full rounded-lg border border-dashed border-neutral-700/40 py-2.5 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-all flex items-center justify-center gap-1.5"
+        >
+          <Plus className="h-3 w-3" /> Add company
+        </button>
       </div>
     </div>
   );
@@ -510,6 +541,97 @@ function MarketMapInner() {
   const [expandedCo, setExpandedCo] = useState<string | null>(null);
   const [activePerson, setActivePerson] = useState<Candidate | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [addCompanyTier, setAddCompanyTier] = useState<Tier | null>(null);
+  const [addCompanyQuery, setAddCompanyQuery] = useState("");
+  const [addCompanyResults, setAddCompanyResults] = useState<Array<{ company_name: string; company_domain: string; headcount: number | null; hq_city: string | null; apollo_org_id: string | null }>>([]);
+  const [addCompanyLoading, setAddCompanyLoading] = useState(false);
+  const [flightRiskFilter, setFlightRiskFilter] = useState(false);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  // Handle drag end — move company to new tier
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || !mapData) return;
+
+    const overId = String(over.id);
+    if (!overId.startsWith("tier-")) return;
+    const newTier = overId.replace("tier-", "") as Tier;
+    const companyId = String(active.id);
+
+    // Find which tier this company is currently in
+    let currentTier: string | null = null;
+    for (const [tier, companies] of Object.entries(mapData.tiers)) {
+      if ((companies as Company[]).some((c) => c.id === companyId)) {
+        currentTier = tier;
+        break;
+      }
+    }
+    if (!currentTier || currentTier === newTier) return;
+
+    // Optimistic UI: move the company
+    const company = (mapData.tiers[currentTier] as Company[]).find((c) => c.id === companyId);
+    if (!company) return;
+
+    setMapData({
+      ...mapData,
+      tiers: {
+        ...mapData.tiers,
+        [currentTier]: (mapData.tiers[currentTier] as Company[]).filter((c) => c.id !== companyId),
+        [newTier]: [...(mapData.tiers[newTier] as Company[] || []), { ...company, tier: newTier }],
+      },
+    });
+
+    // Persist
+    await fetch(`/api/market-map/${mapData.id}/company/${companyId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tier: newTier }),
+    });
+  }
+
+  // Add company search
+  useEffect(() => {
+    if (!addCompanyQuery || addCompanyQuery.length < 2) {
+      setAddCompanyResults([]);
+      return;
+    }
+    const timeout = setTimeout(async () => {
+      setAddCompanyLoading(true);
+      try {
+        const res = await fetch(`/api/apollo/company-search?q=${encodeURIComponent(addCompanyQuery)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setAddCompanyResults(data.results || []);
+        }
+      } catch { /* ignore */ }
+      finally { setAddCompanyLoading(false); }
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [addCompanyQuery]);
+
+  async function addCompany(co: { company_name: string; company_domain: string; apollo_org_id: string | null }) {
+    if (!mapData || !addCompanyTier) return;
+    setAddCompanyTier(null);
+    setAddCompanyQuery("");
+
+    await fetch(`/api/market-map/${mapData.id}/company/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_name: co.company_name,
+        company_domain: co.company_domain,
+        tier: addCompanyTier,
+        apollo_org_id: co.apollo_org_id,
+      }),
+    });
+
+    // Reload map to show the new company
+    loadMap(mapData.id);
+  }
 
   // Load existing map if ID in URL
   const loadMap = useCallback(async (id: string) => {
@@ -716,6 +838,21 @@ function MarketMapInner() {
             ))}
           </div>
 
+          {/* Filters */}
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              onClick={() => setFlightRiskFilter(!flightRiskFilter)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                flightRiskFilter
+                  ? "bg-red-500/15 text-red-400 border border-red-500/20"
+                  : "border border-neutral-700/50 text-neutral-500 hover:text-neutral-300"
+              }`}
+            >
+              <Filter className="h-3 w-3" />
+              {flightRiskFilter ? "Showing high risk only" : "Show high risk only"}
+            </button>
+          </div>
+
           {/* Pipeline summary */}
           {mapData.stats.statusCounts && Object.keys(mapData.stats.statusCounts).length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
@@ -732,13 +869,20 @@ function MarketMapInner() {
           )}
 
           {/* Tiers + detail panel */}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <div className="flex gap-5 items-start">
             <div className="flex-1 min-w-0 space-y-8">
               {(["A", "B", "C"] as Tier[]).map((tier) => (
                 <TierSection
                   key={tier}
                   tier={tier}
-                  companies={(mapData.tiers[tier] || []) as Company[]}
+                  companies={flightRiskFilter
+                    ? ((mapData.tiers[tier] || []) as Company[]).map(co => ({
+                        ...co,
+                        candidates: co.candidates.filter(c => c.flightRisk === "high"),
+                      })).filter(co => co.candidates.length > 0)
+                    : (mapData.tiers[tier] || []) as Company[]
+                  }
                   mapId={mapData.id}
                   expandedCo={expandedCo}
                   onToggleCo={(id) => setExpandedCo((prev) => prev === id ? null : id)}
@@ -747,6 +891,7 @@ function MarketMapInner() {
                   onSelectPerson={setActivePerson}
                   activePerson={activePerson}
                   onRemoveCompany={removeCompany}
+                  onAddCompany={(t) => setAddCompanyTier(t)}
                 />
               ))}
 
@@ -784,6 +929,50 @@ function MarketMapInner() {
               </div>
             )}
           </div>
+          </DndContext>
+
+          {/* Add company modal */}
+          {addCompanyTier && (
+            <>
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => { setAddCompanyTier(null); setAddCompanyQuery(""); }} />
+              <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border border-neutral-700/50 bg-neutral-900 p-5 shadow-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-white">Add company to {TIER_CONFIG[addCompanyTier].label}</h3>
+                  <button onClick={() => { setAddCompanyTier(null); setAddCompanyQuery(""); }}
+                    className="text-neutral-500 hover:text-white"><X className="h-4 w-4" /></button>
+                </div>
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                  <input
+                    type="text"
+                    value={addCompanyQuery}
+                    onChange={(e) => setAddCompanyQuery(e.target.value)}
+                    placeholder="Search companies..."
+                    autoFocus
+                    className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 py-2.5 pl-10 pr-4 text-sm text-white outline-none focus:border-indigo-500/50"
+                  />
+                  {addCompanyLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-neutral-500" />}
+                </div>
+                {addCompanyResults.length > 0 && (
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {addCompanyResults.map((co) => (
+                      <button
+                        key={co.company_domain}
+                        onClick={() => addCompany(co)}
+                        className="w-full text-left rounded-lg px-3 py-2.5 hover:bg-neutral-800/50 transition-colors"
+                      >
+                        <p className="text-sm font-medium text-white">{co.company_name}</p>
+                        <p className="text-[11px] text-neutral-500">{co.company_domain}{co.headcount ? ` · ${co.headcount} employees` : ""}{co.hq_city ? ` · ${co.hq_city}` : ""}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {addCompanyQuery.length >= 2 && addCompanyResults.length === 0 && !addCompanyLoading && (
+                  <p className="text-xs text-neutral-500 text-center py-4">No companies found</p>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
