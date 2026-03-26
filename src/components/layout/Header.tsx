@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { GitBranch, Search, Target, List, Settings } from "lucide-react";
+import { GitBranch, Search, Target, List, Map, Settings } from "lucide-react";
 import { AuthButton } from "@/components/auth/AuthButton";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
@@ -34,6 +34,13 @@ export function Header() {
           >
             <List className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Lists</span>
+          </Link>
+          <Link
+            href="/map"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-white"
+          >
+            <Map className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Map</span>
           </Link>
           <Link
             href="/settings"
