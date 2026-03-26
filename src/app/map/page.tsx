@@ -1,177 +1,336 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, X, Users, Building2, TrendingUp, MapPin, Download, Share2, Send, Map } from "lucide-react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ChevronDown, X, Users, Building2, TrendingUp, MapPin,
+  Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
+  CheckSquare, Square, ExternalLink, Link2, Shield,
+} from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════
-//  TYPES & DATA
+//  TYPES
 // ═══════════════════════════════════════════════════════════
 
-interface Person {
+interface Candidate {
+  id: string;
   name: string;
-  title: string;
-  yoe: number;
-  score: number;
-  status: "open" | "passive";
-  tenure: string;
+  firstName: string | null;
+  lastName: string | null;
+  title: string | null;
+  seniority: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  linkedinUrl: string | null;
+  headline: string | null;
+  fitScore: number | null;
+  fitReasoning: string | null;
+  flightRisk: string | null;
+  flightRiskSignals: string[];
+  flightRiskReasoning: string | null;
+  status: string;
+  email: string | null;
+  phone: string | null;
+  tenureMonths: number | null;
+  yearsOfExperience: number | null;
 }
 
 interface Company {
+  id: string;
+  companyName: string;
+  companyDomain: string;
+  tier: string;
+  tierOverride: boolean;
+  tierReasoning: string | null;
+  headcount: number | null;
+  engHeadcount: number | null;
+  hqCity: string | null;
+  hqCountry: string | null;
+  fundingStage: string | null;
+  fundingAmount: string | null;
+  growthRate: string | null;
+  newsSummary: string | null;
+  flightRiskCompany: string | null;
+  enrichmentStatus: string;
+  candidates: Candidate[];
+}
+
+interface MapData {
+  id: string;
   name: string;
-  domain: string;
-  headcount: number;
-  engSize: number;
-  hqCity: string;
-  growth: string;
-  people: Person[];
+  roleTitle: string;
+  roleLevel: string | null;
+  roleStack: string[];
+  geography: string[];
+  status: string;
+  tiers: Record<string, Company[]>;
+  hiddenCompanies: Array<{ id: string; companyName: string; tier: string }>;
+  stats: {
+    totalCompanies: number;
+    totalCandidates: number;
+    openCandidates: number;
+    avgFitScore: number;
+    statusCounts: Record<string, number>;
+  };
 }
 
 type Tier = "A" | "B" | "C";
 
-const MOCK_COMPANIES: Record<Tier, Company[]> = {
-  A: [
-    { name: "FluidStack", domain: "GPU Cloud", headcount: 85, engSize: 34, hqCity: "San Francisco", growth: "+42%",
-      people: [
-        { name: "Sarah Chen", title: "Sr. Platform Engineer", yoe: 8, score: 91, status: "passive", tenure: "2.1y" },
-        { name: "Marcus Webb", title: "Staff Infrastructure Eng", yoe: 12, score: 87, status: "passive", tenure: "0.8y" },
-        { name: "Priya Nair", title: "Sr. Backend Engineer", yoe: 6, score: 84, status: "open", tenure: "1.4y" },
-        { name: "James Liu", title: "Platform Engineer", yoe: 5, score: 79, status: "passive", tenure: "3.2y" },
-      ],
-    },
-    { name: "CoreWeave", domain: "GPU Cloud", headcount: 320, engSize: 140, hqCity: "New York", growth: "+67%",
-      people: [
-        { name: "Alex Rivera", title: "Staff Platform Engineer", yoe: 10, score: 93, status: "passive", tenure: "1.2y" },
-        { name: "Dana Kim", title: "Sr. Infrastructure Eng", yoe: 7, score: 88, status: "passive", tenure: "2.5y" },
-        { name: "Raj Patel", title: "Sr. SRE", yoe: 9, score: 85, status: "open", tenure: "0.6y" },
-      ],
-    },
-    { name: "Lambda", domain: "GPU Cloud / ML Infra", headcount: 200, engSize: 90, hqCity: "San Francisco", growth: "+38%",
-      people: [
-        { name: "Emily Zhao", title: "Staff Engineer", yoe: 11, score: 90, status: "passive", tenure: "3.1y" },
-        { name: "Tom Okafor", title: "Sr. Platform Engineer", yoe: 7, score: 82, status: "passive", tenure: "1.8y" },
-      ],
-    },
-  ],
-  B: [
-    { name: "Anyscale", domain: "ML Infrastructure", headcount: 150, engSize: 75, hqCity: "San Francisco", growth: "+25%",
-      people: [
-        { name: "Nina Volkov", title: "Sr. Distributed Systems", yoe: 8, score: 86, status: "passive", tenure: "2.4y" },
-        { name: "Chris Park", title: "Platform Engineer", yoe: 5, score: 78, status: "open", tenure: "1.1y" },
-        { name: "Mei Zhang", title: "Sr. Backend Engineer", yoe: 6, score: 81, status: "passive", tenure: "0.9y" },
-      ],
-    },
-    { name: "Modal", domain: "Serverless GPU", headcount: 45, engSize: 28, hqCity: "San Francisco", growth: "+55%",
-      people: [
-        { name: "Luca Moretti", title: "Staff Engineer", yoe: 9, score: 89, status: "passive", tenure: "1.6y" },
-        { name: "Ava Thompson", title: "Sr. Platform Engineer", yoe: 6, score: 83, status: "passive", tenure: "2.0y" },
-      ],
-    },
-    { name: "Replicate", domain: "ML Deployment", headcount: 60, engSize: 35, hqCity: "San Francisco", growth: "+30%",
-      people: [
-        { name: "Oscar Reyes", title: "Sr. Infrastructure Eng", yoe: 7, score: 80, status: "open", tenure: "1.3y" },
-        { name: "Yuki Tanaka", title: "Platform Engineer", yoe: 4, score: 76, status: "passive", tenure: "0.7y" },
-      ],
-    },
-  ],
-  C: [
-    { name: "Cloudflare", domain: "Edge / CDN / Compute", headcount: 3800, engSize: 1600, hqCity: "San Francisco", growth: "+18%",
-      people: [
-        { name: "Jordan Ellis", title: "Staff Platform Engineer", yoe: 13, score: 94, status: "passive", tenure: "4.2y" },
-        { name: "Sasha Popov", title: "Principal Engineer", yoe: 15, score: 96, status: "passive", tenure: "5.1y" },
-        { name: "Kenji Sato", title: "Sr. SRE", yoe: 8, score: 85, status: "passive", tenure: "2.8y" },
-      ],
-    },
-    { name: "Vercel", domain: "Developer Platform", headcount: 500, engSize: 220, hqCity: "San Francisco", growth: "+22%",
-      people: [
-        { name: "Isla Murray", title: "Staff Infrastructure", yoe: 10, score: 91, status: "passive", tenure: "2.3y" },
-        { name: "Ben Nakamura", title: "Sr. Platform Engineer", yoe: 7, score: 84, status: "passive", tenure: "1.5y" },
-      ],
-    },
-    { name: "Datadog", domain: "Observability", headcount: 5500, engSize: 2200, hqCity: "New York", growth: "+15%",
-      people: [
-        { name: "Clara Nguyen", title: "Staff SRE", yoe: 11, score: 92, status: "passive", tenure: "3.7y" },
-        { name: "Dmitri Volkov", title: "Sr. Platform Engineer", yoe: 9, score: 87, status: "open", tenure: "1.0y" },
-        { name: "Fatima Al-Rashid", title: "Sr. Backend Engineer", yoe: 7, score: 83, status: "passive", tenure: "2.2y" },
-      ],
-    },
-  ],
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════
+
+const TIER_CONFIG: Record<Tier, { label: string; sub: string; dot: string; badge: string }> = {
+  A: { label: "Tier A", sub: "Direct competitors", dot: "bg-emerald-500", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+  B: { label: "Tier B", sub: "Adjacent space", dot: "bg-indigo-500", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
+  C: { label: "Tier C", sub: "Upmarket talent", dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
 };
 
-const TIER_CONFIG: Record<Tier, { label: string; sub: string; dot: string; badge: string; badgeText: string; accent: string }> = {
-  A: { label: "Tier A", sub: "Direct competitors", dot: "bg-emerald-500", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", badgeText: "text-emerald-400", accent: "border-l-emerald-500" },
-  B: { label: "Tier B", sub: "Adjacent space", dot: "bg-indigo-500", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20", badgeText: "text-indigo-400", accent: "border-l-indigo-500" },
-  C: { label: "Tier C", sub: "Upmarket talent", dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-400 border-blue-500/20", badgeText: "text-blue-400", accent: "border-l-blue-500" },
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  mapped: { label: "Mapped", color: "bg-neutral-500/10 text-neutral-400" },
+  shortlisted: { label: "Shortlisted", color: "bg-blue-500/10 text-blue-400" },
+  contacted: { label: "Contacted", color: "bg-amber-500/10 text-amber-400" },
+  responded: { label: "Responded", color: "bg-teal-500/10 text-teal-400" },
+  screening: { label: "Screening", color: "bg-purple-500/10 text-purple-400" },
+  offer: { label: "Offer", color: "bg-emerald-500/10 text-emerald-400" },
+  rejected: { label: "Rejected", color: "bg-red-500/15 text-red-400/80" },
+};
+
+const FLIGHT_RISK_LABELS: Record<string, string> = {
+  short_tenure: "Short tenure at current role",
+  company_layoffs: "Company had recent layoffs",
+  company_reorg: "Company restructuring",
+  team_backfilling: "Team is backfilling similar roles",
+  rapid_growth_hire: "Joined during hypergrowth",
+  leadership_change: "Recent engineering leadership change",
 };
 
 function scoreColor(s: number) {
   if (s >= 90) return "text-emerald-400 bg-emerald-500/10";
   if (s >= 80) return "text-blue-400 bg-blue-500/10";
   if (s >= 70) return "text-amber-400 bg-amber-500/10";
-  return "text-red-400 bg-red-500/10";
+  return "text-neutral-400 bg-neutral-500/10";
 }
 
 // ═══════════════════════════════════════════════════════════
-//  COMPONENTS
+//  STATUS DROPDOWN
 // ═══════════════════════════════════════════════════════════
 
-function PersonRow({ person, onSelect, isSelected }: { person: Person; onSelect: (p: Person) => void; isSelected: boolean }) {
+function StatusDropdown({ status, onUpdate }: { status: string; onUpdate: (s: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.mapped;
+
   return (
-    <div
-      onClick={() => onSelect(person)}
-      className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-4 py-2.5 cursor-pointer transition-all text-sm
-        ${isSelected ? "bg-indigo-500/5 border-l-2 border-l-indigo-500" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
-    >
-      <div>
-        <p className="font-medium text-white text-[13px]">{person.name}</p>
-        <p className="text-[11px] text-neutral-500 mt-0.5">{person.title}</p>
-      </div>
-      <span className="text-[11px] text-neutral-500">{person.yoe}y</span>
-      <span className={`inline-flex items-center gap-1.5 text-[11px] ${person.status === "open" ? "text-emerald-400" : "text-neutral-500"}`}>
-        <span className={`w-1.5 h-1.5 rounded-full ${person.status === "open" ? "bg-emerald-400" : "bg-neutral-600"}`} />
-        {person.status === "open" ? "Open" : "Passive"}
-      </span>
-      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(person.score)}`}>
-        {person.score}
-      </span>
+    <div className="relative">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+        className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${cfg.color} hover:brightness-125 transition-all`}
+      >
+        {cfg.label}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-6 z-50 w-36 rounded-lg border border-neutral-700/50 bg-neutral-900 p-1 shadow-xl">
+            {Object.entries(STATUS_CONFIG).map(([key, val]) => (
+              <button
+                key={key}
+                onClick={(e) => { e.stopPropagation(); onUpdate(key); setOpen(false); }}
+                className={`w-full rounded-md px-2.5 py-1.5 text-left text-[11px] font-medium transition-colors ${
+                  key === status ? "bg-neutral-800 text-white" : "text-neutral-400 hover:bg-neutral-800/50 hover:text-white"
+                }`}
+              >
+                {val.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function CompanyCard({ company, tier, expanded, onToggle, onSelectPerson, selectedPerson }: {
-  company: Company; tier: Tier; expanded: boolean; onToggle: () => void;
-  onSelectPerson: (p: Person) => void; selectedPerson: Person | null;
+// ═══════════════════════════════════════════════════════════
+//  FLIGHT RISK BADGE
+// ═══════════════════════════════════════════════════════════
+
+function FlightRiskBadge({ risk, signals, reasoning }: { risk: string | null; signals: string[]; reasoning: string | null }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  if (!risk || risk === "low") return null;
+
+  return (
+    <div className="relative">
+      <button
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onClick={(e) => e.stopPropagation()}
+        className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
+          risk === "high"
+            ? "bg-red-500/15 text-red-400"
+            : "bg-amber-500/10 text-amber-400"
+        }`}
+      >
+        <AlertTriangle className="h-2.5 w-2.5" />
+        {risk === "high" ? "High risk" : "Medium risk"}
+      </button>
+      {showTooltip && (signals.length > 0 || reasoning) && (
+        <div className="absolute left-0 top-7 z-50 w-64 rounded-lg border border-neutral-700/50 bg-neutral-900 p-3 shadow-xl text-xs">
+          {signals.map((s) => (
+            <div key={s} className="flex items-start gap-2 mb-1.5 text-neutral-300">
+              <Shield className="h-3 w-3 mt-0.5 shrink-0 text-amber-400" />
+              {FLIGHT_RISK_LABELS[s] || s}
+            </div>
+          ))}
+          {reasoning && (
+            <p className="mt-2 text-neutral-500 italic border-t border-neutral-800 pt-2">{reasoning}</p>
+          )}
+          {risk === "high" && (
+            <p className="mt-2 text-emerald-400/80 text-[10px] font-medium">This candidate may be open to outreach</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CANDIDATE ROW
+// ═══════════════════════════════════════════════════════════
+
+function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, isActive }: {
+  candidate: Candidate;
+  mapId: string;
+  selected: boolean;
+  onSelect: (id: string) => void;
+  onSelectPerson: (c: Candidate) => void;
+  isActive: boolean;
+}) {
+  async function updateStatus(newStatus: string) {
+    await fetch(`/api/market-map/${mapId}/candidate/${candidate.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    candidate.status = newStatus; // optimistic
+  }
+
+  return (
+    <div
+      onClick={() => onSelectPerson(candidate)}
+      className={`grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-2 px-4 py-2.5 cursor-pointer transition-all text-sm
+        ${isActive ? "bg-indigo-500/5 border-l-2 border-l-indigo-500" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onSelect(candidate.id); }}
+        className="text-neutral-600 hover:text-white transition-colors"
+      >
+        {selected ? <CheckSquare className="h-3.5 w-3.5 text-indigo-400" /> : <Square className="h-3.5 w-3.5" />}
+      </button>
+      <div className="min-w-0">
+        <p className="font-medium text-[13px] truncate" style={{ color: "#e5e5e5" }}>{candidate.name}</p>
+        <p className="text-[11px] text-neutral-500 truncate mt-0.5">{candidate.title}</p>
+      </div>
+      <FlightRiskBadge risk={candidate.flightRisk} signals={candidate.flightRiskSignals} reasoning={candidate.flightRiskReasoning} />
+      <StatusDropdown status={candidate.status} onUpdate={updateStatus} />
+      {candidate.linkedinUrl && (
+        <a href={candidate.linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+          className="text-neutral-600 hover:text-blue-400 transition-colors">
+          <Link2 className="h-3.5 w-3.5" />
+        </a>
+      )}
+      {candidate.fitScore != null && candidate.fitScore > 0 && (
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(candidate.fitScore)}`}>
+          {candidate.fitScore}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COMPANY CARD
+// ═══════════════════════════════════════════════════════════
+
+function CompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove }: {
+  company: Company; mapId: string; tier: Tier; expanded: boolean; onToggle: () => void;
+  selectedIds: Set<string>; onSelectCandidate: (id: string) => void;
+  onSelectPerson: (c: Candidate) => void; activePerson: Candidate | null;
+  onRemove: (id: string) => void;
 }) {
   const cfg = TIER_CONFIG[tier];
-  const openCount = company.people.filter((p) => p.status === "open").length;
+  const openCount = company.candidates.filter((c) => c.flightRisk === "high").length;
+  const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
 
   return (
     <div className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-indigo-500/20" : ""}`}>
-      <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer">
+      <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer group">
         <div className={`w-9 h-9 rounded-lg ${cfg.badge} border flex items-center justify-center text-sm font-bold shrink-0`}>
-          {company.name.charAt(0)}
+          {company.companyName.charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white">{company.name}</p>
-          <p className="text-[11px] text-neutral-500 mt-0.5">{company.domain}</p>
-        </div>
-        <div className="text-right shrink-0">
-          <p className="text-[11px] text-neutral-500">{company.engSize} eng · {company.hqCity}</p>
-          <div className="flex gap-1.5 justify-end mt-1">
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growth} YoY</span>
-            {openCount > 0 && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium">{openCount} open</span>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-white truncate">{company.companyName}</p>
+            {company.flightRiskCompany === "high" && (
+              <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
             )}
           </div>
+          <p className="text-[11px] text-neutral-500 mt-0.5">{company.companyDomain}</p>
         </div>
+        <div className="text-right shrink-0">
+          {isEnriching ? (
+            <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+              <Loader2 className="h-3 w-3 animate-spin" /> Enriching...
+            </div>
+          ) : (
+            <>
+              <p className="text-[11px] text-neutral-500">
+                {company.engHeadcount ? `${company.engHeadcount} eng` : ""}{company.hqCity ? ` · ${company.hqCity}` : ""}
+              </p>
+              <div className="flex gap-1.5 justify-end mt-1">
+                {company.growthRate && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growthRate}</span>
+                )}
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
+                {openCount > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">{openCount} high risk</span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(company.id); }}
+          className="opacity-0 group-hover:opacity-100 text-neutral-600 hover:text-red-400 transition-all shrink-0"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
         <ChevronDown className={`h-4 w-4 text-neutral-600 transition-transform shrink-0 ${expanded ? "rotate-180" : ""}`} />
       </div>
+
       {expanded && (
         <div className="border-t border-neutral-800/50">
+          {company.newsSummary && company.flightRiskCompany !== "low" && (
+            <div className="px-4 py-2 text-[11px] text-amber-400/80 bg-amber-500/5 border-b border-neutral-800/30">
+              <AlertTriangle className="inline h-3 w-3 mr-1" />
+              {company.newsSummary}
+            </div>
+          )}
           <p className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-600">
-            {company.people.length} candidates mapped
+            {company.candidates.length} candidates
           </p>
-          {company.people.map((p, i) => (
-            <PersonRow key={i} person={p} onSelect={onSelectPerson} isSelected={selectedPerson?.name === p.name} />
+          {company.candidates.map((c) => (
+            <CandidateRow
+              key={c.id}
+              candidate={c}
+              mapId={mapId}
+              selected={selectedIds.has(c.id)}
+              onSelect={onSelectCandidate}
+              onSelectPerson={onSelectPerson}
+              isActive={activePerson?.id === c.id}
+            />
           ))}
         </div>
       )}
@@ -179,15 +338,11 @@ function CompanyCard({ company, tier, expanded, onToggle, onSelectPerson, select
   );
 }
 
-function CandidateDetail({ person, onClose }: { person: Person; onClose: () => void }) {
-  const pillars = [
-    { label: "Impact", val: Math.min(100, person.score + Math.floor(Math.random() * 8 - 3)) },
-    { label: "Contributions", val: Math.min(100, person.score + Math.floor(Math.random() * 10 - 5)) },
-    { label: "Consistency", val: Math.min(100, person.score + Math.floor(Math.random() * 6 - 2)) },
-    { label: "Tech depth", val: Math.min(100, person.score + Math.floor(Math.random() * 7 - 4)) },
-    { label: "Reputation", val: Math.min(100, person.score + Math.floor(Math.random() * 12 - 6)) },
-  ];
+// ═══════════════════════════════════════════════════════════
+//  CANDIDATE DETAIL PANEL
+// ═══════════════════════════════════════════════════════════
 
+function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () => void }) {
   return (
     <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 relative">
       <button onClick={onClose} className="absolute top-3 right-3 text-neutral-600 hover:text-white transition-colors">
@@ -195,7 +350,7 @@ function CandidateDetail({ person, onClose }: { person: Person; onClose: () => v
       </button>
 
       <div className="flex items-center gap-3 mb-5">
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-bold ${scoreColor(person.score)}`}>
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-bold ${person.fitScore ? scoreColor(person.fitScore) : "bg-neutral-800 text-neutral-400"}`}>
           {person.name.split(" ").map(n => n[0]).join("")}
         </div>
         <div>
@@ -206,10 +361,10 @@ function CandidateDetail({ person, onClose }: { person: Person; onClose: () => v
 
       <div className="grid grid-cols-2 gap-2 mb-5">
         {[
-          { label: "GitScout score", val: String(person.score) },
-          { label: "Experience", val: `${person.yoe} years` },
-          { label: "Tenure", val: person.tenure },
-          { label: "Status", val: person.status === "open" ? "Open" : "Passive" },
+          { label: "Fit score", val: person.fitScore != null ? String(person.fitScore) : "—" },
+          { label: "Seniority", val: person.seniority || "—" },
+          { label: "Location", val: [person.city, person.state].filter(Boolean).join(", ") || "—" },
+          { label: "Status", val: STATUS_CONFIG[person.status]?.label || person.status },
         ].map((m) => (
           <div key={m.label} className="rounded-lg bg-neutral-800/40 p-3">
             <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{m.label}</p>
@@ -218,20 +373,46 @@ function CandidateDetail({ person, onClose }: { person: Person; onClose: () => v
         ))}
       </div>
 
-      <div className="mb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 mb-3">Score breakdown</p>
-        {pillars.map((s) => (
-          <div key={s.label} className="flex items-center gap-3 mb-2">
-            <span className="text-xs text-neutral-400 w-24">{s.label}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-neutral-800">
-              <div
-                className="h-full rounded-full bg-indigo-500/70 transition-all duration-500"
-                style={{ width: `${s.val}%` }}
-              />
+      {person.fitReasoning && (
+        <div className="mb-4 rounded-lg bg-neutral-800/30 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Fit analysis</p>
+          <p className="text-xs text-neutral-300">{person.fitReasoning}</p>
+        </div>
+      )}
+
+      {person.flightRisk && person.flightRisk !== "low" && (
+        <div className={`mb-4 rounded-lg p-3 ${person.flightRisk === "high" ? "bg-red-500/5 border border-red-500/10" : "bg-amber-500/5 border border-amber-500/10"}`}>
+          <p className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">Flight risk: {person.flightRisk}</p>
+          {person.flightRiskSignals.map((s) => (
+            <div key={s} className="flex items-start gap-2 mb-1 text-xs text-neutral-300">
+              <Shield className="h-3 w-3 mt-0.5 shrink-0 text-amber-400" />
+              {FLIGHT_RISK_LABELS[s] || s}
             </div>
-            <span className="text-[11px] font-medium text-neutral-400 w-7 text-right">{s.val}</span>
-          </div>
-        ))}
+          ))}
+          {person.flightRiskReasoning && (
+            <p className="mt-2 text-[11px] text-neutral-400 italic">{person.flightRiskReasoning}</p>
+          )}
+          {person.flightRisk === "high" && (
+            <p className="mt-2 text-[10px] text-emerald-400 font-medium">Consider reaching out soon — this candidate may be open to new opportunities</p>
+          )}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 mb-4">
+        {person.linkedinUrl && (
+          <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors">
+            <Link2 className="h-3.5 w-3.5" /> LinkedIn
+          </a>
+        )}
+        {person.email && (
+          <span className="text-xs text-neutral-400">{person.email}</span>
+        )}
+        {!person.email && (
+          <button className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+            Reveal contact (1 credit)
+          </button>
+        )}
       </div>
 
       <div className="flex gap-2">
@@ -246,13 +427,21 @@ function CandidateDetail({ person, onClose }: { person: Person; onClose: () => v
   );
 }
 
-function TierSection({ tier, companies, expandedCo, onToggleCo, onSelectPerson, selectedPerson }: {
-  tier: Tier; companies: Company[]; expandedCo: string | null;
-  onToggleCo: (name: string) => void; onSelectPerson: (p: Person) => void; selectedPerson: Person | null;
+// ═══════════════════════════════════════════════════════════
+//  TIER SECTION
+// ═══════════════════════════════════════════════════════════
+
+function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany }: {
+  tier: Tier; companies: Company[]; mapId: string; expandedCo: string | null;
+  onToggleCo: (name: string) => void; selectedIds: Set<string>;
+  onSelectCandidate: (id: string) => void; onSelectPerson: (c: Candidate) => void;
+  activePerson: Candidate | null; onRemoveCompany: (id: string) => void;
 }) {
   const cfg = TIER_CONFIG[tier];
-  const totalPeople = companies.reduce((a, c) => a + c.people.length, 0);
-  const avgScore = Math.round(companies.reduce((a, c) => a + c.people.reduce((s, p) => s + p.score, 0), 0) / totalPeople);
+  const totalPeople = companies.reduce((a, c) => a + c.candidates.length, 0);
+  const avgScore = totalPeople > 0
+    ? Math.round(companies.reduce((a, c) => a + c.candidates.reduce((s, p) => s + (p.fitScore || 0), 0), 0) / totalPeople)
+    : 0;
 
   return (
     <div>
@@ -265,7 +454,7 @@ function TierSection({ tier, companies, expandedCo, onToggleCo, onSelectPerson, 
         {[
           { val: companies.length, label: "cos" },
           { val: totalPeople, label: "people" },
-          { val: avgScore, label: "avg score" },
+          { val: avgScore, label: "avg fit" },
         ].map((b) => (
           <div key={b.label} className={`rounded-md border px-2.5 py-1 text-[11px] ${cfg.badge}`}>
             <span className="font-semibold">{b.val}</span>
@@ -276,15 +465,22 @@ function TierSection({ tier, companies, expandedCo, onToggleCo, onSelectPerson, 
       <div className="space-y-2">
         {companies.map((co) => (
           <CompanyCard
-            key={co.name}
+            key={co.id}
             company={co}
+            mapId={mapId}
             tier={tier}
-            expanded={expandedCo === co.name}
-            onToggle={() => onToggleCo(co.name)}
+            expanded={expandedCo === co.id}
+            onToggle={() => onToggleCo(co.id)}
+            selectedIds={selectedIds}
+            onSelectCandidate={onSelectCandidate}
             onSelectPerson={onSelectPerson}
-            selectedPerson={selectedPerson}
+            activePerson={activePerson}
+            onRemove={onRemoveCompany}
           />
         ))}
+        {companies.length === 0 && (
+          <p className="text-xs text-neutral-600 italic py-4 text-center">No companies in this tier</p>
+        )}
       </div>
     </div>
   );
@@ -294,18 +490,134 @@ function TierSection({ tier, companies, expandedCo, onToggleCo, onSelectPerson, 
 //  MAIN PAGE
 // ═══════════════════════════════════════════════════════════
 
-export default function MarketMapPage() {
+function MarketMapInner() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const mapIdParam = searchParams.get("id");
+
+  // Form state
+  const [roleTitle, setRoleTitle] = useState("Sr. Platform Engineer");
+  const [roleLevel, setRoleLevel] = useState("senior");
+  const [roleStack, setRoleStack] = useState("Go, Kubernetes");
+  const [geography, setGeography] = useState("San Francisco");
+
+  // Map state
+  const [mapData, setMapData] = useState<MapData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expandedCo, setExpandedCo] = useState<string | null>(null);
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const [searchInput, setSearchInput] = useState("Sr. Platform Engineer");
-  const [roleLevel, setRoleLevel] = useState("Senior");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [activePerson, setActivePerson] = useState<Candidate | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const handleToggleCo = (name: string) => setExpandedCo((prev) => (prev === name ? null : name));
+  // Load existing map if ID in URL
+  const loadMap = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/market-map/${id}`);
+      if (!res.ok) throw new Error("Failed to load map");
+      const data = await res.json();
+      setMapData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load map");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const allCompanies = Object.values(MOCK_COMPANIES).flat();
-  const totalCandidates = allCompanies.reduce((a, c) => a + c.people.length, 0);
-  const openCandidates = allCompanies.reduce((a, c) => a + c.people.filter((p) => p.status === "open").length, 0);
+  useEffect(() => {
+    if (mapIdParam) loadMap(mapIdParam);
+  }, [mapIdParam, loadMap]);
+
+  // Generate new map
+  async function generateMap() {
+    if (!session?.user?.id) {
+      setError("Please sign in to generate market maps");
+      return;
+    }
+    setGenerating(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/market-map/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role_title: roleTitle,
+          role_level: roleLevel,
+          role_stack: roleStack.split(",").map((s) => s.trim()).filter(Boolean),
+          geography: geography ? [geography] : [],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Map generation failed");
+      }
+
+      const data = await res.json();
+      router.push(`/map?id=${data.mapId}`);
+
+      // Enrich companies in background
+      for (const co of data.companies) {
+        fetch("/api/market-map/enrich-company", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            map_id: data.mapId,
+            company_id: co.id,
+            company_domain: co.domain,
+            company_name: co.name,
+            role_title: roleTitle,
+            role_level: roleLevel,
+            role_stack: roleStack.split(",").map((s) => s.trim()),
+            geography: geography ? [geography] : [],
+          }),
+        }).then(() => {
+          // Reload map after each enrichment completes
+          loadMap(data.mapId);
+        }).catch(() => {});
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Generation failed");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function toggleSelectCandidate(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  async function removeCompany(companyId: string) {
+    if (!mapData) return;
+    await fetch(`/api/market-map/${mapData.id}/company/${companyId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hidden: true }),
+    });
+    loadMap(mapData.id);
+  }
+
+  async function bulkUpdateStatus(status: string) {
+    if (!mapData || selectedIds.size === 0) return;
+    await fetch(`/api/market-map/${mapData.id}/candidates/bulk-update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ candidate_ids: Array.from(selectedIds), update: { status } }),
+    });
+    setSelectedIds(new Set());
+    loadMap(mapData.id);
+  }
+
+  const allCompanies = mapData ? Object.values(mapData.tiers).flat() : [];
+  const totalCandidates = allCompanies.reduce((s, c) => s + c.candidates.length, 0);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -318,103 +630,207 @@ export default function MarketMapPage() {
             GitScout
           </span>
         </div>
-        <p className="text-sm text-neutral-500">Interactive talent landscape for targeted recruiting searches</p>
+        <p className="text-sm text-neutral-500">AI-powered talent landscape for targeted recruiting</p>
       </div>
 
-      {/* Search bar */}
-      <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-4 mb-5 flex flex-wrap gap-3 items-end">
-        <div className="flex-[2] min-w-[180px]">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role / title</label>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50"
-          />
-        </div>
-        <div className="min-w-[120px]">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
-          <select
-            value={roleLevel}
-            onChange={(e) => setRoleLevel(e.target.value)}
-            className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none"
-          >
-            <option>Mid</option>
-            <option>Senior</option>
-            <option>Staff</option>
-            <option>Principal</option>
-          </select>
-        </div>
-        <div className="min-w-[120px]">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Status</label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none"
-          >
-            <option value="all">All candidates</option>
-            <option value="open">Open to work</option>
-            <option value="passive">Passive only</option>
-          </select>
-        </div>
-        <button className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors whitespace-nowrap">
-          Generate map
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-        {[
-          { label: "Companies mapped", val: allCompanies.length, icon: Building2 },
-          { label: "Candidates identified", val: totalCandidates, icon: Users },
-          { label: "Open to work", val: openCandidates, icon: TrendingUp },
-          { label: "Avg GitScout score", val: 86, icon: MapPin },
-        ].map((m) => (
-          <div key={m.label} className="rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <m.icon className="h-3.5 w-3.5 text-neutral-500" />
-              <p className="text-[10px] uppercase tracking-wider text-neutral-500">{m.label}</p>
+      {/* Generate form */}
+      {!mapData && (
+        <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
+              <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
             </div>
-            <p className="text-2xl font-bold text-white tabular-nums">{m.val}</p>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
+              <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value)}
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none">
+                <option value="mid">Mid</option>
+                <option value="senior">Senior</option>
+                <option value="staff">Staff</option>
+                <option value="principal">Principal</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
+              <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
+              <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
+            </div>
           </div>
-        ))}
-      </div>
-
-      {/* Main content: tiers + detail panel */}
-      <div className="flex gap-5 items-start">
-        <div className="flex-1 min-w-0 space-y-8">
-          {(["A", "B", "C"] as Tier[]).map((tier) => (
-            <TierSection
-              key={tier}
-              tier={tier}
-              companies={MOCK_COMPANIES[tier]}
-              expandedCo={expandedCo}
-              onToggleCo={handleToggleCo}
-              onSelectPerson={setSelectedPerson}
-              selectedPerson={selectedPerson}
-            />
-          ))}
+          <button onClick={generateMap} disabled={generating || !roleTitle}
+            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors disabled:opacity-50">
+            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
+            {generating ? "Generating map..." : "Generate market map"}
+          </button>
         </div>
+      )}
 
-        {selectedPerson && (
-          <div className="w-80 shrink-0 sticky top-20">
-            <CandidateDetail person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-800/30 bg-red-950/50 px-4 py-3 text-sm text-red-300">
+          {error}
+        </div>
+      )}
+
+      {loading && (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
+        </div>
+      )}
+
+      {/* Map content */}
+      {mapData && !loading && (
+        <>
+          {/* Map header */}
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-white">{mapData.name}</h2>
+              <p className="text-xs text-neutral-500">{mapData.roleTitle} · {mapData.roleLevel} · {mapData.geography.join(", ")}</p>
+            </div>
+            <button onClick={() => { setMapData(null); router.push("/map"); }}
+              className="text-xs text-neutral-500 hover:text-white transition-colors">
+              ← New map
+            </button>
           </div>
-        )}
-      </div>
 
-      {/* Footer actions */}
-      <div className="mt-6 rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4 flex gap-2 justify-end flex-wrap">
-        <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
-          <Download className="h-3.5 w-3.5" /> Export PDF
-        </button>
-        <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
-          <Share2 className="h-3.5 w-3.5" /> Share with HM
-        </button>
-        <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-          <Send className="h-3.5 w-3.5" /> Push all to outreach
-        </button>
-      </div>
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+            {[
+              { label: "Companies", val: mapData.stats.totalCompanies, icon: Building2 },
+              { label: "Candidates", val: totalCandidates, icon: Users },
+              { label: "Avg Fit", val: mapData.stats.avgFitScore || "—", icon: TrendingUp },
+              { label: "High risk", val: allCompanies.reduce((s, c) => s + c.candidates.filter((p) => p.flightRisk === "high").length, 0), icon: AlertTriangle },
+            ].map((m) => (
+              <div key={m.label} className="rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <m.icon className="h-3.5 w-3.5 text-neutral-500" />
+                  <p className="text-[10px] uppercase tracking-wider text-neutral-500">{m.label}</p>
+                </div>
+                <p className="text-2xl font-bold text-white tabular-nums">{m.val}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Pipeline summary */}
+          {mapData.stats.statusCounts && Object.keys(mapData.stats.statusCounts).length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {Object.entries(mapData.stats.statusCounts).map(([status, count]) => {
+                const cfg = STATUS_CONFIG[status];
+                if (!cfg || count === 0) return null;
+                return (
+                  <span key={status} className={`rounded-md px-2.5 py-1 text-[11px] font-medium ${cfg.color}`}>
+                    {count} {cfg.label.toLowerCase()}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Tiers + detail panel */}
+          <div className="flex gap-5 items-start">
+            <div className="flex-1 min-w-0 space-y-8">
+              {(["A", "B", "C"] as Tier[]).map((tier) => (
+                <TierSection
+                  key={tier}
+                  tier={tier}
+                  companies={(mapData.tiers[tier] || []) as Company[]}
+                  mapId={mapData.id}
+                  expandedCo={expandedCo}
+                  onToggleCo={(id) => setExpandedCo((prev) => prev === id ? null : id)}
+                  selectedIds={selectedIds}
+                  onSelectCandidate={toggleSelectCandidate}
+                  onSelectPerson={setActivePerson}
+                  activePerson={activePerson}
+                  onRemoveCompany={removeCompany}
+                />
+              ))}
+
+              {/* Hidden companies */}
+              {mapData.hiddenCompanies.length > 0 && (
+                <div className="mt-6 rounded-lg border border-neutral-800/50 bg-neutral-900/30 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-600 mb-2">
+                    Removed companies ({mapData.hiddenCompanies.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {mapData.hiddenCompanies.map((co) => (
+                      <button
+                        key={co.id}
+                        onClick={async () => {
+                          await fetch(`/api/market-map/${mapData.id}/company/${co.id}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ hidden: false }),
+                          });
+                          loadMap(mapData.id);
+                        }}
+                        className="flex items-center gap-1.5 rounded-md border border-neutral-700/30 px-2.5 py-1 text-xs text-neutral-500 hover:text-white hover:border-neutral-600 transition-colors"
+                      >
+                        <Plus className="h-3 w-3" /> {co.companyName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {activePerson && (
+              <div className="w-80 shrink-0 sticky top-20">
+                <CandidateDetail person={activePerson} onClose={() => setActivePerson(null)} />
+              </div>
+            )}
+          </div>
+
+          {/* Bulk action bar */}
+          {selectedIds.size > 0 && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border border-neutral-700/50 bg-neutral-900/95 px-6 py-3 shadow-2xl backdrop-blur-sm">
+              <span className="text-sm font-semibold text-white">{selectedIds.size} selected</span>
+              <div className="h-5 w-px bg-neutral-700" />
+              <button onClick={() => bulkUpdateStatus("shortlisted")}
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 transition-colors">
+                Shortlist
+              </button>
+              <button onClick={() => bulkUpdateStatus("contacted")}
+                className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-500 transition-colors">
+                Mark contacted
+              </button>
+              <button onClick={() => bulkUpdateStatus("rejected")}
+                className="rounded-lg border border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors">
+                Remove
+              </button>
+              <button onClick={() => setSelectedIds(new Set())}
+                className="text-xs text-neutral-500 hover:text-white transition-colors">
+                Clear
+              </button>
+            </div>
+          )}
+
+          {/* Footer actions */}
+          <div className="mt-6 rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4 flex gap-2 justify-end flex-wrap">
+            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+              <Download className="h-3.5 w-3.5" /> Export PDF
+            </button>
+            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+              <Share2 className="h-3.5 w-3.5" /> Share with HM
+            </button>
+            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+              <Send className="h-3.5 w-3.5" /> Push to Ashby
+            </button>
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+export default function MarketMapPage() {
+  return (
+    <Suspense>
+      <MarketMapInner />
+    </Suspense>
   );
 }
