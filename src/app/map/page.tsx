@@ -9,6 +9,7 @@ import {
   CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
   GripVertical, Search, Save, Copy, Clock,
 } from "lucide-react";
+import Link from "next/link";
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
   type DragEndEvent,
@@ -538,6 +539,10 @@ function MarketMapInner() {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recentMaps, setRecentMaps] = useState<Array<{
+    id: string; name: string; roleTitle: string; status: string;
+    companyCount: number; candidateCount: number; createdAt: string;
+  }>>([]);
   const [expandedCo, setExpandedCo] = useState<string | null>(null);
   const [activePerson, setActivePerson] = useState<Candidate | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -592,6 +597,15 @@ function MarketMapInner() {
       body: JSON.stringify({ tier: newTier }),
     });
   }
+
+  // Load recent maps when no map is selected
+  useEffect(() => {
+    if (!session?.user?.id || mapIdParam) return;
+    fetch("/api/market-map/list")
+      .then((r) => r.json())
+      .then((data) => setRecentMaps(data.maps || []))
+      .catch(() => {});
+  }, [session, mapIdParam]);
 
   // Add company search
   useEffect(() => {
@@ -790,6 +804,40 @@ function MarketMapInner() {
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
             {generating ? "Generating map..." : "Generate market map"}
           </button>
+        </div>
+      )}
+
+      {/* Recent maps */}
+      {!mapData && !loading && recentMaps.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Recent maps</h2>
+            <Link href="/map/templates" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
+              Templates →
+            </Link>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {recentMaps.slice(0, 6).map((m) => (
+              <Link
+                key={m.id}
+                href={`/map?id=${m.id}`}
+                className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-4 transition-all hover:border-neutral-700/80 hover:bg-neutral-900/80"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                  {m.status === "stale" && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium shrink-0 ml-2">Stale</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-neutral-500">{m.roleTitle}</p>
+                <div className="flex items-center gap-3 mt-2 text-[11px] text-neutral-600">
+                  <span className="flex items-center gap-1"><Building2 className="h-3 w-3" />{m.companyCount} cos</span>
+                  <span className="flex items-center gap-1"><Users className="h-3 w-3" />{m.candidateCount} people</span>
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(m.createdAt).toLocaleDateString()}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
@@ -999,16 +1047,41 @@ function MarketMapInner() {
           )}
 
           {/* Footer actions */}
-          <div className="mt-6 rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4 flex gap-2 justify-end flex-wrap">
-            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
-              <Download className="h-3.5 w-3.5" /> Export PDF
-            </button>
-            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
-              <Share2 className="h-3.5 w-3.5" /> Share with HM
-            </button>
-            <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-              <Send className="h-3.5 w-3.5" /> Push to Ashby
-            </button>
+          <div className="mt-6 rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4 flex gap-2 justify-between flex-wrap">
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const name = prompt("Template name:", mapData.roleTitle);
+                  if (!name) return;
+                  const res = await fetch("/api/market-map/templates", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ map_id: mapData.id, name }),
+                  });
+                  if (res.ok) alert("Template saved!");
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors"
+              >
+                <Save className="h-3.5 w-3.5" /> Save as template
+              </button>
+              <Link
+                href="/map/templates"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors"
+              >
+                <Copy className="h-3.5 w-3.5" /> Templates
+              </Link>
+            </div>
+            <div className="flex gap-2">
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+                <Download className="h-3.5 w-3.5" /> Export PDF
+              </button>
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+                <Share2 className="h-3.5 w-3.5" /> Share with HM
+              </button>
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                <Send className="h-3.5 w-3.5" /> Push to Ashby
+              </button>
+            </div>
           </div>
         </>
       )}
