@@ -87,24 +87,24 @@ function Landing() {
         <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-blue-500/[0.03] blur-[80px]" />
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-16">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         {/* Hero badge */}
-        <div className="mb-6 flex items-center gap-2 rounded-full border border-neutral-200/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-neutral-400 backdrop-blur-sm dark:border-neutral-700/50">
+        <div className="mb-4 flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-4 py-1.5 text-xs font-medium text-indigo-300 backdrop-blur-sm">
           <LiveDot />
           <span>Live GitHub intelligence</span>
-          <span className="text-neutral-600">·</span>
-          <span className="text-indigo-400">48M+ developers</span>
+          <span className="text-indigo-500/50">·</span>
+          <span className="text-indigo-200">48M+ developers</span>
         </div>
 
         {/* Title */}
         <h1 className="mb-3 text-center text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-          <span className="text-neutral-900 dark:text-white">Scout </span>
+          <span className="text-white">Scout </span>
           <span className="text-gradient">top talent</span>
           <br />
-          <span className="text-neutral-900 dark:text-white">from GitHub</span>
+          <span className="text-white">from GitHub</span>
         </h1>
 
-        <p className="mb-10 max-w-xl text-center text-base text-neutral-500 sm:text-lg dark:text-neutral-400">
+        <p className="mb-8 max-w-xl text-center text-base text-neutral-300 sm:text-lg">
           Source engineers by what they build, not what they claim.
           Real code. Real contributions. Real signal.
         </p>
@@ -147,7 +147,7 @@ function Landing() {
               <button
                 key={chip.label}
                 onClick={() => handleSearch(chip.q)}
-                className="rounded-full border border-neutral-200/30 px-3 py-1 text-xs font-medium text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-500"
+                className="rounded-full border border-neutral-600/40 px-3 py-1.5 text-xs font-medium text-neutral-300 transition-all hover:border-indigo-400/60 hover:text-indigo-300 hover:bg-indigo-500/10 hover:-translate-y-px"
               >
                 {chip.label}
               </button>
@@ -156,20 +156,21 @@ function Landing() {
         </div>
 
         {/* Stats bar */}
-        <div className="mt-16 flex items-center gap-8 sm:gap-12">
-          {stats.map((s) => (
+        <div className="mt-10 flex items-center gap-8 sm:gap-12 rounded-xl border border-neutral-700/30 bg-neutral-900/50 px-8 py-4 backdrop-blur-sm">
+          {stats.map((s, i) => (
             <div key={s.label} className="flex items-center gap-2.5">
-              <s.icon className="h-4 w-4 text-indigo-400/60" />
+              <s.icon className="h-4 w-4 text-indigo-400" />
               <div>
-                <p className="text-lg font-bold tabular-nums text-neutral-900 dark:text-white">{s.value}</p>
-                <p className="text-[11px] text-neutral-500">{s.label}</p>
+                <p className="text-lg font-bold tabular-nums text-white">{s.value}</p>
+                <p className="text-[11px] text-neutral-400">{s.label}</p>
               </div>
+              {i < stats.length - 1 && <div className="ml-6 h-8 w-px bg-neutral-700/50 sm:ml-8" />}
             </div>
           ))}
         </div>
 
         {/* Trust line */}
-        <p className="mt-12 text-xs text-neutral-500/60">
+        <p className="mt-8 text-xs text-neutral-400">
           Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration
         </p>
       </div>
