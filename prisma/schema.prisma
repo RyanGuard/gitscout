@@ -93,8 +93,11 @@ model User {
   ashbyConnection AshbyConnection?
   ashbyPushes     AshbyPush[]
   candidateLists  CandidateList[]
-  marketMaps      MarketMap[]
-  mapTemplates    MapTemplate[]
+  marketMaps        MarketMap[]
+  mapTemplates      MapTemplate[]
+  connectionHomeBases ConnectionHomeBase[]
+  connectionLookups   ConnectionLookup[]
+  linkedinImports     LinkedinImport[]
 }
 
 model Account {
@@ -381,4 +384,133 @@ model SyncLog {
   errors      Int      @default(0)
   startedAt   DateTime @default(now())
   completedAt DateTime?
+}
+
+// --- Connection Mapper ---
+
+model ConnectionHomeBase {
+  id                  String   @id @default(cuid())
+  userId              String
+  companyName         String
+  companyDomain       String
+  apolloOrgId         String?
+  investors           String[] @default([])
+  fundingStage        String?
+  setupStatus         String   @default("pending") // pending | enriching_team | enriching_github | ready | failed
+  teamCount           Int      @default(0)
+  engCount            Int      @default(0)
+  githubMatchedCount  Int      @default(0)
+  lastEnrichedAt      DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  people              HomeBasePerson[]
+  githubRepos         HomeBaseGithubRepo[]
+  lookups             ConnectionLookup[]
+
+  @@index([userId])
+  @@index([companyDomain])
+}
+
+model HomeBasePerson {
+  id                String   @id @default(cuid())
+  homeBaseId        String
+  apolloPersonId    String?
+  name              String
+  firstName         String?
+  lastName          String?
+  title             String?
+  department        String?
+  seniority         String?
+  linkedinUrl       String?
+  githubUsername     String?
+  githubUrl         String?
+  githubConfidence  String?  // high | medium | low
+  education         Json?    // array of { school_name, degree, field, start_year, end_year }
+  employmentHistory Json?    // array of { company_name, company_domain, title, start_date, end_date, is_current }
+  createdAt         DateTime @default(now())
+  homeBase          ConnectionHomeBase @relation(fields: [homeBaseId], references: [id], onDelete: Cascade)
+  githubRepos       HomeBaseGithubRepo[]
+  connections       Connection[] @relation("HomePersonConnections")
+
+  @@index([homeBaseId])
+  @@index([apolloPersonId])
+}
+
+model HomeBaseGithubRepo {
+  id                String   @id @default(cuid())
+  homeBaseId        String
+  personId          String
+  githubUsername     String
+  repoFullName      String   // e.g. "kubernetes/kubernetes"
+  repoUrl           String?
+  contributionType  String   // commit | pr_merged | pr_open | issue
+  contributionCount Int      @default(0)
+  lastContributedAt DateTime?
+  createdAt         DateTime @default(now())
+  homeBase          ConnectionHomeBase @relation(fields: [homeBaseId], references: [id], onDelete: Cascade)
+  person            HomeBasePerson     @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([homeBaseId])
+  @@index([personId])
+  @@index([repoFullName])
+}
+
+model ConnectionLookup {
+  id                    String   @id @default(cuid())
+  userId                String
+  homeBaseId            String
+  targetCompanyName     String
+  targetCompanyDomain   String
+  targetApolloOrgId     String?
+  targetInvestors       String[] @default([])
+  totalConnectionsFound Int      @default(0)
+  connectionBreakdown   Json?    // { former_employee: 3, shared_investor: 1, ... }
+  mapId                 String?
+  mapCompanyId          String?
+  createdAt             DateTime @default(now())
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  homeBase              ConnectionHomeBase @relation(fields: [homeBaseId], references: [id], onDelete: Cascade)
+  connections           Connection[]
+
+  @@index([userId])
+  @@index([homeBaseId])
+  @@index([targetCompanyDomain])
+  @@index([mapId])
+}
+
+model Connection {
+  id                  String   @id @default(cuid())
+  lookupId            String
+  connectionType      String   // former_employee | shared_investor | shared_education | github_overlap | linkedin_import | manual_tag
+  strength            String   // strong | medium | weak
+  homePersonId        String?
+  homePersonName      String?
+  homePersonTitle     String?
+  targetPersonName    String?
+  targetPersonTitle   String?
+  targetPersonApolloId String?
+  detail              Json?    // varies by connection type
+  suggestedAction     String?
+  createdAt           DateTime @default(now())
+  lookup              ConnectionLookup @relation(fields: [lookupId], references: [id], onDelete: Cascade)
+  homePerson          HomeBasePerson?  @relation("HomePersonConnections", fields: [homePersonId], references: [id], onDelete: SetNull)
+
+  @@index([lookupId])
+  @@index([connectionType])
+  @@index([strength])
+}
+
+model LinkedinImport {
+  id                  String   @id @default(cuid())
+  userId              String
+  connectionName      String
+  connectionTitle     String?
+  connectionCompany   String?
+  connectionLinkedinUrl String?
+  importedAt          DateTime @default(now())
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([connectionCompany])
 }

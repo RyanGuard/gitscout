@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { GitBranch, Search, Target, List, Map, Menu, X } from "lucide-react";
+import { GitBranch, Search, Target, List, Map, Link2, Menu, X } from "lucide-react";
 import { AuthButton } from "@/components/auth/AuthButton";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/match", label: "Match", icon: Target },
   { href: "/lists", label: "Lists", icon: List },
   { href: "/map", label: "Map", icon: Map },
+  { href: "/connections", label: "Connections", icon: Link2 },
 ];
 
 export function Header() {

@@ -263,11 +263,12 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
 //  COMPANY CARD
 // ═══════════════════════════════════════════════════════════
 
-function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove }: {
+function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove, connectionCount }: {
   company: Company; mapId: string; tier: Tier; expanded: boolean; onToggle: () => void;
   selectedIds: Set<string>; onSelectCandidate: (id: string) => void;
   onSelectPerson: (c: Candidate) => void; activePerson: Candidate | null;
   onRemove: (id: string) => void;
+  connectionCount?: number;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: company.id,
@@ -297,6 +298,11 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold text-white truncate">{company.companyName}</p>
+            {connectionCount && connectionCount > 0 ? (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 font-medium shrink-0 border border-teal-500/20" title={`${connectionCount} warm connection${connectionCount !== 1 ? "s" : ""}`}>
+                <Link2 className="inline h-2.5 w-2.5 mr-0.5" />{connectionCount}
+              </span>
+            ) : null}
             {company.flightRiskCompany === "high" && (
               <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
             )}
@@ -455,12 +461,13 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
 //  TIER SECTION
 // ═══════════════════════════════════════════════════════════
 
-function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany }: {
+function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany, connectionCounts }: {
   tier: Tier; companies: Company[]; mapId: string; expandedCo: string | null;
   onToggleCo: (name: string) => void; selectedIds: Set<string>;
   onSelectCandidate: (id: string) => void; onSelectPerson: (c: Candidate) => void;
   activePerson: Candidate | null; onRemoveCompany: (id: string) => void;
   onAddCompany: (tier: Tier) => void;
+  connectionCounts?: Record<string, number>;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `tier-${tier}`, data: { tier } });
   const cfg = TIER_CONFIG[tier];
@@ -502,6 +509,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
             onSelectPerson={onSelectPerson}
             activePerson={activePerson}
             onRemove={onRemoveCompany}
+            connectionCount={connectionCounts?.[co.id]}
           />
         ))}
         {companies.length === 0 && (
@@ -551,6 +559,7 @@ function MarketMapInner() {
   const [addCompanyResults, setAddCompanyResults] = useState<Array<{ company_name: string; company_domain: string; headcount: number | null; hq_city: string | null; apollo_org_id: string | null }>>([]);
   const [addCompanyLoading, setAddCompanyLoading] = useState(false);
   const [flightRiskFilter, setFlightRiskFilter] = useState(false);
+  const [connectionCounts, setConnectionCounts] = useState<Record<string, number>>({});
 
   // DnD sensors
   const sensors = useSensors(
@@ -663,9 +672,29 @@ function MarketMapInner() {
     }
   }, []);
 
+  // Fetch connection counts for all companies on the map
+  const loadConnectionCounts = useCallback(async (mapId: string) => {
+    try {
+      const res = await fetch(`/api/market-map/${mapId}/connections`);
+      if (res.ok) {
+        const data = await res.json();
+        setConnectionCounts(data.counts || {});
+      }
+    } catch {
+      // Non-fatal — badges just won't show
+    }
+  }, []);
+
   useEffect(() => {
     if (mapIdParam) loadMap(mapIdParam);
   }, [mapIdParam, loadMap]);
+
+  // Load connection counts when map data is available
+  useEffect(() => {
+    if (mapData?.id) {
+      loadConnectionCounts(mapData.id);
+    }
+  }, [mapData?.id, loadConnectionCounts]);
 
   // Generate new map
   async function generateMap() {
@@ -940,6 +969,7 @@ function MarketMapInner() {
                   activePerson={activePerson}
                   onRemoveCompany={removeCompany}
                   onAddCompany={(t) => setAddCompanyTier(t)}
+                  connectionCounts={connectionCounts}
                 />
               ))}
 
