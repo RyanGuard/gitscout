@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
-const APOLLO_API = "https://api.apollo.io/v1";
+const APOLLO_API = "https://api.apollo.io/api/v1";
 
 interface NewsEvent {
   event_type: "LAYOFFS" | "REORG" | "ACQUISITION" | "FUNDING" | "LEADERSHIP_CHANGE";

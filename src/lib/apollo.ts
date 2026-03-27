@@ -1,4 +1,4 @@
-const APOLLO_API = "https://api.apollo.io/v1";
+const APOLLO_API = "https://api.apollo.io/api/v1";
 
 export interface ApolloPersonMatch {
   id: string | null;

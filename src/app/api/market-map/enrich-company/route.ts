@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-const APOLLO_API = "https://api.apollo.io/v1";
+const APOLLO_API = "https://api.apollo.io/api/v1";
 
 // Title variations for broader matching
 const TITLE_EXPANSIONS: Record<string, string[]> = {
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
         searchBody.person_locations = geography;
       }
 
-      const res = await fetch(`${APOLLO_API}/mixed_people/search`, {
+      const res = await fetch(`${APOLLO_API}/mixed_people/api_search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(searchBody),
@@ -158,8 +158,8 @@ export async function POST(request: Request) {
         // Cache the results
         await setCache(cacheKey, "people_search", people);
       } else {
-        console.error(`[apollo] People search failed: ${res.status} for ${company_domain}`);
-        // Try to get company info at least
+        const errBody = await res.text().catch(() => "");
+        console.error(`[apollo] People search failed: ${res.status} for ${company_domain}`, errBody.slice(0, 500));
       }
     }
 

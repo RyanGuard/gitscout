@@ -1,6 +1,6 @@
 import { getCached, setCache } from "./cache";
 
-const APOLLO_API = "https://api.apollo.io/v1";
+const APOLLO_API = "https://api.apollo.io/api/v1";
 
 function getApiKey(): string {
   const key = process.env.APOLLO_API_KEY;
@@ -139,7 +139,7 @@ export async function searchPeopleAtCompany(
       searchBody.person_seniorities = options.seniorities;
     }
 
-    const res = await fetch(`${APOLLO_API}/mixed_people/search`, {
+    const res = await fetch(`${APOLLO_API}/mixed_people/api_search`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(searchBody),

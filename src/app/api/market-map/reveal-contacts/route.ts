@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const APOLLO_API = "https://api.apollo.io/v1";
+const APOLLO_API = "https://api.apollo.io/api/v1";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
