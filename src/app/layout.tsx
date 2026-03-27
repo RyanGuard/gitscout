@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Header } from "@/components/layout/Header";
+import { Instrument_Sans, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/auth/Providers";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -16,24 +17,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GitScout - Discover Talented Developers",
+  title: "Scout — Recruiting intelligence",
   description:
-    "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
+    "Recruiting intelligence platform. Source engineers, map connections, and build pipeline with real data.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://gitscout.dev"
   ),
   openGraph: {
-    title: "GitScout - Discover Talented Developers",
+    title: "Scout — Recruiting intelligence",
     description:
-      "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
-    siteName: "GitScout",
+      "Recruiting intelligence platform. Source engineers, map connections, and build pipeline with real data.",
+    siteName: "Scout",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "GitScout - Discover Talented Developers",
+    title: "Scout — Recruiting intelligence",
     description:
-      "Search and discover talented developers on GitHub. Filter by language, location, and expertise.",
+      "Recruiting intelligence platform. Source engineers, map connections, and build pipeline with real data.",
   },
 };
 
@@ -45,14 +46,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${instrumentSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-neutral-50 dark:bg-[#0a0a0f]">
+      <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <Providers>
-            <Header />
-            <main className="flex flex-1 flex-col">{children}</main>
+            <AppShell>{children}</AppShell>
           </Providers>
         </ThemeProvider>
       </body>
