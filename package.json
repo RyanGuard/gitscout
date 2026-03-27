@@ -25,6 +25,7 @@
     "@elastic/elasticsearch": "^9.3.4",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
+    "@react-pdf/renderer": "^4.3.2",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
