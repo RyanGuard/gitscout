@@ -791,8 +791,8 @@ function MarketMapInner() {
         <div className="flex items-center gap-2.5 mb-1">
           <Map className="h-5 w-5 text-indigo-400" />
           <h1 className="text-xl font-bold text-white tracking-tight">Market Map</h1>
-          <span className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold">
-            GitScout
+          <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold" style={{ background: "rgba(200,165,90,0.1)", color: "#C8A55A", border: "1px solid rgba(200,165,90,0.2)" }}>
+            Scout
           </span>
         </div>
         <p className="text-sm text-neutral-500">AI-powered talent landscape for targeted recruiting</p>

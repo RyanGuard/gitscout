@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
   Search, Target, List, Map, Link2, BarChart3, Bell,
-  Settings, ChevronLeft, ChevronRight, Sparkles, Send,
+  Settings, ChevronLeft, ChevronRight, Sparkles, Send, Copy,
 } from "lucide-react";
 
 const SECTIONS = [
@@ -30,6 +30,7 @@ const SECTIONS = [
     items: [
       { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles },
       { id: "lists", label: "Saved lists", href: "/lists", icon: List },
+      { id: "templates", label: "Templates", href: "/templates", icon: Copy },
     ],
   },
   {
