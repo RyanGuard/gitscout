@@ -100,7 +100,7 @@ export function DailyBriefing() {
       }
 
       // Check streak
-      const streakKey = "scout_active_dates";
+      const streakKey = "gitscout_active_dates";
       const today = new Date().toISOString().split("T")[0];
       const stored = JSON.parse(localStorage.getItem(streakKey) || "[]") as string[];
       if (!stored.includes(today)) {

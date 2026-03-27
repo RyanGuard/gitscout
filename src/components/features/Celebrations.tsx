@@ -13,7 +13,7 @@ import { toast, Toaster } from 'sonner';
 
 // ── localStorage state ──────────────────────────────────────
 
-const STORAGE_KEY = 'scout_celebrations';
+const STORAGE_KEY = 'gitscout_celebrations';
 
 interface CelebrationState {
   firstUnicorn: boolean;
@@ -98,7 +98,7 @@ function startMatrixRain(durationMs: number = 3000): void {
   if (prefersReducedMotion()) return;
 
   const canvas = document.createElement('canvas');
-  canvas.id = 'scout-matrix-rain';
+  canvas.id = 'gitscout-matrix-rain';
   Object.assign(canvas.style, {
     position: 'fixed',
     top: '0',

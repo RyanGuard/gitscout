@@ -23,17 +23,17 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [resolved, setResolved] = useState<"dark" | "light">("light");
+  const [theme, setThemeState] = useState<Theme>("dark");
+  const [resolved, setResolved] = useState<"dark" | "light">("dark");
 
   // On mount, read saved preference
   useEffect(() => {
-    const saved = localStorage.getItem("scout-theme") as Theme | null;
+    const saved = localStorage.getItem("gitscout-theme") as Theme | null;
     if (saved && ["dark", "light", "system"].includes(saved)) {
       setThemeState(saved);
     } else {
-      // Default to light
-      setThemeState("light");
+      // Default to system preference (respects user's OS setting)
+      setThemeState("system");
     }
   }, []);
 
@@ -71,7 +71,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
-    localStorage.setItem("scout-theme", t);
+    localStorage.setItem("gitscout-theme", t);
   }, []);
 
   const toggle = useCallback(() => {

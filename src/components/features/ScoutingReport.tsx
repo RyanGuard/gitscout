@@ -128,11 +128,11 @@ export function ScoutingReport({
     if (!report) return;
     const displayName = profileData.name || username;
     const score = scoreData?.score ?? 0;
-    const formatted = `\u{1F984} Scout Scouting Report \u{2014} ${displayName} (Score: ${score}/100)
+    const formatted = `\u{1F984} GitScout Scouting Report \u{2014} ${displayName} (Score: ${score}/100)
 \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 ${report}
 \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
-Sourced via Scout \u{00B7} gitscout.dev`;
+Sourced via GitScout \u{00B7} gitscout.dev`;
     await navigator.clipboard.writeText(formatted);
     setCopied("share");
     setTimeout(() => setCopied(null), 2000);

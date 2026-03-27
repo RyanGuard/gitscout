@@ -79,30 +79,30 @@ function Landing() {
   ];
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden" style={{ background: "#0a0a0f", minHeight: "100vh" }}>
+    <div className="relative flex flex-1 flex-col overflow-hidden">
       {/* Atmospheric gradient background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "rgba(200,165,90,0.04)" }} />
-        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full blur-[100px]" style={{ background: "rgba(200,165,90,0.03)" }} />
-        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full blur-[80px]" style={{ background: "rgba(200,165,90,0.03)" }} />
+        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-indigo-500/[0.04] blur-[120px]" />
+        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full bg-violet-500/[0.03] blur-[100px]" />
+        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-blue-500/[0.03] blur-[80px]" />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         {/* Hero badge */}
         <div
           className="mb-4 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
-          style={{ border: "1px solid rgba(200,165,90,0.25)", background: "rgba(200,165,90,0.08)", color: "#C8A55A" }}
+          style={{ border: "1px solid rgba(129,140,248,0.25)", background: "rgba(129,140,248,0.08)", color: "#a5b4fc" }}
         >
           <LiveDot />
           <span>Live GitHub intelligence</span>
-          <span style={{ color: "rgba(200,165,90,0.4)" }}>{"\u00B7"}</span>
-          <span style={{ color: "#E8E6DF" }}>48M+ developers</span>
+          <span style={{ color: "rgba(129,140,248,0.4)" }}>·</span>
+          <span style={{ color: "#c7d2fe" }}>48M+ developers</span>
         </div>
 
         {/* Title */}
         <h1 className="mb-4 text-center text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
           <span style={{ color: "#f5f5f5" }}>Scout </span>
-          <span style={{ background: "linear-gradient(135deg, #C8A55A, #E8D5A3)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>top talent</span>
+          <span className="text-gradient">top talent</span>
           <br />
           <span style={{ color: "#f5f5f5" }}>from GitHub</span>
         </h1>
@@ -118,22 +118,20 @@ function Landing() {
             onSubmit={(e) => { e.preventDefault(); handleSearch(query); }}
             className="group relative"
           >
-            <div className="absolute -inset-1 rounded-2xl opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" style={{ background: "linear-gradient(to right, rgba(200,165,90,0.2), rgba(200,165,90,0.1))" }} />
-            <div className="relative flex items-center rounded-xl shadow-2xl" style={{ border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)" }}>
-              <Search className="ml-5 h-5 w-5" style={{ color: "rgba(255,255,255,0.4)" }} />
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-blue-500/20 opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" />
+            <div className="relative flex items-center rounded-xl border border-neutral-200/50 bg-white shadow-lg dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:shadow-2xl">
+              <Search className="ml-5 h-5 w-5 text-neutral-400" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={hints[activeHint]}
-                className="flex-1 bg-transparent px-4 py-4 text-base outline-none"
-                style={{ color: "#f5f5f5", caretColor: "#C8A55A" }}
+                className="flex-1 bg-transparent px-4 py-4 text-base outline-none placeholder:text-neutral-400/60 dark:text-white"
               />
               <button
                 type="submit"
-                className="mr-2 rounded-lg px-5 py-2 text-sm font-semibold transition-all hover:shadow-lg"
-                style={{ background: "#C8A55A", color: "#19191A" }}
+                className="mr-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25"
               >
                 Search
               </button>
@@ -168,7 +166,7 @@ function Landing() {
         >
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center gap-2.5">
-              <s.icon className="h-4 w-4" style={{ color: "#C8A55A" }} />
+              <s.icon className="h-4 w-4" style={{ color: "#818cf8" }} />
               <div>
                 <p className="text-lg font-bold tabular-nums" style={{ color: "#f5f5f5" }}>{s.value}</p>
                 <p className="text-[11px]" style={{ color: "#888" }}>{s.label}</p>

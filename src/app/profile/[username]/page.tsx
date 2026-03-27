@@ -30,7 +30,7 @@ const GITHUB_API = "https://api.github.com";
 function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "Scout/1.0",
+    "User-Agent": "GitScout/1.0",
   };
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -166,15 +166,15 @@ export async function generateMetadata({
 
   if (!developer) {
     return {
-      title: "Developer Not Found — Scout",
-      description: "This developer profile could not be found on Scout.",
+      title: "Developer Not Found — GitScout",
+      description: "This developer profile could not be found on GitScout.",
     };
   }
 
   const displayName = developer.name || developer.username;
-  const title = `${displayName} (@${developer.username}) — Scout`;
+  const title = `${displayName} (@${developer.username}) — GitScout`;
   const description =
-    developer.bio || `Developer profile for ${developer.username} on Scout`;
+    developer.bio || `Developer profile for ${developer.username} on GitScout`;
   const avatarUrl =
     developer.avatarUrl || `https://github.com/${developer.username}.png`;
 
@@ -206,7 +206,6 @@ export default async function ProfilePage({
   if (!developer) notFound();
 
   return (
-    <div className="dark min-h-screen" style={{ background: "#0a0a0f" }}>
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <Link
         href="/search"
@@ -420,7 +419,6 @@ export default async function ProfilePage({
       )}
 
       {/* (AI features and Find Similar / Share Card are in the header toolbar above) */}
-    </div>
     </div>
   );
 }

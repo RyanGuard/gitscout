@@ -131,7 +131,7 @@ async function fetchCratesPackages(username: string): Promise<PackageInfo[]> {
     const res = await fetch(
       `https://crates.io/api/v1/crates?user_id=${encodeURIComponent(username)}&per_page=20&sort=downloads`,
       {
-        headers: { "User-Agent": "Scout/1.0 (https://gitscout.dev)" },
+        headers: { "User-Agent": "GitScout/1.0 (https://gitscout.dev)" },
         next: { revalidate: 86400 },
       }
     );
@@ -142,7 +142,7 @@ async function fetchCratesPackages(username: string): Promise<PackageInfo[]> {
       const searchRes = await fetch(
         `https://crates.io/api/v1/crates?q=${encodeURIComponent(username)}&per_page=10`,
         {
-          headers: { "User-Agent": "Scout/1.0 (https://gitscout.dev)" },
+          headers: { "User-Agent": "GitScout/1.0 (https://gitscout.dev)" },
           next: { revalidate: 86400 },
         }
       );

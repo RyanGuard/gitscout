@@ -1,4 +1,4 @@
-// NextAuth configuration for Scout
+// NextAuth configuration for GitScout
 // GitHub OAuth App setup required:
 //   Homepage URL: https://gitscout-beta.vercel.app
 //   Callback URL: https://gitscout-beta.vercel.app/api/auth/callback/github

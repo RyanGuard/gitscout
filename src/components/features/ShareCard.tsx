@@ -59,7 +59,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
             showCopied("image");
           } catch {
             // Fallback: download instead
-            downloadBlob(pngBlob, `${username}-scout-card.png`);
+            downloadBlob(pngBlob, `${username}-gitscout-card.png`);
             showCopied("downloaded");
           }
         }, "image/png");
@@ -89,7 +89,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
 
         canvas.toBlob((pngBlob) => {
           if (!pngBlob) return;
-          downloadBlob(pngBlob, `${username}-scout-card.png`);
+          downloadBlob(pngBlob, `${username}-gitscout-card.png`);
           showCopied("downloaded");
         }, "image/png");
       };
@@ -159,7 +159,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
                 <img
                   ref={imgRef}
                   src={cardUrl}
-                  alt={`Scout card for ${username}`}
+                  alt={`GitScout card for ${username}`}
                   className="w-full"
                   onLoad={() => setLoading(false)}
                   onError={() => setLoading(false)}
@@ -194,7 +194,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
               {/* Score note */}
               {score > 0 && (
                 <p className="mt-3 text-xs text-neutral-500">
-                  Scout Score: {score}/100
+                  GitScout Score: {score}/100
                 </p>
               )}
             </motion.div>

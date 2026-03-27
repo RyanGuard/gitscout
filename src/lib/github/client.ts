@@ -1,4 +1,4 @@
-// Scout GitHub API Client
+// GitScout GitHub API Client
 // Rate limiting, Supabase caching, retry with exponential backoff, REST + GraphQL
 
 const GITHUB_API = "https://api.github.com";
@@ -31,7 +31,7 @@ export class GitHubClient {
   private headers(): HeadersInit {
     const h: HeadersInit = {
       Accept: "application/vnd.github+json",
-      "User-Agent": "Scout/2.0",
+      "User-Agent": "GitScout/2.0",
     };
     if (this.token) h.Authorization = `Bearer ${this.token}`;
     return h;

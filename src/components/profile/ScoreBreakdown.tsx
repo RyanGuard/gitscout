@@ -131,7 +131,7 @@ export function ScoreBreakdown({ username }: { username: string }) {
         <ScoreRing score={data.score} size={110} />
         <div className="flex-1">
           <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
-            Scout Score
+            GitScout Score
           </h2>
           <p className="text-xs text-neutral-500 mt-0.5">
             5-pillar analysis • {data.externalMergedPRs} external merged PRs

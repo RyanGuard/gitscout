@@ -94,14 +94,14 @@ export async function findOrCreateSource(apiKey: string): Promise<string> {
     apiKey
   );
   const existing = list.results.find(
-    (s) => s.title === "Scout"
+    (s) => s.title === "GitScout"
   );
   if (existing) return existing.id;
 
   const created = await ashbyRequest<{
     success: boolean;
     results: AshbySource;
-  }>("source.create", apiKey, { title: "Scout" });
+  }>("source.create", apiKey, { title: "GitScout" });
 
   return created.results.id;
 }

@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Ensure a Scout source exists in their Ashby org
+  // Ensure a GitScout source exists in their Ashby org
   let sourceId: string | null = null;
   try {
     sourceId = await findOrCreateSource(apiKey.trim());
