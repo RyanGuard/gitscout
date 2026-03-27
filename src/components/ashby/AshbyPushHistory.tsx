@@ -82,7 +82,7 @@ export function AshbyPushHistory() {
           <div className="min-w-0 flex-1">
             <Link
               href={`/profile/${push.developer.username}`}
-              className="text-sm font-medium text-neutral-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
+              className="text-sm font-medium text-neutral-900 hover:text-gold dark:text-white dark:hover:text-gold"
             >
               {push.developer.name || push.developer.username}
             </Link>

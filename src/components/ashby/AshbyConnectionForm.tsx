@@ -126,8 +126,8 @@ export function AshbyConnectionForm() {
               placeholder="Enter your Ashby API key"
               className={cn(
                 "w-full rounded-lg border px-3 py-2 text-sm transition-colors",
-                "border-neutral-300 bg-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500",
-                "dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-400"
+                "border-neutral-300 bg-white focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold",
+                "dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:focus:border-gold dark:focus:ring-gold"
               )}
             />
             <p className="mt-1 text-xs text-neutral-500">
@@ -139,8 +139,8 @@ export function AshbyConnectionForm() {
             disabled={loading || !apiKey.trim()}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-              "bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50",
-              "dark:bg-indigo-500 dark:hover:bg-indigo-600"
+              "bg-gold text-white hover:bg-gold-hover disabled:opacity-50",
+              "dark:bg-gold dark:hover:bg-gold-hover"
             )}
           >
             {loading ? (

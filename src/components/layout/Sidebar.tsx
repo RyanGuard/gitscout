@@ -30,7 +30,7 @@ const SECTIONS = [
     items: [
       { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles },
       { id: "lists", label: "Saved lists", href: "/lists", icon: List },
-      { id: "templates", label: "Templates", href: "/templates", icon: Copy },
+      { id: "templates", label: "Templates", href: "/map/templates", icon: Copy },
     ],
   },
   {
@@ -80,11 +80,11 @@ export function Sidebar() {
       {/* Logo + Collapse toggle */}
       <div className="flex items-center justify-between px-3 pt-4 pb-5">
         <Link href="/" className="flex items-center gap-2.5 min-w-0" onClick={() => setMobileOpen(false)}>
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md" style={{ background: "#C8A55A" }}>
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gold">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="3.5" stroke="#19191A" strokeWidth="2" />
-              <path d="M12 12.5c-4 0-7 2.5-7 5.5h14c0-3-3-5.5-7-5.5z" stroke="#19191A" strokeWidth="2" strokeLinejoin="round" />
-              <path d="M18 4l2.5 2.5M18 9l2.5-2.5" stroke="#19191A" strokeWidth="1.8" strokeLinecap="round" />
+              <circle cx="12" cy="8" r="3.5" stroke="var(--sidebar-bg)" strokeWidth="2" />
+              <path d="M12 12.5c-4 0-7 2.5-7 5.5h14c0-3-3-5.5-7-5.5z" stroke="var(--sidebar-bg)" strokeWidth="2" strokeLinejoin="round" />
+              <path d="M18 4l2.5 2.5M18 9l2.5-2.5" stroke="var(--sidebar-bg)" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </div>
           {!collapsed && (
@@ -123,8 +123,8 @@ export function Sidebar() {
                     onClick={() => setMobileOpen(false)}
                     className={`group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-colors duration-150 ${
                       active
-                        ? "bg-white/[0.07] text-sidebar-text font-medium border-l-2 border-l-gold -ml-[2px] pl-[calc(0.625rem+2px)]"
-                        : "text-sidebar-muted hover:bg-white/[0.04] hover:text-sidebar-text"
+                        ? "bg-sidebar-active text-sidebar-text font-medium border-l-2 border-l-gold -ml-[2px] pl-[calc(0.625rem+2px)]"
+                        : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-text"
                     }`}
                     title={collapsed ? item.label : undefined}
                   >
@@ -139,14 +139,14 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="mt-auto border-t border-white/[0.06] px-2 py-2 space-y-0.5">
+      <div className="mt-auto border-t border-sidebar-border px-2 py-2 space-y-0.5">
         <Link
           href="/settings"
           onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-colors duration-150 ${
             isActive(pathname, "/settings")
-              ? "bg-white/[0.07] text-sidebar-text font-medium"
-              : "text-sidebar-muted hover:bg-white/[0.04] hover:text-sidebar-text"
+              ? "bg-sidebar-active text-sidebar-text font-medium"
+              : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-text"
           }`}
         >
           <Settings className="h-4 w-4 shrink-0" />
@@ -155,10 +155,7 @@ export function Sidebar() {
 
         {/* User card */}
         <div className="flex items-center gap-2.5 px-2.5 py-2">
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold"
-            style={{ background: "rgba(200,165,90,0.12)", color: "#C8A55A" }}
-          >
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold bg-gold-bg-strong text-gold">
             {initials}
           </div>
           {!collapsed && (
@@ -177,14 +174,13 @@ export function Sidebar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed top-3 left-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg md:hidden"
-        style={{ background: "#19191A", border: "1px solid rgba(255,255,255,0.08)" }}
+        className="fixed top-3 left-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-bg border border-sidebar-border md:hidden"
         aria-label={mobileOpen ? "Close menu" : "Open menu"}
       >
         {mobileOpen ? (
-          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="#E8E6DF" strokeWidth="1.5" strokeLinecap="round" /></svg>
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="var(--sidebar-text)" strokeWidth="1.5" strokeLinecap="round" /></svg>
         ) : (
-          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M2 5h14M2 9h14M2 13h14" stroke="#E8E6DF" strokeWidth="1.5" strokeLinecap="round" /></svg>
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M2 5h14M2 9h14M2 13h14" stroke="var(--sidebar-text)" strokeWidth="1.5" strokeLinecap="round" /></svg>
         )}
       </button>
 
@@ -193,10 +189,10 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:sticky top-0 h-screen z-40 flex flex-col transition-all duration-200 md:translate-x-0 ${
+        className={`fixed md:sticky top-0 h-screen z-40 flex flex-col bg-sidebar-bg transition-all duration-200 md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{ width: sidebarWidth, background: "#19191A", flexShrink: 0 }}
+        style={{ width: sidebarWidth, flexShrink: 0 }}
       >
         {sidebarContent}
       </aside>

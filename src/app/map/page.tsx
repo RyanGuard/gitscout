@@ -230,16 +230,16 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
     <div
       onClick={() => onSelectPerson(candidate)}
       className={`grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-2 px-3 sm:px-4 py-2.5 cursor-pointer transition-all text-sm
-        ${isActive ? "bg-indigo-500/5 border-l-2 border-l-indigo-500" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
+        ${isActive ? "bg-gold/5 border-l-2 border-l-gold" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
     >
       <button
         onClick={(e) => { e.stopPropagation(); onSelect(candidate.id); }}
         className="text-neutral-600 hover:text-white transition-colors"
       >
-        {selected ? <CheckSquare className="h-3.5 w-3.5 text-indigo-400" /> : <Square className="h-3.5 w-3.5" />}
+        {selected ? <CheckSquare className="h-3.5 w-3.5 text-gold" /> : <Square className="h-3.5 w-3.5" />}
       </button>
       <div className="min-w-0">
-        <p className="font-medium text-[13px] truncate" style={{ color: "#e5e5e5" }}>{candidate.name}</p>
+        <p className="font-medium text-[13px] truncate text-foreground">{candidate.name}</p>
         <p className="text-[11px] text-neutral-500 truncate mt-0.5">{candidate.title}</p>
       </div>
       <FlightRiskBadge risk={candidate.flightRisk} signals={candidate.flightRiskSignals} reasoning={candidate.flightRiskReasoning} />
@@ -286,7 +286,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
   const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
 
   return (
-    <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-indigo-500/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-indigo-500/30 scale-[1.02]" : ""}`}>
+    <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-gold/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-gold/30 scale-[1.02]" : ""}`}>
       <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer group">
         <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 transition-colors shrink-0 touch-none"
           onClick={(e) => e.stopPropagation()}>
@@ -439,14 +439,14 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
           <span className="text-xs text-neutral-400">{person.email}</span>
         )}
         {!person.email && (
-          <button className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+          <button className="text-xs text-gold hover:text-gold-hover transition-colors">
             Reveal contact (1 credit)
           </button>
         )}
       </div>
 
       <div className="flex gap-2">
-        <button className="flex-1 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition-colors">
+        <button className="flex-1 py-2 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold-hover transition-colors">
           Add to outreach
         </button>
         <button className="flex-1 py-2 rounded-lg border border-neutral-700/50 text-neutral-300 text-xs font-medium hover:bg-neutral-800/50 transition-colors">
@@ -477,7 +477,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
     : 0;
 
   return (
-    <div ref={setNodeRef} className={`transition-all rounded-xl p-2 -m-2 ${isOver ? "bg-indigo-500/5 ring-1 ring-indigo-500/20" : ""}`}>
+    <div ref={setNodeRef} className={`transition-all rounded-xl p-2 -m-2 ${isOver ? "bg-gold/5 ring-1 ring-gold/20" : ""}`}>
       <div className="flex items-center gap-2.5 mb-3">
         <div className={`w-2.5 h-2.5 rounded ${cfg.dot}`} />
         <span className="text-sm font-semibold text-white">{cfg.label}</span>
@@ -517,7 +517,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
         )}
         <button
           onClick={() => onAddCompany(tier)}
-          className="w-full rounded-lg border border-dashed border-neutral-700/40 py-2.5 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-all flex items-center justify-center gap-1.5"
+          className="w-full rounded-lg border border-dashed border-neutral-700/40 py-2.5 text-xs text-neutral-500 hover:border-gold/30 hover:text-gold transition-all flex items-center justify-center gap-1.5"
         >
           <Plus className="h-3 w-3" /> Add company
         </button>
@@ -789,9 +789,9 @@ function MarketMapInner() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
-          <Map className="h-5 w-5 text-indigo-400" />
+          <Map className="h-5 w-5 text-gold" />
           <h1 className="text-xl font-bold text-white tracking-tight">Market Map</h1>
-          <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold" style={{ background: "rgba(200,165,90,0.1)", color: "#C8A55A", border: "1px solid rgba(200,165,90,0.2)" }}>
+          <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-gold-bg text-gold border border-gold-border">
             Scout
           </span>
         </div>
@@ -805,7 +805,7 @@ function MarketMapInner() {
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
               <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
             </div>
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
@@ -820,16 +820,16 @@ function MarketMapInner() {
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
               <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
             </div>
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
               <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-indigo-500/50" />
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
             </div>
           </div>
           <button onClick={generateMap} disabled={generating || !roleTitle}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors disabled:opacity-50">
+            className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
             {generating ? "Generating map..." : "Generate market map"}
           </button>
@@ -841,7 +841,7 @@ function MarketMapInner() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Recent maps</h2>
-            <Link href="/map/templates" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
+            <Link href="/map/templates" className="text-xs text-gold hover:text-gold-hover transition-colors">
               Templates →
             </Link>
           </div>
@@ -878,7 +878,7 @@ function MarketMapInner() {
 
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
         </div>
       )}
 
@@ -1027,7 +1027,7 @@ function MarketMapInner() {
                     onChange={(e) => setAddCompanyQuery(e.target.value)}
                     placeholder="Search companies..."
                     autoFocus
-                    className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 py-2.5 pl-10 pr-4 text-sm text-white outline-none focus:border-indigo-500/50"
+                    className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 py-2.5 pl-10 pr-4 text-sm text-white outline-none focus:border-gold/50"
                   />
                   {addCompanyLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-neutral-500" />}
                 </div>
@@ -1058,7 +1058,7 @@ function MarketMapInner() {
               <span className="text-sm font-semibold text-white">{selectedIds.size} selected</span>
               <div className="h-5 w-px bg-neutral-700" />
               <button onClick={() => bulkUpdateStatus("shortlisted")}
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 transition-colors">
+                className="rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-gold-hover transition-colors">
                 Shortlist
               </button>
               <button onClick={() => bulkUpdateStatus("contacted")}
@@ -1108,7 +1108,7 @@ function MarketMapInner() {
               <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
                 <Share2 className="h-3.5 w-3.5" /> Share with HM
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-sm font-semibold text-white hover:bg-gold-hover transition-colors">
                 <Send className="h-3.5 w-3.5" /> Push to Ashby
               </button>
             </div>

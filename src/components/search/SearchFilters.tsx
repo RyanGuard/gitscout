@@ -80,7 +80,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
         <SlidersHorizontal className="h-4 w-4" />
         Filters
         {hasActiveFilters && (
-          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+          <span className="rounded-full bg-gold-bg px-2 py-0.5 text-xs text-gold dark:bg-gold-bg dark:text-gold">
             {selectedLanguages.length + (location ? 1 : 0) + (minStars ? 1 : 0) + (hireable ? 1 : 0)}
           </span>
         )}
@@ -112,7 +112,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
                     onClick={() => toggleLanguage(lang)}
                     className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                       selectedLanguages.includes(lang)
-                        ? "bg-blue-600 text-white"
+                        ? "bg-gold text-white"
                         : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400"
                     }`}
                   >
@@ -132,7 +132,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. San Francisco"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
+                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 dark:border-neutral-700 transition-colors"
                 />
               </div>
               <div>
@@ -144,7 +144,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
                   value={minStars}
                   onChange={(e) => setMinStars(e.target.value)}
                   placeholder="e.g. 100"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
+                  className="mt-1 w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 dark:border-neutral-700 transition-colors"
                 />
               </div>
             </div>
@@ -156,7 +156,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
                   id="hireable"
                   checked={hireable}
                   onChange={(e) => setHireable(e.target.checked)}
-                  className="rounded accent-blue-600"
+                  className="rounded accent-gold"
                 />
                 <label htmlFor="hireable" className="text-sm text-neutral-600 dark:text-neutral-400">
                   Hireable only
@@ -168,7 +168,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="rounded-lg border border-neutral-200 bg-transparent px-2 py-1 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 transition-colors"
+                  className="rounded-lg border border-neutral-200 bg-transparent px-2 py-1 text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 dark:border-neutral-700 transition-colors"
                 >
                   <option value="score">Relevance</option>
                   <option value="stars">Stars</option>
@@ -180,7 +180,7 @@ export function SearchFilters({ onFilterChange, defaultValues }: SearchFiltersPr
 
             <button
               onClick={apply}
-              className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="w-full rounded-lg bg-gold py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
             >
               Apply Filters
             </button>

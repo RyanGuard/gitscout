@@ -49,7 +49,7 @@ export function SoundToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+      className="relative p-2 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
       aria-label={enabled ? 'Mute sounds' : 'Enable sounds'}
       title={enabled ? 'Mute sounds' : 'Enable sounds'}
     >

@@ -75,20 +75,20 @@ export function KeyboardOverlay() {
 
       {/* Card */}
       <div
-        className={`relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 ${
+        className={`relative bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 ${
           prefersReducedMotion ? '' : 'animate-in zoom-in-95 fade-in duration-200'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-6">
           <h2 className="text-xl font-semibold text-white">Keyboard Shortcuts</h2>
-          <p className="text-sm text-gray-400 mt-1">Navigate GitScout like a pro</p>
+          <p className="text-sm text-neutral-400 mt-1">Navigate Scout like a pro</p>
         </div>
 
         <div className="space-y-6">
           {SHORTCUT_GROUPS.map((group) => (
             <div key={group.title}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">
                 {group.title}
               </h3>
               <div className="space-y-2">
@@ -97,8 +97,8 @@ export function KeyboardOverlay() {
                     key={shortcut.keys}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="text-gray-300">{shortcut.description}</span>
-                    <kbd className="inline-flex items-center gap-1 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-xs font-mono text-gray-300">
+                    <span className="text-neutral-300">{shortcut.description}</span>
+                    <kbd className="inline-flex items-center gap-1 px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-xs font-mono text-neutral-300">
                       {shortcut.keys}
                     </kbd>
                   </div>
@@ -108,9 +108,9 @@ export function KeyboardOverlay() {
           ))}
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-700 text-center">
-          <p className="text-xs text-gray-500">
-            Press <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-600 rounded text-xs font-mono">?</kbd> to close
+        <div className="mt-6 pt-4 border-t border-neutral-700 text-center">
+          <p className="text-xs text-neutral-500">
+            Press <kbd className="px-1.5 py-0.5 bg-neutral-800 border border-neutral-600 rounded text-xs font-mono">?</kbd> to close
           </p>
         </div>
       </div>

@@ -79,7 +79,7 @@ export function SearchLoadingMessages({
       <div className="mx-auto h-0.5 w-48 overflow-hidden rounded-full bg-neutral-800">
         <div
           className="h-full w-1/3 rounded-full animate-[indeterminate_1.5s_ease-in-out_infinite]"
-          style={{ background: "#1D9E75" }}
+          style={{ background: "var(--gold)" }}
         />
       </div>
       <style>{`

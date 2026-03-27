@@ -64,7 +64,7 @@ export function CandidateRow({
             className="h-8 w-8 rounded-full border border-neutral-200 dark:border-neutral-700"
           />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+            <p className="truncate text-sm font-medium text-neutral-900 group-hover:text-gold dark:text-white dark:group-hover:text-gold">
               {entry.developer.name || entry.developer.username}
             </p>
             <p className="text-xs text-neutral-500">@{entry.developer.username}</p>

@@ -119,7 +119,7 @@ export function PushToAshbyButton({
         onClick={openJobPicker}
         disabled={loading}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-400 dark:hover:bg-indigo-900",
+          "inline-flex items-center gap-1.5 rounded-lg border border-gold-border bg-gold-bg px-3 py-2 text-sm font-medium text-gold-muted transition-colors hover:bg-gold-bg dark:border-gold-border dark:bg-gold-bg dark:text-gold dark:hover:bg-gold-bg",
           className
         )}
       >
@@ -170,7 +170,7 @@ export function PushToAshbyButton({
                   onClick={() => handlePush(job.id)}
                   className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
-                  <Briefcase className="h-4 w-4 shrink-0 text-indigo-500" />
+                  <Briefcase className="h-4 w-4 shrink-0 text-gold" />
                   <span className="truncate">{job.title}</span>
                 </button>
               ))

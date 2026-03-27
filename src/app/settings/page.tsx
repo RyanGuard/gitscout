@@ -5,8 +5,8 @@ import { AshbyConnectionForm } from "@/components/ashby/AshbyConnectionForm";
 import { AshbyPushHistory } from "@/components/ashby/AshbyPushHistory";
 
 export const metadata = {
-  title: "Settings — GitScout",
-  description: "Manage your GitScout integrations and settings.",
+  title: "Settings — Scout",
+  description: "Manage your Scout integrations and settings.",
 };
 
 export default async function SettingsPage() {
@@ -28,7 +28,7 @@ export default async function SettingsPage() {
           Ashby ATS
         </h2>
         <p className="mt-1 text-sm text-neutral-500">
-          Connect your Ashby account to push candidates directly from GitScout.
+          Connect your Ashby account to push candidates directly from Scout.
         </p>
         <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
           <AshbyConnectionForm />

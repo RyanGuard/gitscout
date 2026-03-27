@@ -128,11 +128,11 @@ export function ScoutingReport({
     if (!report) return;
     const displayName = profileData.name || username;
     const score = scoreData?.score ?? 0;
-    const formatted = `\u{1F984} GitScout Scouting Report \u{2014} ${displayName} (Score: ${score}/100)
+    const formatted = `\u{1F984} Scout Scouting Report \u{2014} ${displayName} (Score: ${score}/100)
 \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
 ${report}
 \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}
-Sourced via GitScout \u{00B7} gitscout.dev`;
+Sourced via Scout \u{00B7} gitscout.dev`;
     await navigator.clipboard.writeText(formatted);
     setCopied("share");
     setTimeout(() => setCopied(null), 2000);
@@ -145,7 +145,7 @@ Sourced via GitScout \u{00B7} gitscout.dev`;
       {!report && !loading && (
         <button
           onClick={generate}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
         >
           <Sparkles className="h-4 w-4" />
           Generate Scouting Report
@@ -153,9 +153,9 @@ Sourced via GitScout \u{00B7} gitscout.dev`;
       )}
 
       {loading && (
-        <div className="mt-4 rounded-lg border-l-4 border-emerald-500 border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900 dark:border-l-emerald-500">
+        <div className="mt-4 rounded-lg border-l-4 border-gold border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900 dark:border-l-gold">
           <div className="flex items-center gap-2 text-sm text-neutral-500">
-            <Sparkles className="h-4 w-4 animate-pulse text-emerald-500" />
+            <Sparkles className="h-4 w-4 animate-pulse text-gold" />
             Writing report...
           </div>
         </div>
@@ -168,11 +168,11 @@ Sourced via GitScout \u{00B7} gitscout.dev`;
       )}
 
       {report && !loading && (
-        <div className="mt-4 rounded-lg border-l-4 border-emerald-500 border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900 dark:border-l-emerald-500">
+        <div className="mt-4 rounded-lg border-l-4 border-gold border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900 dark:border-l-gold">
           <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
             {displayedText}
             {displayedText.length < report.length && (
-              <span className="inline-block h-4 w-0.5 animate-pulse bg-emerald-500 ml-0.5" />
+              <span className="inline-block h-4 w-0.5 animate-pulse bg-gold ml-0.5" />
             )}
           </p>
 

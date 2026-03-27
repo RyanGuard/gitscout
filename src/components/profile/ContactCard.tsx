@@ -188,7 +188,7 @@ export function ContactCard({
                 href={contactInfo.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                className="inline-flex items-center gap-1 text-sm text-gold hover:underline dark:text-gold"
               >
                 LinkedIn
                 <ExternalLink className="h-3 w-3" />
@@ -204,7 +204,7 @@ export function ContactCard({
                 href={contactInfo.twitterUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                className="inline-flex items-center gap-1 text-sm text-gold hover:underline dark:text-gold"
               >
                 Twitter / X
                 <ExternalLink className="h-3 w-3" />
@@ -220,7 +220,7 @@ export function ContactCard({
                 href={contactInfo.personalSite}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                className="inline-flex items-center gap-1 text-sm text-gold hover:underline dark:text-gold"
               >
                 Website
                 <ExternalLink className="h-3 w-3" />

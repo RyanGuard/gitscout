@@ -39,13 +39,13 @@ function ChipGroup({
       {items.map((item) => (
         <span
           key={item}
-          className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+          className="inline-flex items-center gap-1 rounded-full bg-gold-bg px-3 py-1 text-sm font-medium text-gold-muted dark:bg-gold-bg dark:text-gold"
         >
           {item}
           <button
             type="button"
             onClick={() => onRemove(item)}
-            className="ml-0.5 text-blue-400 hover:text-blue-600 dark:hover:text-blue-200"
+            className="ml-0.5 text-gold hover:text-gold-hover dark:hover:text-gold"
             aria-label={`Remove ${item}`}
           >
             &times;
@@ -58,7 +58,7 @@ function ChipGroup({
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={`Add ${label.toLowerCase()}...`}
-        className="w-32 rounded-full border border-dashed border-neutral-300 bg-transparent px-3 py-1 text-sm text-neutral-700 placeholder-neutral-400 focus:border-blue-400 focus:outline-none dark:border-neutral-600 dark:text-neutral-300 dark:placeholder-neutral-500"
+        className="w-32 rounded-full border border-dashed border-neutral-300 bg-transparent px-3 py-1 text-sm text-neutral-700 placeholder-neutral-400 focus:border-gold focus:outline-none dark:border-neutral-600 dark:text-neutral-300 dark:placeholder-neutral-500"
       />
     </div>
   );
@@ -97,7 +97,7 @@ export function RequirementsEditor({
           type="button"
           onClick={onSearch}
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-lg bg-gold px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Searching..." : "Find Matches"}
         </button>
@@ -145,7 +145,7 @@ export function RequirementsEditor({
                 updateField("location", e.target.value || null)
               }
               placeholder="Any"
-              className="w-36 rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-blue-400 focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
+              className="w-36 rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-gold focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -157,7 +157,7 @@ export function RequirementsEditor({
               onChange={(e) =>
                 updateField("seniority", e.target.value || null)
               }
-              className="rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-blue-400 focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
+              className="rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-gold focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
             >
               <option value="">Any</option>
               <option value="junior">Junior</option>
@@ -182,7 +182,7 @@ export function RequirementsEditor({
                 )
               }
               placeholder="Any"
-              className="w-20 rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-blue-400 focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
+              className="w-20 rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm text-neutral-700 focus:border-gold focus:outline-none dark:border-neutral-600 dark:text-neutral-300"
             />
           </div>
         </div>

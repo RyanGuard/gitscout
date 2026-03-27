@@ -44,7 +44,7 @@ export function SearchRadar({ isSearching, resultsFound }: SearchRadarProps) {
         {isSearching && (
           <line
             x1="50" y1="50" x2="50" y2="2"
-            stroke="#1D9E75"
+            stroke="var(--gold)"
             strokeWidth="0.8"
             opacity="0.8"
             className="origin-center animate-[spin_2s_linear_infinite]"
@@ -57,13 +57,13 @@ export function SearchRadar({ isSearching, resultsFound }: SearchRadarProps) {
           <g key={dot.id}>
             <circle
               cx={dot.x} cy={dot.y} r="2"
-              fill="#1D9E75"
+              fill="var(--gold)"
               className="animate-[ping_1s_ease-out_1]"
               opacity="0.3"
             />
             <circle
               cx={dot.x} cy={dot.y} r="1.5"
-              fill="#1D9E75"
+              fill="var(--gold)"
               className="animate-[pulse_2s_ease-in-out_infinite]"
             />
           </g>

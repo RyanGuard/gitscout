@@ -14,7 +14,7 @@ import { getLanguageColor } from "@/lib/utils";
 // ═══════════════════════════════════════════════════════════
 //  MINI SPARKLINE — tiny activity visualization
 // ═══════════════════════════════════════════════════════════
-function Sparkline({ data, color = "#818cf8" }: { data: number[]; color?: string }) {
+function Sparkline({ data, color }: { data: number[]; color?: string }) {
   const max = Math.max(...data, 1);
   return (
     <div className="flex items-end gap-[2px] h-5">
@@ -24,7 +24,7 @@ function Sparkline({ data, color = "#818cf8" }: { data: number[]; color?: string
           className="w-[3px] rounded-full animate-grow-bar"
           style={{
             height: `${Math.max(8, (v / max) * 100)}%`,
-            backgroundColor: color,
+            backgroundColor: color || "var(--gold)",
             opacity: 0.4 + (v / max) * 0.6,
             animationDelay: `${i * 50}ms`,
           }}
@@ -79,35 +79,32 @@ function Landing() {
   ];
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden">
+    <div className="relative flex flex-1 flex-col overflow-hidden bg-background">
       {/* Atmospheric gradient background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-indigo-500/[0.04] blur-[120px]" />
-        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full bg-violet-500/[0.03] blur-[100px]" />
-        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-blue-500/[0.03] blur-[80px]" />
+        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-gold/[0.06] blur-[120px]" />
+        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full bg-gold/[0.04] blur-[100px]" />
+        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-gold/[0.03] blur-[80px]" />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         {/* Hero badge */}
-        <div
-          className="mb-4 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
-          style={{ border: "1px solid rgba(129,140,248,0.25)", background: "rgba(129,140,248,0.08)", color: "#a5b4fc" }}
-        >
+        <div className="mb-4 flex items-center gap-2 rounded-full border border-gold-border bg-gold-bg px-4 py-1.5 text-xs font-medium backdrop-blur-sm">
           <LiveDot />
-          <span>Live GitHub intelligence</span>
-          <span style={{ color: "rgba(129,140,248,0.4)" }}>·</span>
-          <span style={{ color: "#c7d2fe" }}>48M+ developers</span>
+          <span className="text-foreground">Live GitHub intelligence</span>
+          <span className="text-text-dim">&middot;</span>
+          <span className="text-gold">48M+ developers</span>
         </div>
 
         {/* Title */}
         <h1 className="mb-4 text-center text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-          <span style={{ color: "#f5f5f5" }}>Scout </span>
+          <span className="text-foreground">Scout </span>
           <span className="text-gradient">top talent</span>
           <br />
-          <span style={{ color: "#f5f5f5" }}>from GitHub</span>
+          <span className="text-foreground">from GitHub</span>
         </h1>
 
-        <p className="mb-8 max-w-lg text-center text-base sm:text-lg" style={{ color: "#a3a3a3" }}>
+        <p className="mb-8 max-w-lg text-center text-base text-text-muted sm:text-lg">
           Source engineers by what they build, not what they claim.
           Real code. Real contributions. Real signal.
         </p>
@@ -118,20 +115,20 @@ function Landing() {
             onSubmit={(e) => { e.preventDefault(); handleSearch(query); }}
             className="group relative"
           >
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-blue-500/20 opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" />
-            <div className="relative flex items-center rounded-xl border border-neutral-200/50 bg-white shadow-lg dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:shadow-2xl">
-              <Search className="ml-5 h-5 w-5 text-neutral-400" />
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-gold/20 via-gold/10 to-gold/20 opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" />
+            <div className="relative flex items-center rounded-xl border border-border bg-surface shadow-lg">
+              <Search className="ml-5 h-5 w-5 text-text-dim" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={hints[activeHint]}
-                className="flex-1 bg-transparent px-4 py-4 text-base outline-none placeholder:text-neutral-400/60 dark:text-white"
+                className="flex-1 bg-transparent px-4 py-4 text-base text-foreground outline-none placeholder:text-text-dim/60"
               />
               <button
                 type="submit"
-                className="mr-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25"
+                className="mr-2 rounded-lg bg-gold px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-gold-hover hover:shadow-lg hover:shadow-gold/25"
               >
                 Search
               </button>
@@ -150,8 +147,7 @@ function Landing() {
               <button
                 key={chip.label}
                 onClick={() => handleSearch(chip.q)}
-                className="rounded-full px-3 py-1.5 text-xs font-medium transition-all hover:-translate-y-px"
-                style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#ccc" }}
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-all hover:-translate-y-px hover:border-gold-border hover:text-gold"
               >
                 {chip.label}
               </button>
@@ -160,25 +156,22 @@ function Landing() {
         </div>
 
         {/* Stats bar */}
-        <div
-          className="mt-10 flex items-center gap-8 sm:gap-12 rounded-xl px-8 py-4 backdrop-blur-sm"
-          style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
-        >
+        <div className="mt-10 flex items-center gap-8 sm:gap-12 rounded-xl border border-border bg-surface/70 px-8 py-4 backdrop-blur-sm">
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center gap-2.5">
-              <s.icon className="h-4 w-4" style={{ color: "#818cf8" }} />
+              <s.icon className="h-4 w-4 text-gold" />
               <div>
-                <p className="text-lg font-bold tabular-nums" style={{ color: "#f5f5f5" }}>{s.value}</p>
-                <p className="text-[11px]" style={{ color: "#888" }}>{s.label}</p>
+                <p className="text-lg font-bold tabular-nums text-foreground">{s.value}</p>
+                <p className="text-[11px] text-text-muted">{s.label}</p>
               </div>
-              {i < stats.length - 1 && <div className="ml-6 h-8 w-px sm:ml-8" style={{ background: "rgba(255,255,255,0.1)" }} />}
+              {i < stats.length - 1 && <div className="ml-6 h-8 w-px bg-border sm:ml-8" />}
             </div>
           ))}
         </div>
 
         {/* Trust line */}
-        <p className="mt-8 text-xs" style={{ color: "#777" }}>
-          Powered by GitHub REST + GraphQL · Apollo enrichment · Ashby ATS integration
+        <p className="mt-8 text-xs text-text-dim">
+          Powered by GitHub REST + GraphQL &middot; Apollo enrichment &middot; Ashby ATS integration
         </p>
       </div>
     </div>
@@ -208,7 +201,7 @@ interface FavoriteDev {
 const MARKETS = [
   {
     city: "San Francisco",
-    flag: "🇺🇸",
+    flag: "\u{1F1FA}\u{1F1F8}",
     developers: "892K",
     topLangs: ["TypeScript", "Python", "Go"],
     trend: "+4.2%",
@@ -217,7 +210,7 @@ const MARKETS = [
   },
   {
     city: "Berlin",
-    flag: "🇩🇪",
+    flag: "\u{1F1E9}\u{1F1EA}",
     developers: "312K",
     topLangs: ["TypeScript", "Rust", "Go"],
     trend: "+6.1%",
@@ -226,7 +219,7 @@ const MARKETS = [
   },
   {
     city: "New York",
-    flag: "🇺🇸",
+    flag: "\u{1F1FA}\u{1F1F8}",
     developers: "645K",
     topLangs: ["Python", "TypeScript", "Java"],
     trend: "+3.8%",
@@ -235,7 +228,7 @@ const MARKETS = [
   },
   {
     city: "London",
-    flag: "🇬🇧",
+    flag: "\u{1F1EC}\u{1F1E7}",
     developers: "528K",
     topLangs: ["TypeScript", "Python", "Go"],
     trend: "+2.9%",
@@ -246,12 +239,12 @@ const MARKETS = [
 
 // Role lanes
 const ROLE_LANES = [
-  { label: "Frontend", query: "react typescript frontend", langs: ["TypeScript", "JavaScript"], icon: Code, iconColor: "text-blue-400", signal: "High demand", signalColor: "text-amber-400" },
-  { label: "Backend", query: "go python backend api", langs: ["Go", "Python"], icon: GitFork, iconColor: "text-emerald-400", signal: "Growing", signalColor: "text-emerald-400" },
-  { label: "ML / AI", query: "python machine learning AI", langs: ["Python"], icon: Sparkles, iconColor: "text-violet-400", signal: "Surging", signalColor: "text-red-400" },
-  { label: "Infra / DevOps", query: "kubernetes terraform infrastructure", langs: ["Go", "Python"], icon: Globe, iconColor: "text-cyan-400", signal: "Steady", signalColor: "text-neutral-400" },
-  { label: "Rust Systems", query: "rust systems performance", langs: ["Rust"], icon: Zap, iconColor: "text-orange-400", signal: "Hot", signalColor: "text-red-400" },
-  { label: "Mobile", query: "swift kotlin mobile", langs: ["Swift", "Kotlin"], icon: Target, iconColor: "text-pink-400", signal: "Stable", signalColor: "text-neutral-400" },
+  { label: "Frontend", query: "react typescript frontend", langs: ["TypeScript", "JavaScript"], icon: Code, iconColor: "text-blue-500", signal: "High demand", signalColor: "text-amber-500" },
+  { label: "Backend", query: "go python backend api", langs: ["Go", "Python"], icon: GitFork, iconColor: "text-emerald-500", signal: "Growing", signalColor: "text-emerald-500" },
+  { label: "ML / AI", query: "python machine learning AI", langs: ["Python"], icon: Sparkles, iconColor: "text-violet-500", signal: "Surging", signalColor: "text-red-500" },
+  { label: "Infra / DevOps", query: "kubernetes terraform infrastructure", langs: ["Go", "Python"], icon: Globe, iconColor: "text-cyan-500", signal: "Steady", signalColor: "text-neutral-400" },
+  { label: "Rust Systems", query: "rust systems performance", langs: ["Rust"], icon: Zap, iconColor: "text-orange-500", signal: "Hot", signalColor: "text-red-500" },
+  { label: "Mobile", query: "swift kotlin mobile", langs: ["Swift", "Kotlin"], icon: Target, iconColor: "text-pink-500", signal: "Stable", signalColor: "text-neutral-400" },
 ];
 
 function Dashboard() {
@@ -285,7 +278,6 @@ function Dashboard() {
     if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
   }
 
-  // Use display name, not username — fall back gracefully
   const rawName = session?.user?.name || "";
   const firstName = rawName.includes(" ") ? rawName.split(" ")[0] : (rawName || "there");
   const hour = new Date().getHours();
@@ -295,8 +287,8 @@ function Dashboard() {
     <div className="relative min-h-screen">
       {/* Subtle gradient bg */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-indigo-500/[0.02] blur-[120px]" />
-        <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-violet-500/[0.015] blur-[100px]" />
+        <div className="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-gold/[0.03] blur-[120px]" />
+        <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-gold/[0.02] blur-[100px]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -321,11 +313,11 @@ function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by role, skill, location, or name..."
-              className="w-full rounded-xl border border-neutral-200/50 bg-white py-3 pl-11 pr-20 text-sm shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-indigo-400/50 focus:shadow-lg focus:shadow-indigo-500/5 dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:text-white dark:focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-neutral-200/50 bg-surface py-3 pl-11 pr-20 text-sm shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-gold/50 focus:shadow-lg focus:shadow-gold/5 dark:border-neutral-700/50 dark:bg-surface dark:text-white dark:focus:border-gold/50"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-              <kbd className="hidden rounded border border-neutral-200/50 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 sm:inline-flex dark:border-neutral-700/50">⌘K</kbd>
-              <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors">
+              <kbd className="hidden rounded border border-neutral-200/50 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 sm:inline-flex dark:border-neutral-700/50">\u2318K</kbd>
+              <button type="submit" className="rounded-lg bg-gold px-4 py-1.5 text-xs font-semibold text-white hover:bg-gold-hover transition-colors">
                 Search
               </button>
             </div>
@@ -336,8 +328,8 @@ function Dashboard() {
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Talent lanes</h2>
-            <Link href="/search" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
-              All searches →
+            <Link href="/search" className="text-xs text-gold hover:text-gold-hover transition-colors">
+              All searches \u2192
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
@@ -347,7 +339,7 @@ function Dashboard() {
                 <button
                   key={role.label}
                   onClick={() => search(role.query)}
-                  className="group relative overflow-hidden rounded-xl border border-neutral-200/50 bg-white p-3.5 text-left transition-all duration-200 hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/40 dark:hover:border-indigo-500/30 dark:hover:bg-neutral-900/60"
+                  className="group relative overflow-hidden rounded-xl border border-neutral-200/50 bg-surface p-3.5 text-left transition-all duration-200 hover:border-gold/30 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/40 dark:hover:border-gold/30 dark:hover:bg-neutral-900/60"
                 >
                   <Icon className={`h-5 w-5 mb-2 ${role.iconColor}`} />
                   <p className="text-sm font-semibold text-neutral-900 dark:text-white">{role.label}</p>
@@ -365,14 +357,14 @@ function Dashboard() {
         </section>
 
         <div className="grid gap-6 lg:grid-cols-12">
-          {/* ══ LEFT COLUMN (8 cols) ══ */}
+          {/* Left column (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
 
             {/* ── MARKET INTELLIGENCE ── */}
             <section>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Globe className="h-3.5 w-3.5 text-indigo-400" />
+                  <Globe className="h-3.5 w-3.5 text-gold" />
                   <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Markets</h2>
                 </div>
                 <span className="text-[10px] text-neutral-400">GitHub developer activity, 30d</span>
@@ -382,7 +374,7 @@ function Dashboard() {
                   <button
                     key={m.city}
                     onClick={() => search(`developers in ${m.city}`)}
-                    className="group rounded-xl border border-neutral-200/50 bg-white p-4 text-left transition-all duration-200 glow-hover dark:border-neutral-700/50 dark:bg-neutral-900/60"
+                    className="group rounded-xl border border-neutral-200/50 bg-surface p-4 text-left transition-all duration-200 glow-hover dark:border-neutral-700/50 dark:bg-neutral-900/60"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-lg">{m.flag}</span>
@@ -401,7 +393,7 @@ function Dashboard() {
                           </span>
                         ))}
                       </div>
-                      <Sparkline data={m.sparkline} color="#818cf8" />
+                      <Sparkline data={m.sparkline} />
                     </div>
                   </button>
                 ))}
@@ -422,8 +414,8 @@ function Dashboard() {
                     </span>
                   )}
                 </div>
-                <Link href="/favorites" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
-                  View all →
+                <Link href="/favorites" className="text-xs text-gold hover:text-gold-hover transition-colors">
+                  View all \u2192
                 </Link>
               </div>
 
@@ -438,7 +430,7 @@ function Dashboard() {
                   <Bookmark className="mx-auto h-8 w-8 text-neutral-300 dark:text-neutral-600" />
                   <p className="mt-2 text-sm font-medium text-neutral-500">No developers saved yet</p>
                   <p className="text-xs text-neutral-400 mt-1">Search for developers and save them to your watchlist</p>
-                  <Link href="/search" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors">
+                  <Link href="/search" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-white hover:bg-gold-hover transition-colors">
                     <Search className="h-3.5 w-3.5" />
                     Start searching
                   </Link>
@@ -449,13 +441,13 @@ function Dashboard() {
                     const dev = fav.developer;
                     const langColor = dev.primaryLanguage ? getLanguageColor(dev.primaryLanguage) : "#888";
                     const score = dev.score || 0;
-                    const scoreColor = score >= 75 ? "text-amber-500" : score >= 50 ? "text-indigo-400" : score >= 30 ? "text-emerald-500" : "text-neutral-400";
+                    const scoreColor = score >= 75 ? "text-amber-500" : score >= 50 ? "text-gold" : score >= 30 ? "text-emerald-500" : "text-neutral-400";
 
                     return (
                       <Link
                         key={fav.id}
                         href={`/profile/${dev.username}`}
-                        className="group flex items-center gap-4 rounded-xl border border-neutral-200/50 bg-white p-3.5 transition-all duration-200 hover:border-indigo-400/30 hover:shadow-md dark:border-neutral-700/50 dark:bg-neutral-900/60 dark:hover:border-indigo-500/30"
+                        className="group flex items-center gap-4 rounded-xl border border-neutral-200/50 bg-surface p-3.5 transition-all duration-200 hover:border-gold/30 hover:shadow-md dark:border-neutral-700/50 dark:bg-neutral-900/60 dark:hover:border-gold/30"
                         style={{ animationDelay: `${i * 60}ms` }}
                       >
                         {/* Rank + Avatar */}
@@ -467,7 +459,7 @@ function Dashboard() {
                             className="h-10 w-10 rounded-full ring-2 ring-neutral-100 dark:ring-neutral-800"
                           />
                           {score > 0 && (
-                            <span className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[9px] font-bold ring-1 ring-neutral-200 dark:bg-neutral-900 dark:ring-neutral-700 ${scoreColor}`}>
+                            <span className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-surface text-[9px] font-bold ring-1 ring-neutral-200 dark:ring-neutral-700 ${scoreColor}`}>
                               {Math.round(score)}
                             </span>
                           )}
@@ -476,7 +468,7 @@ function Dashboard() {
                         {/* Info */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="truncate text-sm font-semibold text-neutral-900 group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400 transition-colors">
+                            <p className="truncate text-sm font-semibold text-neutral-900 group-hover:text-gold dark:text-white dark:group-hover:text-gold transition-colors">
                               {dev.name || dev.username}
                             </p>
                             {dev.primaryLanguage && (
@@ -507,13 +499,13 @@ function Dashboard() {
             </section>
           </div>
 
-          {/* ══ RIGHT COLUMN (4 cols) ══ */}
+          {/* Right column (4 cols) */}
           <aside className="lg:col-span-4 space-y-4">
 
             {/* ── ACTIVITY DIGEST ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
+            <div className="rounded-xl border border-neutral-200/50 bg-surface p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="h-3.5 w-3.5 text-indigo-400" />
+                <Activity className="h-3.5 w-3.5 text-gold" />
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Activity</h3>
               </div>
               <div className="space-y-3">
@@ -521,7 +513,7 @@ function Dashboard() {
                   { icon: Search, text: "Search engine", status: "Live", color: "text-emerald-500" },
                   { icon: Zap, text: "Apollo enrichment", status: "Active", color: "text-emerald-500" },
                   { icon: Target, text: "Ashby ATS", status: "Connected", color: "text-emerald-500" },
-                  { icon: Radio, text: "GitHub API", status: "5K req/hr", color: "text-indigo-400" },
+                  { icon: Radio, text: "GitHub API", status: "5K req/hr", color: "text-gold" },
                 ].map((item) => (
                   <div key={item.text} className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5 text-sm text-neutral-600 dark:text-neutral-400">
@@ -535,11 +527,11 @@ function Dashboard() {
             </div>
 
             {/* ── QUICK ACTIONS ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
+            <div className="rounded-xl border border-neutral-200/50 bg-surface p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">Quick actions</h3>
               <div className="space-y-1">
                 {[
-                  { href: "/search", icon: Search, label: "Search developers", kbd: "⌘K" },
+                  { href: "/search", icon: Search, label: "Search developers", kbd: "\u2318K" },
                   { href: "/match", icon: Sparkles, label: "Match job description" },
                   { href: "/lists", icon: Bookmark, label: "Candidate lists" },
                   { href: "/settings", icon: Target, label: "Settings & Ashby" },
@@ -562,10 +554,10 @@ function Dashboard() {
             </div>
 
             {/* ── DISCOVERY TIPS ── */}
-            <div className="rounded-xl border border-indigo-200/30 bg-indigo-50/30 p-5 dark:border-indigo-500/10 dark:bg-indigo-500/5">
+            <div className="rounded-xl border border-gold-border bg-gold-bg p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Pro tip</h3>
+                <Sparkles className="h-3.5 w-3.5 text-gold" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-muted dark:text-gold">Pro tip</h3>
               </div>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
                 Try searching by what developers <strong className="text-neutral-900 dark:text-white">build</strong>, not
@@ -575,7 +567,7 @@ function Dashboard() {
             </div>
 
             {/* ── PIPELINE STATS ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
+            <div className="rounded-xl border border-neutral-200/50 bg-surface p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">Your pipeline</h3>
               <div className="grid grid-cols-2 gap-3">
                 {[
@@ -610,7 +602,7 @@ export default function Home() {
   if (status === "loading") {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-indigo-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-gold" />
       </div>
     );
   }

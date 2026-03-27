@@ -153,7 +153,7 @@ export default async function SharedMapPage({ params }: Props) {
 
   const data = {
     permissionLevel: share.permissionLevel,
-    sharedBy: share.user.name || "A GitScout recruiter",
+    sharedBy: share.user.name || "A Scout recruiter",
     expiresAt: share.expiresAt?.toISOString() || null,
     map: {
       name: map.name,

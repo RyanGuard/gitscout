@@ -95,7 +95,7 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-8">
       <div className="flex items-center gap-3 mb-8">
-        <BarChart3 className="h-6 w-6 text-indigo-400" />
+        <BarChart3 className="h-6 w-6 text-gold" />
         <h1 className="text-2xl font-bold text-white">Pipeline Dashboard</h1>
       </div>
 
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 <MiniFunnel statusCounts={m.statusCounts} />
               </div>
               {m.inPipeline > 0 && (
-                <span className="text-xs text-indigo-400 whitespace-nowrap">
+                <span className="text-xs text-gold whitespace-nowrap">
                   {m.inPipeline} in pipeline
                 </span>
               )}
@@ -172,7 +172,7 @@ export default function DashboardPage() {
         {maps.length === 0 && (
           <div className="text-center py-12 text-neutral-500">
             No maps yet.{" "}
-            <Link href="/map" className="text-indigo-400 hover:underline">
+            <Link href="/map" className="text-gold hover:underline">
               Create your first map
             </Link>
           </div>

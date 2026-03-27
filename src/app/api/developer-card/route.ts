@@ -167,8 +167,8 @@ function buildSvg(data: CardData): string {
 
   <!-- Bottom branding -->
   <line x1="80" y1="560" x2="1120" y2="560" stroke="#262626" stroke-width="1"/>
-  <text x="80" y="595" fill="#525252" font-size="20" font-weight="600" font-family="system-ui, -apple-system, sans-serif">GitScout</text>
-  <text x="220" y="595" fill="#404040" font-size="18" font-family="system-ui, -apple-system, sans-serif">gitscout.dev</text>
+  <text x="80" y="595" fill="#C8A55A" font-size="20" font-weight="600" font-family="system-ui, -apple-system, sans-serif">Scout</text>
+  <text x="175" y="595" fill="#525252" font-size="18" font-family="system-ui, -apple-system, sans-serif">Recruiting intelligence</text>
 </svg>`;
 }
 

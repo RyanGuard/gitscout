@@ -44,7 +44,7 @@ const TIER_CONFIG: Record<string, { label: string; sub: string; dot: string }> =
       sub: "Direct competitors",
       dot: "bg-emerald-500",
     },
-    B: { label: "Tier B", sub: "Adjacent space", dot: "bg-indigo-500" },
+    B: { label: "Tier B", sub: "Adjacent space", dot: "bg-blue-500" },
     C: { label: "Tier C", sub: "Upmarket talent", dot: "bg-blue-500" },
   };
 
@@ -77,16 +77,16 @@ export function SharedMapView({ data }: { data: SharedData }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen dark bg-background">
       {/* Header */}
       <header className="border-b border-neutral-800/50 bg-neutral-900/50 backdrop-blur-sm">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
-                G
+              <div className="h-7 w-7 rounded-lg bg-gold flex items-center justify-center text-sidebar-bg font-bold text-sm">
+                S
               </div>
-              <span className="text-lg font-semibold text-white">GitScout</span>
+              <span className="text-lg font-semibold text-white">Scout</span>
             </div>
             <span className="text-neutral-500">·</span>
             <span className="text-sm text-neutral-400">
@@ -196,7 +196,7 @@ export function SharedMapView({ data }: { data: SharedData }) {
       {/* Footer */}
       <footer className="border-t border-neutral-800/50 py-6 mt-8">
         <div className="mx-auto max-w-6xl px-6 flex items-center justify-between text-xs text-neutral-500">
-          <span>Powered by GitScout</span>
+          <span>Powered by Scout</span>
           {expiresAt && (
             <span>
               This link expires{" "}

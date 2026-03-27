@@ -33,7 +33,7 @@ export function MatchCard({
   return (
     <Link
       href={`/profile/${developer.username}`}
-      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600"
+      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-gold/30 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-gold"
     >
       <div className="flex items-start gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,7 +44,7 @@ export function MatchCard({
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-lg font-semibold text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+            <h3 className="truncate text-lg font-semibold text-neutral-900 group-hover:text-gold dark:text-white dark:group-hover:text-gold">
               {developer.name || developer.username}
             </h3>
             <Badge className={getFitColor(fitScore)}>

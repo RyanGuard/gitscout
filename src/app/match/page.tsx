@@ -60,7 +60,7 @@ export default function MatchPage() {
   if (status === "loading") {
     return (
       <div className="flex flex-1 items-center justify-center py-20">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-indigo-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-gold" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function MatchPage() {
   }
 
   return (
-    <div className="dark min-h-screen" style={{ background: "#0a0a0f" }}>
+    <div className="min-h-screen bg-background">
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">

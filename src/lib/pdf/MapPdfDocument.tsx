@@ -7,16 +7,16 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
-// GitScout brand
+// Scout brand
 const COLORS = {
-  brand: "#0F6E56",
-  brandLight: "#e6f4f0",
-  dark: "#1a1a2e",
-  text: "#333333",
-  textLight: "#666666",
-  textMuted: "#999999",
-  border: "#e5e5e5",
-  bgLight: "#f9fafb",
+  brand: "#C8A55A",
+  brandLight: "#f8f3e8",
+  dark: "#19191A",
+  text: "#1c1c1a",
+  textLight: "#525252",
+  textMuted: "#737373",
+  border: "#e5e4e0",
+  bgLight: "#f5f5f3",
   tierA: "#059669",
   tierB: "#6366f1",
   tierC: "#3b82f6",
@@ -255,7 +255,7 @@ function fitColor(score: number) {
 function Footer({ pageLabel }: { pageLabel?: string }) {
   return (
     <View style={styles.footer} fixed>
-      <Text>GitScout Market Map</Text>
+      <Text>Scout Market Map</Text>
       <Text>{pageLabel || ""}</Text>
       <Text>Confidential</Text>
     </View>
@@ -285,9 +285,9 @@ export function MapPdfDocument(props: MapPdfProps) {
     <Document>
       {/* Page 1: Cover */}
       <Page size="A4" style={styles.coverPage}>
-        <Text style={styles.coverLogo}>GitScout</Text>
+        <Text style={styles.coverLogo}>Scout</Text>
         <Text style={styles.coverSubtitle}>
-          Talent Intelligence Platform
+          Recruiting Intelligence
         </Text>
         <Text style={styles.coverTitle}>{mapName}</Text>
         <Text style={styles.coverMeta}>{roleTitle}{roleLevel ? ` · ${roleLevel}` : ""}</Text>
@@ -566,13 +566,13 @@ export function MapPdfDocument(props: MapPdfProps) {
       <Page size="A4" style={styles.page}>
         <Text style={styles.sectionTitle}>Methodology</Text>
         <Text style={styles.methodology}>
-          This market map was generated using GitScout&apos;s AI-powered talent
+          This market map was generated using Scout&apos;s AI-powered talent
           intelligence platform. Companies were identified and classified by
           relevance to the role brief using a combination of industry analysis
           and AI classification.
         </Text>
         <Text style={[styles.methodology, { marginTop: 8 }]}>
-          Candidate quality is scored using GitScout&apos;s evaluation engine,
+          Candidate quality is scored using Scout&apos;s evaluation engine,
           which considers role fit, seniority alignment, technical background,
           and location match. Scores range from 0 to 100, with higher scores
           indicating stronger fit for the target role.

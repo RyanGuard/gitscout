@@ -56,12 +56,12 @@ export function NoteInput({ notes, onAdd, loading }: NoteInputProps) {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write a note..."
               rows={2}
-              className="flex-1 resize-none rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs text-neutral-700 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+              className="flex-1 resize-none rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs text-neutral-700 outline-none focus:border-gold/30 focus:ring-1 focus:ring-gold/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
             />
             <button
               type="submit"
               disabled={loading || !content.trim()}
-              className="self-end rounded-md bg-blue-600 p-1.5 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              className="self-end rounded-md bg-gold p-1.5 text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
             </button>

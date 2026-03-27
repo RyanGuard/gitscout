@@ -143,13 +143,13 @@ export function AddToListButton({ developerId, className }: AddToListButtonProps
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && createAndAdd()}
                   placeholder="New list name..."
-                  className="flex-1 rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-blue-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                  className="flex-1 rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-gold dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                 />
                 <button
                   type="button"
                   onClick={createAndAdd}
                   disabled={creating || !newName.trim()}
-                  className="rounded-md bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="rounded-md bg-gold px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
                 >
                   {creating ? "..." : "Create"}
                 </button>

@@ -43,7 +43,7 @@ const TYPE_CONFIG: Record<
   former_employee: {
     label: "Former Employee Overlap",
     icon: Users,
-    color: "text-indigo-500",
+    color: "text-gold",
   },
   shared_investor: {
     label: "Shared Investor",

@@ -79,14 +79,14 @@ export default function TemplatesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <Map className="h-5 w-5 text-indigo-400" />
+            <Map className="h-5 w-5 text-gold" />
             <h1 className="text-xl font-bold text-white tracking-tight">Map Templates</h1>
           </div>
           <p className="text-sm text-neutral-500">Saved market maps you can reuse and refresh</p>
         </div>
         <Link
           href="/map"
-          className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-white hover:bg-gold-hover transition-colors"
         >
           <Plus className="h-4 w-4" /> New map
         </Link>
@@ -94,7 +94,7 @@ export default function TemplatesPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-gold" />
         </div>
       ) : templates.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-700/40 bg-neutral-900/30 p-12 text-center">
@@ -103,7 +103,7 @@ export default function TemplatesPage() {
           <p className="mt-1 text-xs text-neutral-500">Generate a market map and save it as a template to reuse later</p>
           <Link
             href="/map"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-white hover:bg-gold-hover transition-colors"
           >
             <Plus className="h-3.5 w-3.5" /> Create your first map
           </Link>
@@ -166,7 +166,7 @@ export default function TemplatesPage() {
                 <button
                   onClick={() => cloneTemplate(t.id)}
                   disabled={cloning === t.id}
-                  className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-gold py-2 text-xs font-semibold text-white hover:bg-gold-hover transition-colors disabled:opacity-50"
                 >
                   {cloning === t.id ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

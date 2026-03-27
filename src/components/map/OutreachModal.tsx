@@ -240,7 +240,7 @@ export function OutreachModal({
                       onClick={() => setTone(t.value)}
                       className={`rounded-lg border p-3 text-left transition-colors ${
                         tone === t.value
-                          ? "border-indigo-500 bg-indigo-500/10"
+                          ? "border-gold bg-gold-bg"
                           : "border-neutral-700/50 hover:border-neutral-600"
                       }`}
                     >
@@ -265,7 +265,7 @@ export function OutreachModal({
                   onChange={(e) => setSellingPoints(e.target.value)}
                   placeholder={"Series B, just raised $50M\nFounding platform team\nRemote-friendly"}
                   rows={4}
-                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2.5 text-sm text-white placeholder-neutral-500 focus:border-indigo-500 focus:outline-none resize-none"
+                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2.5 text-sm text-white placeholder-neutral-500 focus:border-gold focus:outline-none resize-none"
                 />
               </div>
 
@@ -279,7 +279,7 @@ export function OutreachModal({
                   onChange={(e) => setCustomInstructions(e.target.value)}
                   placeholder="Any additional context or style notes..."
                   rows={2}
-                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2.5 text-sm text-white placeholder-neutral-500 focus:border-indigo-500 focus:outline-none resize-none"
+                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2.5 text-sm text-white placeholder-neutral-500 focus:border-gold focus:outline-none resize-none"
                 />
               </div>
 
@@ -314,7 +314,7 @@ export function OutreachModal({
               <button
                 onClick={generate}
                 disabled={generating}
-                className="w-full rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full rounded-lg bg-gold px-4 py-3 text-sm font-semibold text-white hover:bg-gold-hover disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {generating ? (
                   <>
@@ -346,7 +346,7 @@ export function OutreachModal({
                     onClick={() => setSelectedCandidateId(msg.candidateId)}
                     className={`w-full px-4 py-3 text-left border-b border-neutral-800/30 transition-colors ${
                       isSelected
-                        ? "bg-indigo-500/10 border-l-2 border-l-indigo-500"
+                        ? "bg-gold-bg border-l-2 border-l-gold"
                         : "hover:bg-neutral-800/30"
                     }`}
                   >
@@ -381,7 +381,7 @@ export function OutreachModal({
                           )
                         )
                       }
-                      className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                     />
                   </div>
 
@@ -402,7 +402,7 @@ export function OutreachModal({
                         )
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-indigo-500/30 bg-indigo-500/5 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none resize-none"
+                      className="w-full rounded-lg border border-gold/30 bg-gold/5 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none resize-none"
                     />
                   </div>
 
@@ -423,7 +423,7 @@ export function OutreachModal({
                         )
                       }
                       rows={6}
-                      className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none resize-none"
+                      className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none resize-none"
                     />
                   </div>
 

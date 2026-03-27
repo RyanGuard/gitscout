@@ -43,14 +43,14 @@ export function TagInput({ tags, onAdd, onRemove, suggestions = [], disabled }: 
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+            className="inline-flex items-center gap-1 rounded-full bg-gold-bg px-2 py-0.5 text-xs font-medium text-gold dark:bg-gold-bg dark:text-gold"
           >
             {tag}
             {!disabled && (
               <button
                 type="button"
                 onClick={() => onRemove(tag)}
-                className="rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800"
+                className="rounded-full p-0.5 hover:bg-gold/20 dark:hover:bg-gold/20"
               >
                 <X className="h-2.5 w-2.5" />
               </button>

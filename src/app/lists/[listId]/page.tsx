@@ -207,7 +207,7 @@ export default function ListDetailPage({
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-lg font-bold outline-none focus:border-blue-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-lg font-bold outline-none focus:border-gold/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               autoFocus
             />
             <input
@@ -215,13 +215,13 @@ export default function ListDetailPage({
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
               placeholder="Description"
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-gold/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handleSave}
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-lg bg-gold px-3 py-1.5 text-sm font-medium text-white hover:bg-gold-hover"
               >
                 Save
               </button>

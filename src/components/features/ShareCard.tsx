@@ -59,7 +59,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
             showCopied("image");
           } catch {
             // Fallback: download instead
-            downloadBlob(pngBlob, `${username}-gitscout-card.png`);
+            downloadBlob(pngBlob, `${username}-scout-card.png`);
             showCopied("downloaded");
           }
         }, "image/png");
@@ -89,7 +89,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
 
         canvas.toBlob((pngBlob) => {
           if (!pngBlob) return;
-          downloadBlob(pngBlob, `${username}-gitscout-card.png`);
+          downloadBlob(pngBlob, `${username}-scout-card.png`);
           showCopied("downloaded");
         }, "image/png");
       };
@@ -159,7 +159,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
                 <img
                   ref={imgRef}
                   src={cardUrl}
-                  alt={`GitScout card for ${username}`}
+                  alt={`Scout card for ${username}`}
                   className="w-full"
                   onLoad={() => setLoading(false)}
                   onError={() => setLoading(false)}
@@ -170,7 +170,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handleCopyImage}
-                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
                 >
                   <Share2 className="h-4 w-4" />
                   {copied === "image" ? "Copied!" : "Copy Image"}
@@ -194,7 +194,7 @@ export function ShareCard({ username, displayName, score }: ShareCardProps) {
               {/* Score note */}
               {score > 0 && (
                 <p className="mt-3 text-xs text-neutral-500">
-                  GitScout Score: {score}/100
+                  Scout Score: {score}/100
                 </p>
               )}
             </motion.div>

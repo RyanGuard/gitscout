@@ -44,7 +44,7 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
     <Link
       href={`/profile/${developer.username}`}
       onClick={handleClick}
-      className={`group block rounded-xl border border-neutral-200/50 bg-white shadow-sm transition-all duration-200 hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/60 dark:hover:border-indigo-500/40 dark:hover:shadow-indigo-500/5 ${
+      className={`group block rounded-xl border border-neutral-200/50 bg-white shadow-sm transition-all duration-200 hover:border-gold hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/60 dark:hover:border-gold/40 dark:hover:shadow-gold/5 ${
         tierAccent ? `border-l-4 ${tierAccent}` : ""
       } ${viewed ? "opacity-60" : ""}`}
     >

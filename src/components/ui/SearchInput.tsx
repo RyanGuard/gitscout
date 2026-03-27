@@ -41,21 +41,21 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-neutral-200 bg-white py-3 pl-12 pr-12 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500"
+          className="w-full rounded-xl border border-neutral-200 bg-white py-3 pl-12 pr-12 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-gold focus:ring-2 focus:ring-gold/20 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500"
         />
         {value && (
           <button
             type="button"
             onClick={handleClear}
             aria-label="Clear search"
-            className="absolute right-14 top-1/2 -translate-y-1/2 rounded p-0.5 text-neutral-400 hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:hover:text-neutral-300"
+            className="absolute right-14 top-1/2 -translate-y-1/2 rounded p-0.5 text-neutral-400 hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-gold/20 dark:hover:text-neutral-300"
           >
             <X className="h-4 w-4" />
           </button>
         )}
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-gold px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-gold-hover focus:outline-none focus:ring-2 focus:ring-gold/20"
         >
           Search
         </button>

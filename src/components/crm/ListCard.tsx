@@ -16,9 +16,9 @@ export function ListCard({ list }: ListCardProps) {
   return (
     <Link
       href={`/lists/${list.id}`}
-      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-blue-600"
+      className="group block rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-gold/30 hover:shadow-md hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-gold"
     >
-      <h3 className="text-lg font-semibold text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+      <h3 className="text-lg font-semibold text-neutral-900 group-hover:text-gold dark:text-white dark:group-hover:text-gold">
         {list.name}
       </h3>
       {list.description && (

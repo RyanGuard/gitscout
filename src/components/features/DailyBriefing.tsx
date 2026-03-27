@@ -47,7 +47,7 @@ export function DailyBriefing() {
         if (favCount === 0) {
           briefingItems.push({
             id: "no-favorites",
-            icon: <Search className="h-4 w-4 text-blue-400" />,
+            icon: <Search className="h-4 w-4 text-gold" />,
             message: "Start building your pipeline — save developers from search results.",
             cta: { label: "Search now", href: "/search" },
             type: "tip",
@@ -100,7 +100,7 @@ export function DailyBriefing() {
       }
 
       // Check streak
-      const streakKey = "gitscout_active_dates";
+      const streakKey = "scout_active_dates";
       const today = new Date().toISOString().split("T")[0];
       const stored = JSON.parse(localStorage.getItem(streakKey) || "[]") as string[];
       if (!stored.includes(today)) {
@@ -163,7 +163,7 @@ export function DailyBriefing() {
           </span>
           <Link
             href={item.cta.href}
-            className="shrink-0 text-xs font-medium text-blue-600 hover:text-blue-700"
+            className="shrink-0 text-xs font-medium text-gold hover:text-gold-hover"
           >
             {item.cta.label}
           </Link>

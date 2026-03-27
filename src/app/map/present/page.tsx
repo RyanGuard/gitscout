@@ -118,7 +118,7 @@ function PresentationInner() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="flex min-h-screen items-center justify-center dark bg-background">
         <div className="text-neutral-400">Loading presentation...</div>
       </div>
     );
@@ -126,7 +126,7 @@ function PresentationInner() {
 
   if (!mapData) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="flex min-h-screen items-center justify-center dark bg-background">
         <div className="text-neutral-400">Map not found</div>
       </div>
     );
@@ -137,7 +137,7 @@ function PresentationInner() {
   const tierCfg = tier ? TIER_CONFIG[tier] : null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white p-8">
+    <div className="min-h-screen dark bg-background text-white p-8">
       {/* Exit button */}
       <button
         onClick={() => {
@@ -153,8 +153,8 @@ function PresentationInner() {
       {/* Header */}
       <div className="max-w-5xl mx-auto mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
-            G
+          <div className="h-8 w-8 rounded-lg bg-gold flex items-center justify-center text-sidebar-bg font-bold">
+            S
           </div>
           <span className="text-xl font-bold">{mapData.name}</span>
         </div>
@@ -298,7 +298,7 @@ function PresentationInner() {
             }}
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
               i === currentTier
-                ? "bg-indigo-600 text-white"
+                ? "bg-gold text-white"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800"
             }`}
           >

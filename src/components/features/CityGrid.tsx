@@ -83,7 +83,7 @@ function CityCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.2 }}
       onClick={onClick}
-      className="flex flex-col items-start rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-2.5 text-left transition-all hover:border-blue-300 hover:bg-blue-50 dark:border-neutral-800 dark:bg-neutral-800/50 dark:hover:border-blue-600 dark:hover:bg-blue-950/30"
+      className="flex flex-col items-start rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-2.5 text-left transition-all hover:border-gold hover:bg-gold-bg dark:border-neutral-800 dark:bg-neutral-800/50 dark:hover:border-gold dark:hover:bg-gold-bg"
     >
       <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
         {city.flag} {city.displayName}

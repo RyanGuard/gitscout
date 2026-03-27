@@ -62,7 +62,6 @@ function SearchPageInner() {
   const [results, setResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  // Default filters hidden on mobile, visible on desktop
   const [showFilters, setShowFilters] = useState(
     typeof window !== "undefined" ? window.innerWidth >= 1024 : true
   );
@@ -72,7 +71,6 @@ function SearchPageInner() {
   const [hideViewed, setHideViewed] = useState(false);
   const [viewedCount, setViewedCount] = useState(0);
 
-  // Update viewed count on mount and after navigation back
   useEffect(() => {
     setViewedCount(getViewedCount());
   }, [results]);
@@ -107,7 +105,6 @@ function SearchPageInner() {
         }
         const data = await res.json();
         setResults(data);
-        // Surface rate limit warnings from the API
         if (data.warning) setSearchError(data.warning);
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
@@ -178,7 +175,7 @@ function SearchPageInner() {
     (filters.hireable ? 1 : 0);
 
   return (
-    <div className="dark mx-auto w-full min-h-screen overflow-x-hidden" style={{ background: "#0a0a0f" }}>
+    <div className="mx-auto w-full min-h-screen overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 py-6">
       <h1 className="sr-only">Search Developers</h1>
       {/* Search bar */}
@@ -190,15 +187,15 @@ function SearchPageInner() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Search developers — try 'rust engineers in San Francisco' or 'karpathy'"
-          className="w-full rounded-xl border border-neutral-200/50 bg-white py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400/60 focus:border-indigo-400/50 focus:shadow-lg focus:shadow-indigo-500/5 dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:text-white"
+          className="w-full rounded-xl border border-neutral-200/50 bg-surface py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400/60 focus:border-gold/50 focus:shadow-lg focus:shadow-gold/5 dark:border-neutral-700/50 dark:bg-surface dark:text-white"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           <kbd className="hidden sm:inline-flex items-center rounded border border-neutral-200/50 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 dark:border-neutral-700/50">
-            ⌘K
+            \u2318K
           </kbd>
           <button
             type="submit"
-            className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+            className="rounded-lg bg-gold px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
           >
             Search
           </button>
@@ -228,7 +225,7 @@ function SearchPageInner() {
                     onClick={() => updateFilter("sort", opt.value)}
                     className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
                       (filters.sort || "score") === opt.value
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-gold text-white"
                         : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-400 dark:hover:bg-neutral-700/60"
                     }`}
                   >
@@ -248,7 +245,7 @@ function SearchPageInner() {
                     onClick={() => toggleLanguage(lang)}
                     className={`rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       filters.languages?.includes(lang)
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-gold text-white"
                         : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-400 dark:hover:bg-neutral-700/60"
                     }`}
                   >
@@ -266,7 +263,7 @@ function SearchPageInner() {
                 value={filters.location || ""}
                 onChange={(e) => updateFilter("location", e.target.value)}
                 placeholder="e.g. San Francisco"
-                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50"
+                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-gold dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-gold/50"
               />
             </div>
 
@@ -278,7 +275,7 @@ function SearchPageInner() {
                 value={filters.minStars || ""}
                 onChange={(e) => updateFilter("minStars", e.target.value ? parseInt(e.target.value) : undefined)}
                 placeholder="e.g. 100"
-                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-indigo-500/50"
+                className="mt-1.5 w-full rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-gold dark:border-neutral-700/50 dark:bg-neutral-900/40 dark:focus:border-gold/50"
               />
             </div>
 
@@ -289,7 +286,7 @@ function SearchPageInner() {
                   type="checkbox"
                   checked={filters.hireable || false}
                   onChange={(e) => updateFilter("hireable", e.target.checked || undefined)}
-                  className="rounded accent-blue-600"
+                  className="rounded accent-gold"
                 />
                 Open to work only
               </label>
@@ -298,7 +295,7 @@ function SearchPageInner() {
                   type="checkbox"
                   checked={hideViewed}
                   onChange={(e) => setHideViewed(e.target.checked)}
-                  className="rounded accent-blue-600"
+                  className="rounded accent-gold"
                 />
                 <EyeOff className="h-3.5 w-3.5" />
                 Hide viewed ({viewedCount})
@@ -357,7 +354,7 @@ function SearchPageInner() {
                   <button
                     key={term}
                     onClick={() => { setInputValue(term); router.push(`/search?q=${encodeURIComponent(term)}`); }}
-                    className="rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-indigo-400/40 hover:text-indigo-400 hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-500"
+                    className="rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-gold/40 hover:text-gold hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-500"
                   >
                     {term}
                   </button>

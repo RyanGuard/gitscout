@@ -1,10 +1,10 @@
-import { GitBranch } from "lucide-react";
+import { SearchX } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
-      <GitBranch className="h-12 w-12 text-neutral-300 dark:text-neutral-600" />
+      <SearchX className="h-12 w-12 text-neutral-300 dark:text-neutral-600" />
       <h1 className="mt-4 text-2xl font-bold text-neutral-800 dark:text-neutral-200">
         Page not found
       </h1>
@@ -13,7 +13,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="mt-6 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+        className="mt-6 inline-block rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
       >
         Go home
       </Link>

@@ -78,7 +78,7 @@ export function JobInput({ onParsed, ashbyJobs }: JobInputProps) {
             onClick={() => setMode("paste")}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               mode === "paste"
-                ? "bg-blue-600 text-white"
+                ? "bg-gold text-white"
                 : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
             }`}
           >
@@ -89,7 +89,7 @@ export function JobInput({ onParsed, ashbyJobs }: JobInputProps) {
             onClick={() => setMode("ashby")}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               mode === "ashby"
-                ? "bg-blue-600 text-white"
+                ? "bg-gold text-white"
                 : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
             }`}
           >
@@ -106,13 +106,13 @@ export function JobInput({ onParsed, ashbyJobs }: JobInputProps) {
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste the full job description here..."
             rows={8}
-            className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+            className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
           />
         ) : (
           <select
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
-            className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
+            className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
           >
             <option value="">Select a job...</option>
             {ashbyJobs?.map((job) => (
@@ -132,7 +132,7 @@ export function JobInput({ onParsed, ashbyJobs }: JobInputProps) {
         type="button"
         onClick={handleParse}
         disabled={loading}
-        className="mt-4 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-4 rounded-lg bg-gold px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Parsing..." : "Parse Requirements"}
       </button>

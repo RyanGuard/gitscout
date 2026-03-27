@@ -11,7 +11,7 @@ export function RepoCard({ repo }: RepoCardProps) {
   return (
     <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
       <div className="flex items-start justify-between gap-2">
-        <h4 className="truncate font-semibold text-blue-600 dark:text-blue-400">
+        <h4 className="truncate font-semibold text-gold dark:text-gold">
           {repo.name}
         </h4>
         <div className="flex shrink-0 items-center gap-3 text-sm text-neutral-500">

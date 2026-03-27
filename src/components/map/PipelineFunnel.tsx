@@ -45,7 +45,7 @@ export function PipelineFunnel({
           {total} total{rejected > 0 ? ` · ${rejected} rejected` : ""}
         </span>
         {activeFilter && (
-          <span className="ml-auto text-xs text-indigo-400">
+          <span className="ml-auto text-xs text-gold">
             Filtered: {activeFilter}
           </span>
         )}

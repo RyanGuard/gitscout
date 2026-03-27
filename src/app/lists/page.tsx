@@ -78,7 +78,7 @@ export default function ListsPage() {
         <button
           type="button"
           onClick={() => setShowCreate(!showCreate)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
         >
           <Plus className="h-4 w-4" />
           New List
@@ -101,7 +101,7 @@ export default function ListsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Rust Engineers Q1"
-                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/5 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 autoFocus
               />
             </div>
@@ -115,14 +115,14 @@ export default function ListsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="A brief description of this list"
-                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/5 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               />
             </div>
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={creating || !name.trim()}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
               >
                 {creating ? "Creating..." : "Create List"}
               </button>

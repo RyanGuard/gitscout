@@ -139,7 +139,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
                   onClick={() => setPermissionLevel("overview")}
                   className={`rounded-lg border p-3 text-left transition-colors ${
                     permissionLevel === "overview"
-                      ? "border-indigo-500 bg-indigo-500/10"
+                      ? "border-gold bg-gold-bg"
                       : "border-neutral-700/50 hover:border-neutral-600"
                   }`}
                 >
@@ -154,7 +154,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
                   onClick={() => setPermissionLevel("full")}
                   className={`rounded-lg border p-3 text-left transition-colors ${
                     permissionLevel === "full"
-                      ? "border-indigo-500 bg-indigo-500/10"
+                      ? "border-gold bg-gold-bg"
                       : "border-neutral-700/50 hover:border-neutral-600"
                   }`}
                 >
@@ -179,7 +179,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
                   placeholder="John Smith"
-                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white placeholder-neutral-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white placeholder-neutral-500 focus:border-gold focus:outline-none"
                 />
               </div>
               <div>
@@ -191,7 +191,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
                   placeholder="john@company.com"
-                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white placeholder-neutral-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white placeholder-neutral-500 focus:border-gold focus:outline-none"
                 />
               </div>
             </div>
@@ -204,7 +204,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
               <select
                 value={expiresDays}
                 onChange={(e) => setExpiresDays(Number(e.target.value))}
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
               >
                 <option value={7}>7 days</option>
                 <option value={14}>14 days</option>
@@ -217,7 +217,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
             <button
               onClick={generateLink}
               disabled={generating}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {generating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -250,7 +250,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
             </div>
             <button
               onClick={() => setGeneratedUrl(null)}
-              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-sm text-gold hover:text-gold transition-colors"
             >
               Generate another link
             </button>
@@ -274,7 +274,7 @@ export function ShareModal({ mapId, mapName, onClose }: ShareModalProps) {
                       <span
                         className={`rounded px-1.5 py-0.5 font-medium ${
                           s.permissionLevel === "full"
-                            ? "bg-indigo-500/10 text-indigo-400"
+                            ? "bg-gold-bg text-gold"
                             : "bg-neutral-500/10 text-neutral-400"
                         }`}
                       >

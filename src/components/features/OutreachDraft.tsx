@@ -147,7 +147,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
       >
         <PenLine className="h-4 w-4" />
         Draft Outreach
@@ -181,7 +181,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
                     value={roleContext}
                     onChange={(e) => setRoleContext(e.target.value)}
                     placeholder="Senior Frontend Engineer"
-                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                   />
                 </div>
                 <div>
@@ -193,7 +193,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
                     value={companyContext}
                     onChange={(e) => setCompanyContext(e.target.value)}
                     placeholder="Acme Corp — Series B fintech"
-                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -201,7 +201,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
               {!variants && !loading && (
                 <button
                   onClick={generate}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="w-full rounded-lg bg-gold px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gold-hover"
                 >
                   Generate
                 </button>
@@ -209,7 +209,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
 
               {loading && (
                 <div className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-500">
-                  <PenLine className="h-4 w-4 animate-pulse text-blue-500" />
+                  <PenLine className="h-4 w-4 animate-pulse text-gold" />
                   Drafting messages...
                 </div>
               )}
@@ -251,7 +251,7 @@ export function OutreachDraft({ username, profileData }: OutreachDraftProps) {
                     value={displayedVariants[activeTab]}
                     onChange={(e) => handleEditVariant(e.target.value)}
                     rows={6}
-                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm leading-relaxed text-neutral-700 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                    className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm leading-relaxed text-neutral-700 focus:border-gold focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                   />
 
                   {/* Character count */}
