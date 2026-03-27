@@ -165,11 +165,11 @@ export function useKeyboardNav(options: KeyboardNavOptions = {}) {
 
 function showChordIndicator() {
   // Create a temporary floating indicator
-  const existing = document.getElementById('gitscout-chord-indicator');
+  const existing = document.getElementById('scout-chord-indicator');
   if (existing) existing.remove();
 
   const el = document.createElement('div');
-  el.id = 'gitscout-chord-indicator';
+  el.id = 'scout-chord-indicator';
   el.textContent = 'g…';
   Object.assign(el.style, {
     position: 'fixed',

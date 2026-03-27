@@ -1,7 +1,7 @@
 // Track which developer profiles the user has viewed
 // Uses localStorage — works without auth
 
-const STORAGE_KEY = "gitscout_viewed_profiles";
+const STORAGE_KEY = "scout_viewed_profiles";
 const MAX_TRACKED = 500;
 
 export function getViewedProfiles(): Set<string> {

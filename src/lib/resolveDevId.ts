@@ -25,7 +25,7 @@ export async function resolveDeveloperId(developerId: string): Promise<string> {
   // Not indexed — fetch username from GitHub and sync
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "GitScout/1.0",
+    "User-Agent": "Scout/1.0",
   };
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;

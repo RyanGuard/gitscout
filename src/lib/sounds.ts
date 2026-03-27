@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-const STORAGE_KEY = 'gitscout_sound_enabled';
+const STORAGE_KEY = 'scout_sound_enabled';
 
 type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
 

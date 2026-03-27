@@ -1,4 +1,4 @@
-// GitScout Developer Scoring Engine — 5 Pillar Framework
+// Scout Developer Scoring Engine — 5 Pillar Framework
 // Based on: docs/SCORING_FRAMEWORK.md
 //
 // Pillars:

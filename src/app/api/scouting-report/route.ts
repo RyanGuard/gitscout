@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   if (scoreData) {
-    if (scoreData.score != null) parts.push(`GitScout score: ${scoreData.score}/100`);
+    if (scoreData.score != null) parts.push(`Scout score: ${scoreData.score}/100`);
     if (scoreData.tier) parts.push(`Tier: ${scoreData.tier}`);
     if (scoreData.totalCommits != null)
       parts.push(`Total commits (last 12 months): ${scoreData.totalCommits}`);

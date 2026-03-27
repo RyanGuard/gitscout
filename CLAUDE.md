@@ -1,154 +1,210 @@
-@AGENTS.md
+# CLAUDE.md — Scout
 
-# GitScout
+## What is this project?
 
-Talent sourcing tool that searches GitHub in real-time to find engineering candidates, enrich their profiles, and push them into Ashby ATS.
+**Scout** is a recruiting intelligence platform. It started as GitScout (a GitHub developer sourcing tool) and has evolved into a full recruiting workflow platform covering sourcing, connection mapping, outreach, pipeline tracking, and market intelligence.
 
-## Stack
-- Next.js 16.2.1 (Turbopack), React 19, TypeScript, Tailwind CSS 4
-- Prisma 7 + Supabase PostgreSQL (session pooler, IPv4)
-- NextAuth v4 with GitHub OAuth
-- Vercel deployment (Hobby tier — 60s function timeout)
-- Apollo.io for contact enrichment
-- Ashby ATS integration
+The name is **Scout** — not GitScout. Update all references, branding, logos, and copy throughout the codebase.
 
-## Live
-- **App:** https://gitscout-beta.vercel.app
-- **Repo:** https://github.com/RyanGuard/gitscout
+## Tech Stack
 
-## Architecture — How Search Works
+- **Frontend:** Next.js (App Router), React, Tailwind
+- **Backend:** Next.js API routes (serverless on Vercel)
+- **Database:** Supabase (PostgreSQL + Realtime) via Prisma ORM
+- **AI:** Anthropic Claude API (Sonnet for classification, structured JSON output)
+- **Data:** Apollo.io REST API (people search, company search, enrichment, news, job postings)
+- **Data:** GitHub API (developer scoring, OSS contribution analysis)
+- **Deployment:** Vercel
 
-Search queries GitHub's Search API **live** — we do NOT pre-index all developers. The flow is:
+## Brand Identity
 
-1. User searches → hits GitHub `/search/users` API in real-time
-2. Results merged with any locally stored profiles (which have scores, languages, repos)
-3. User clicks a profile → fetched live from GitHub if not in our DB
-4. User clicks "Enrich" → Apollo.io + commit email mining → stored locally
-5. User clicks "Push to Ashby" → candidate created in ATS
+**Name:** Scout
+**Tagline:** Recruiting intelligence
+**Primary accent color:** Gold #C8A55A (CTAs, warm path indicators, badges, active nav)
+**Sidebar background:** #19191A (near-black)
+**Sidebar text:** #E8E6DF (warm off-white)
+**Sidebar muted text:** rgba(232,230,223,0.35)
+**Section labels:** rgba(232,230,223,0.2)
+**Active nav indicator:** 2px left border in #C8A55A
+**Alert/urgent color:** #C2413C
+**Success/positive color:** #2D6A4F
+**Warning/stale color:** #8B6914
+**Font:** Instrument Sans (Google Fonts: https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap)
+**Logo:** Gold rounded square (#C8A55A, border-radius 7px) with scout icon (person silhouette + signal lines) rendered in #19191A
 
-**Only developers the recruiter interacts with get stored locally.** The local DB is for enriched/scored profiles and favorites, not a mirror of GitHub.
+## Information Architecture
 
-## Key Files
+The platform is organized into four workflow sections plus a dashboard:
 
-### Pipeline & Data
-- `src/pipeline/github.ts` — GitHub API client with retry, rate limiting, bulk sync
-- `src/pipeline/graphql.ts` — GitHub GraphQL API for contribution data
-- `src/pipeline/scheduler.ts` — Stale profile re-sync (7-day threshold, 50/run)
-- `src/lib/scoring.ts` — Developer scoring engine (normalized 0-100)
+```
+Dashboard (home — stats, recent searches, alerts, quick actions)
 
-### Auth & Users
-- `src/lib/auth.ts` — NextAuth config (GitHub OAuth + Prisma adapter)
-- `src/components/auth/AuthButton.tsx` — Sign in/out + user menu
-- `src/components/auth/FavoriteButton.tsx` — Save/unsave developer
-- `src/components/auth/Providers.tsx` — SessionProvider wrapper
+SOURCE — "Find talent"
+├── Developer search (GitHub-powered talent discovery)
+└── Market map (company landscape intelligence)
 
-### API Routes
-- `GET /api/search` — **Live GitHub search** + local DB merge
-- `GET /api/profiles/[username]` — Profile (local DB → GitHub fallback)
-- `GET /api/stats` — Dashboard stats
-- `POST /api/pipeline` — Trigger bulk sync (auth: `PIPELINE_SECRET`)
-- `GET /api/cron` — Scheduled re-sync (auth: `CRON_SECRET`)
-- `GET|POST /api/auth/[...nextauth]` — NextAuth endpoints
-- `GET|POST /api/favorites` — List/add favorites
-- `DELETE /api/favorites/[developerId]` — Remove favorite
+CONNECT — "Build warm paths"
+├── Connection mapper (map warm intros to any company)
+└── Outreach (AI-personalized messaging)
 
-### Pages
-- `/` — Landing page with search bar + stats
-- `/search` — Search with filters (URL-synced), Cmd+K shortcut
-- `/profile/[username]` — Developer profile (works for ANY GitHub user)
-- `/favorites` — Saved developers (auth required)
+MANAGE — "Track pipeline"
+├── Pipeline (candidate tracking across searches)
+├── Saved lists (curated candidate collections)
+└── Templates (reusable map & outreach templates)
 
-### Components
-- `src/components/ui/` — SearchInput, Badge, StatCard
-- `src/components/layout/Header.tsx` — Nav with AuthButton
-- `src/components/profile/` — DeveloperCard, LanguageBar, RepoCard
-- `src/components/search/` — SearchFilters, SearchResults
+INTELLIGENCE — "Stay informed"
+├── Alerts (company news & departure signals)
+└── Analytics (response rates & pipeline health)
+```
 
-## Database Schema (Prisma)
+## Navigation / Sidebar Spec
 
-**Core:** Developer, LanguageStat, Repository, SyncLog
-**Auth:** User, Account, Session, VerificationToken, Favorite
+### Structure
+- Dark background (#19191A), 224px fixed width
+- Top: Scout logo (gold square + icon) + "Scout" wordmark (17px, 700 weight) + "RECRUITING INTELLIGENCE" subtitle (9px, uppercase, 0.06em tracking, rgba(232,230,223,0.3))
+- Dashboard nav item (standalone, above sections)
+- Spacer (12px)
+- Four grouped sections, each with:
+  - Section label (9px, uppercase, 0.1em tracking, rgba(232,230,223,0.2))
+  - Nav items nested below
+- Bottom (pinned to bottom):
+  - Settings nav item
+  - User card: avatar circle (initials in gold on dark gold bg), name, plan, notification bell with red unread dot
 
-Developer has computed fields: `score`, `totalCommits`, `recentActivity`, `languageDiversity`, `avgRepoQuality`, `lastSyncError`
+### Nav Item States
+- Default: icon + label in muted color (rgba(232,230,223,0.5)), no background
+- Active: 2px left border (#C8A55A), background rgba(232,230,223,0.06), text brightens to #E8E6DF, icon brightens
+- Hover: slight background highlight
+
+### Nav Item Badges
+- "NEW" badge: gold text (#C8A55A) on dark gold bg (rgba(200,165,90,0.12)), 8px font, right-aligned
+- "SOON" badge: muted text (rgba(232,230,223,0.25)) on subtle bg (rgba(232,230,223,0.06))
+
+### Icons (15x15 SVG, stroke-based, 1.1-1.2px stroke)
+- dashboard: 4 rounded squares in a grid
+- search: magnifying glass
+- map: folded map with dividing lines
+- link: chain links (connection)
+- send: paper plane (outreach)
+- funnel: funnel shape (pipeline)
+- list: bullet list
+- copy: overlapping rectangles (templates)
+- bell: notification bell
+- chart: bar chart
+- settings: gear/cog
+
+## Dashboard Page Spec
+
+The dashboard is the home screen when a user opens Scout.
+
+### Layout
+- Greeting: "Good evening, [name]" (22px, 700 weight)
+- Subtitle: summary stats inline ("4 active searches · 12 candidates in pipeline · 3 new alerts")
+- Quick action cards: 3 cards in a row
+  - "New market map" → navigates to market map
+  - "Search developers" → navigates to developer search
+  - "Map connections" → navigates to connection mapper
+  - Each card: white bg, 0.5px border, 10px radius, title (13px 600) + description (12px, muted)
+- Stat cards: 4 in a row
+  - Active maps, Candidates tracked, Warm connections (gold accent), Response rate (green accent)
+  - Each: white bg, 0.5px border, 10px radius, uppercase label (10px) + large number (26px, 700 weight)
+- Two-column layout below:
+  - Left (wider): Recent searches — list of map cards showing name, company/candidate counts, warm path count, last updated, stale indicator
+  - Right (330px): Alerts feed (urgent = red dot + tinted bg, info = neutral bg) + Connection mapper CTA card (gold tinted, setup prompt with button)
+
+## Feature Status Tracking
+
+### Active
+- Developer search (working)
+- Market map (Apollo enrichment being fixed)
+- Saved lists (working)
+
+### In Development
+- Connection mapper (separate branch: feature/connection-mapper)
+- Market map Phase 3 (share links, PDF export, outreach — separate branch)
+- Search fix (filter bugs — separate branch: fix/search-zero-results)
+
+### Planned
+- Pipeline view
+- Outreach page
+- Alerts system
+- Analytics dashboard
+- Market map Phase 4 (living maps, hiring patterns, team health)
+
+## Architecture Overview
+
+### Two-Phase Enrichment Model
+**Phase 1 — Map Generation (free, no Apollo credits consumed)**
+1. Recruiter enters role brief (title, level, stack, geography)
+2. Claude API suggests 15-25 target companies organized into Tier A/B/C
+3. For each company, Apollo People API Search finds matching candidates (FREE)
+4. Map renders progressively as each company's data comes back
+5. Claude classifies fit scores and flight risk per company batch
+
+**Phase 2 — Contact Enrichment (on demand, costs Apollo credits)**
+1. Recruiter browses the map, identifies targets
+2. Clicks "reveal contact" on specific people
+3. Apollo Bulk People Enrichment reveals verified emails/phones
+4. Enriched data cached for future use
+
+### Connection Mapper
+- One-time setup: recruiter registers their company domain
+- Scout enriches full team from Apollo (employment history, education)
+- Matches engineering team to GitHub profiles
+- On any target company lookup: cross-references for former employee overlap, shared investors, shared education, GitHub/OSS overlap, LinkedIn imports
+- Surfaces warm intro paths with Claude-generated suggested actions
+- Integrates with market map: company cards show connection count badges
+
+## API Details
+
+### Apollo API
+- People API Search (FREE): `POST /api/v1/mixed_people/api_search`
+- Job Postings (FREE): `GET /api/v1/organizations/{id}/job_postings`
+- Organization Search (credits): `POST /api/v1/organizations/search`
+- Bulk People Enrichment (credits): `POST /api/v1/people/bulk_match`
+- News Articles Search: `POST /api/v1/news_articles/search`
+
+### Claude API
+Model: `claude-sonnet-4-20250514`. max_tokens: 4000. Always request JSON output.
+
+### Caching
+Check `enrichment_cache` before ANY external API call:
+- people_search: 7 day TTL
+- company_info: 14 day TTL
+- person_enrichment: 30 day TTL
+- job_postings: 3 day TTL
+- news_articles: 3 day TTL
+
+## Important Rules
+
+1. **The name is Scout.** Not GitScout. Update ALL user-facing text, titles, logos, metadata, page titles.
+2. **Brand color is gold (#C8A55A).** Use for CTAs, active states, warm path badges, accent elements.
+3. **Font is Instrument Sans.** Replace any existing font references.
+4. **Sidebar is the primary navigation.** Dark (#19191A), four grouped sections, gold accents.
+5. **Always check cache before external API calls.**
+6. **People API Search is free. Enrichment costs credits.** Never reveal emails/phones without user action.
+7. **Tier overrides are sacred.** Recruiter's manual tier assignments override AI.
+8. **Candidate pipeline status is recruiter-controlled.** Enrichment never changes it.
+9. **Progressive loading.** Show results as they arrive, don't block on full completion.
+10. **Optimistic UI.** Update immediately, persist in background.
+11. **Rate limit Apollo calls.** Max 3-5 concurrent. Exponential backoff on 429s.
 
 ## Environment Variables
 
 ```
-DATABASE_URL          — Prisma Postgres local dev server
-DIRECT_DATABASE_URL   — Supabase session pooler (production)
-GITHUB_TOKEN          — GitHub PAT (for API rate limits: 5000/hr)
-GITHUB_ID             — GitHub OAuth App client ID
-GITHUB_SECRET         — GitHub OAuth App client secret
-NEXTAUTH_SECRET       — NextAuth session encryption
-PIPELINE_SECRET       — Bearer token for /api/pipeline
-CRON_SECRET           — Vercel Cron auth token
-ASHBY_API_KEY         — Ashby ATS API key
-APOLLO_API_KEY        — Apollo.io people enrichment API key
+APOLLO_API_KEY=
+ANTHROPIC_API_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-## Agent Task Files
+## Build Specs
 
-### Phase 1 (complete):
-- AGENT_SCORING.md — Scoring formula + commit counting
-- AGENT_PIPELINE.md — Pipeline reliability + search + cron
-- AGENT_UI.md — Frontend polish, SEO, responsive, error states
-- AGENT_AUTH.md — GitHub OAuth, user accounts, favorites
-
-### Phase 2 (ready to build):
-- AGENT_ASHBY.md — Ashby ATS integration (connect, push candidates, sequences)
-- AGENT_JD_MATCH.md — Job description parsing + role-based candidate matching
-- AGENT_ENRICHMENT.md — Apollo.io + email mining + contact info + company normalization
-- AGENT_CRM.md — Candidate lists, notes, tags, pipeline stages
-
-Each file defines: scope, exact files to modify/create, files NOT to touch, acceptance criteria, and technical gotchas.
-
-## Critical Rules
-
-### Imports
-- Prisma client: `from "@/generated/prisma/client"` (NOT `@prisma/client`)
-- Prisma singleton: `from "@/lib/prisma"` (never instantiate your own)
-- Auth: `from "@/lib/auth"` for `authOptions`
-- Path alias: `@/*` maps to `./src/*`
-
-### Next.js 16 Breaking Changes
-- `params` in pages and route handlers is a **Promise** — must `await params`
-- `headers()` and `cookies()` are **async** — must `await`
-- `searchParams` in page components is a **Promise**
-- Check `node_modules/next/dist/docs/` for full docs
-
-### lucide-react Icon Names
-- `Github` and `Twitter` icons do NOT exist — use `GitBranch` and `AtSign`
-- Verify icons exist before importing
-
-### Database
-- Always `npx prisma generate` after schema changes
-- Always `npx prisma db push` (NOT `prisma migrate`) for this project
-- Supabase connection is IPv4 session pooler — does NOT support prepared statements
-- Schema at `prisma/schema.prisma`, generated client at `src/generated/prisma/`
-
-### Ashby API
-- All endpoints are POST (even reads)
-- Auth: Basic auth with API key as username, empty password
-- Docs: https://developers.ashbyhq.com
-
-### Apollo.io API
-- Endpoint: `POST https://api.apollo.io/v1/people/match`
-- Auth: `X-Api-Key` header
-- Best matches via name+company or LinkedIn URL
-
-### Build & Deploy
-- Always `npm run build` to verify before committing
-- Build script: `prisma generate && prisma db push && next build`
-- Never commit `.env`
-- Vercel Hobby tier: 60-second function timeout (keep syncs small)
-- `vercel.json` has daily cron at 3am UTC for stale profile re-sync
-
-### Worktrees for Parallel Agents
-When running multiple agents, use git worktrees to isolate:
-```bash
-git worktree add ~/gitscout-{name} -b feat/{name}
-cd ~/gitscout-{name} && cp ~/gitscout/.env . && npm install && npx prisma generate
-claude --dangerously-skip-permissions "Read AGENT_{NAME}.md and execute all tasks."
-```
-Merge back: `cd ~/gitscout && git merge feat/{name}`
-Cleanup: `git worktree remove ~/gitscout-{name} && git branch -d feat/{name}`
+All feature specs in `/docs`:
+- `MARKET_MAP_BUILD_SPEC.md` — Phase 1 core
+- `MARKET_MAP_PHASE_2_SPEC.md` — Control + intelligence
+- `MARKET_MAP_PHASE_3_SPEC.md` — Workflow integration
+- `MARKET_MAP_PHASE_4_SPEC.md` — Defensibility + network effects
+- `CONNECTION_MAPPER_SPEC.md` — Connection mapping tool
+- `SCOUT_REDESIGN_SPEC.md` — Platform redesign (this rebrand)

@@ -117,7 +117,7 @@ async function fetchWithRetry(
 function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "GitScout/1.0",
+    "User-Agent": "Scout/1.0",
   };
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;

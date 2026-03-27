@@ -2,40 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  Search, ArrowRight, TrendingUp, Users, Zap, Globe,
-  MapPin, Code, GitFork, Star, Activity, Eye, Bookmark,
-  ChevronRight, Sparkles, Target, Clock, Radio,
-} from "lucide-react";
+import { Search, ArrowRight, Users, Zap, Code } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { getLanguageColor } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
-//  MINI SPARKLINE — tiny activity visualization
-// ═══════════════════════════════════════════════════════════
-function Sparkline({ data, color = "#818cf8" }: { data: number[]; color?: string }) {
-  const max = Math.max(...data, 1);
-  return (
-    <div className="flex items-end gap-[2px] h-5">
-      {data.map((v, i) => (
-        <div
-          key={i}
-          className="w-[3px] rounded-full animate-grow-bar"
-          style={{
-            height: `${Math.max(8, (v / max) * 100)}%`,
-            backgroundColor: color,
-            opacity: 0.4 + (v / max) * 0.6,
-            animationDelay: `${i * 50}ms`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════
-//  LIVE INDICATOR — pulsing dot
+//  LIVE INDICATOR
 // ═══════════════════════════════════════════════════════════
 function LiveDot({ className = "" }: { className?: string }) {
   return (
@@ -79,30 +51,30 @@ function Landing() {
   ];
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden">
+    <div className="relative flex flex-1 flex-col overflow-hidden" style={{ background: "#0a0a0f", minHeight: "100vh" }}>
       {/* Atmospheric gradient background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-indigo-500/[0.04] blur-[120px]" />
-        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full bg-violet-500/[0.03] blur-[100px]" />
-        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-blue-500/[0.03] blur-[80px]" />
+        <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "rgba(200,165,90,0.04)" }} />
+        <div className="absolute top-20 right-1/4 h-[400px] w-[400px] rounded-full blur-[100px]" style={{ background: "rgba(200,165,90,0.03)" }} />
+        <div className="absolute -bottom-20 left-1/2 h-[300px] w-[500px] -translate-x-1/2 rounded-full blur-[80px]" style={{ background: "rgba(200,165,90,0.03)" }} />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10">
         {/* Hero badge */}
         <div
           className="mb-4 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
-          style={{ border: "1px solid rgba(129,140,248,0.25)", background: "rgba(129,140,248,0.08)", color: "#a5b4fc" }}
+          style={{ border: "1px solid rgba(200,165,90,0.25)", background: "rgba(200,165,90,0.08)", color: "#C8A55A" }}
         >
           <LiveDot />
           <span>Live GitHub intelligence</span>
-          <span style={{ color: "rgba(129,140,248,0.4)" }}>·</span>
-          <span style={{ color: "#c7d2fe" }}>48M+ developers</span>
+          <span style={{ color: "rgba(200,165,90,0.4)" }}>·</span>
+          <span style={{ color: "#E8E6DF" }}>48M+ developers</span>
         </div>
 
         {/* Title */}
         <h1 className="mb-4 text-center text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
           <span style={{ color: "#f5f5f5" }}>Scout </span>
-          <span className="text-gradient">top talent</span>
+          <span style={{ background: "linear-gradient(135deg, #C8A55A, #E8D5A3)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>top talent</span>
           <br />
           <span style={{ color: "#f5f5f5" }}>from GitHub</span>
         </h1>
@@ -118,20 +90,22 @@ function Landing() {
             onSubmit={(e) => { e.preventDefault(); handleSearch(query); }}
             className="group relative"
           >
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-blue-500/20 opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" />
-            <div className="relative flex items-center rounded-xl border border-neutral-200/50 bg-white shadow-lg dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:shadow-2xl">
-              <Search className="ml-5 h-5 w-5 text-neutral-400" />
+            <div className="absolute -inset-1 rounded-2xl opacity-0 blur-lg transition-opacity duration-500 group-focus-within:opacity-100" style={{ background: "linear-gradient(to right, rgba(200,165,90,0.2), rgba(200,165,90,0.1))" }} />
+            <div className="relative flex items-center rounded-xl shadow-2xl" style={{ border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)" }}>
+              <Search className="ml-5 h-5 w-5" style={{ color: "rgba(255,255,255,0.4)" }} />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={hints[activeHint]}
-                className="flex-1 bg-transparent px-4 py-4 text-base outline-none placeholder:text-neutral-400/60 dark:text-white"
+                className="flex-1 bg-transparent px-4 py-4 text-base outline-none"
+                style={{ color: "#f5f5f5", caretColor: "#C8A55A" }}
               />
               <button
                 type="submit"
-                className="mr-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25"
+                className="mr-2 rounded-lg px-5 py-2 text-sm font-semibold transition-all hover:shadow-lg"
+                style={{ background: "#C8A55A", color: "#19191A" }}
               >
                 Search
               </button>
@@ -166,7 +140,7 @@ function Landing() {
         >
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center gap-2.5">
-              <s.icon className="h-4 w-4" style={{ color: "#818cf8" }} />
+              <s.icon className="h-4 w-4" style={{ color: "#C8A55A" }} />
               <div>
                 <p className="text-lg font-bold tabular-nums" style={{ color: "#f5f5f5" }}>{s.value}</p>
                 <p className="text-[11px]" style={{ color: "#888" }}>{s.label}</p>
@@ -186,415 +160,273 @@ function Landing() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  DASHBOARD — logged in
+//  STAT CARD
 // ═══════════════════════════════════════════════════════════
-
-interface FavoriteDev {
-  id: string;
-  developer: {
-    username: string;
-    name: string | null;
-    avatarUrl: string | null;
-    score: number;
-    primaryLanguage: string | null;
-    location: string | null;
-    followers?: number;
-    totalStars?: number;
-  };
-  createdAt: string;
+function StatCard({ label, value, accent }: { label: string; value: string | number; accent?: string }) {
+  return (
+    <div
+      style={{
+        background: "var(--color-background-primary)",
+        borderRadius: 10,
+        border: "0.5px solid var(--color-border-tertiary)",
+        padding: "16px 20px",
+        flex: 1,
+        minWidth: 140,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          color: "var(--color-text-tertiary)",
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 26,
+          fontWeight: 700,
+          color: accent || "var(--color-text-primary)",
+          letterSpacing: "-0.03em",
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  );
 }
 
-// Market intelligence cards
-const MARKETS = [
-  {
-    city: "San Francisco",
-    flag: "🇺🇸",
-    developers: "892K",
-    topLangs: ["TypeScript", "Python", "Go"],
-    trend: "+4.2%",
-    trendUp: true,
-    sparkline: [3, 5, 4, 7, 6, 8, 7, 9, 8, 10, 9, 11],
-  },
-  {
-    city: "Berlin",
-    flag: "🇩🇪",
-    developers: "312K",
-    topLangs: ["TypeScript", "Rust", "Go"],
-    trend: "+6.1%",
-    trendUp: true,
-    sparkline: [2, 3, 4, 3, 5, 6, 5, 7, 8, 7, 9, 10],
-  },
-  {
-    city: "New York",
-    flag: "🇺🇸",
-    developers: "645K",
-    topLangs: ["Python", "TypeScript", "Java"],
-    trend: "+3.8%",
-    trendUp: true,
-    sparkline: [4, 5, 5, 6, 5, 7, 6, 8, 7, 8, 9, 9],
-  },
-  {
-    city: "London",
-    flag: "🇬🇧",
-    developers: "528K",
-    topLangs: ["TypeScript", "Python", "Go"],
-    trend: "+2.9%",
-    trendUp: true,
-    sparkline: [3, 3, 4, 5, 4, 5, 6, 5, 7, 6, 7, 8],
-  },
+// ═══════════════════════════════════════════════════════════
+//  MAP CARD
+// ═══════════════════════════════════════════════════════════
+function MapCard({ map }: { map: { name: string; companies: number; candidates: number; connections: number; updated: string; status: string } }) {
+  const isStale = map.status === "stale";
+  return (
+    <div
+      style={{
+        background: "var(--color-background-primary)",
+        borderRadius: 10,
+        border: "0.5px solid var(--color-border-tertiary)",
+        padding: "16px 20px",
+        cursor: "pointer",
+        transition: "border-color 0.15s",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>{map.name}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          {isStale && (
+            <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 4, background: "rgba(186,117,23,0.08)", color: "#8B6914", fontWeight: 500 }}>
+              Stale
+            </span>
+          )}
+          <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>{map.updated}</span>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 5, background: "var(--color-background-secondary)", color: "var(--color-text-secondary)" }}>
+          {map.companies} companies
+        </span>
+        <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 5, background: "var(--color-background-secondary)", color: "var(--color-text-secondary)" }}>
+          {map.candidates} candidates
+        </span>
+        {map.connections > 0 && (
+          <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 5, background: "rgba(200,165,90,0.08)", color: "#8B6914" }}>
+            {map.connections} warm paths
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ALERT CARD
+// ═══════════════════════════════════════════════════════════
+function AlertCard({ alert }: { alert: { company: string; text: string; time: string; severity: string } }) {
+  const isUrgent = alert.severity === "urgent";
+  return (
+    <div
+      style={{
+        padding: "12px 14px",
+        borderRadius: 8,
+        background: isUrgent ? "rgba(194,65,60,0.04)" : "var(--color-background-secondary)",
+        border: `0.5px solid ${isUrgent ? "rgba(194,65,60,0.12)" : "var(--color-border-tertiary)"}`,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+        {isUrgent && <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#C2413C" }} />}
+        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-primary)" }}>{alert.company}</span>
+        <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginLeft: "auto" }}>{alert.time}</span>
+      </div>
+      <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{alert.text}</div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUICK ACTION
+// ═══════════════════════════════════════════════════════════
+function QuickAction({ label, desc, href }: { label: string; desc: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      style={{
+        flex: 1,
+        minWidth: 180,
+        padding: "18px 22px",
+        borderRadius: 10,
+        border: "0.5px solid var(--color-border-tertiary)",
+        background: "var(--color-background-primary)",
+        cursor: "pointer",
+        transition: "border-color 0.15s, transform 0.1s",
+        textDecoration: "none",
+      }}
+    >
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-primary)", marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", lineHeight: 1.4 }}>{desc}</div>
+    </Link>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MOCK DATA
+// ═══════════════════════════════════════════════════════════
+const MOCK_STATS = { activeMaps: 4, candidatesTracked: 187, warmConnections: 23, responseRate: "34%" };
+
+const MOCK_RECENT = [
+  { name: "Sr. Platform Engineer — GPU Cloud", companies: 9, candidates: 23, connections: 6, updated: "2h ago", status: "ready" },
+  { name: "Staff Backend — Fintech", companies: 12, candidates: 31, connections: 4, updated: "1d ago", status: "ready" },
+  { name: "Engineering Manager — AI Infra", companies: 7, candidates: 18, connections: 2, updated: "3d ago", status: "stale" },
 ];
 
-// Role lanes
-const ROLE_LANES = [
-  { label: "Frontend", query: "react typescript frontend", langs: ["TypeScript", "JavaScript"], icon: Code, iconColor: "text-blue-400", signal: "High demand", signalColor: "text-amber-400" },
-  { label: "Backend", query: "go python backend api", langs: ["Go", "Python"], icon: GitFork, iconColor: "text-emerald-400", signal: "Growing", signalColor: "text-emerald-400" },
-  { label: "ML / AI", query: "python machine learning AI", langs: ["Python"], icon: Sparkles, iconColor: "text-violet-400", signal: "Surging", signalColor: "text-red-400" },
-  { label: "Infra / DevOps", query: "kubernetes terraform infrastructure", langs: ["Go", "Python"], icon: Globe, iconColor: "text-cyan-400", signal: "Steady", signalColor: "text-neutral-400" },
-  { label: "Rust Systems", query: "rust systems performance", langs: ["Rust"], icon: Zap, iconColor: "text-orange-400", signal: "Hot", signalColor: "text-red-400" },
-  { label: "Mobile", query: "swift kotlin mobile", langs: ["Swift", "Kotlin"], icon: Target, iconColor: "text-pink-400", signal: "Stable", signalColor: "text-neutral-400" },
+const MOCK_ALERTS = [
+  { company: "CoreWeave", text: "VP Engineering departed — 3 engineers now high flight risk", time: "4h ago", severity: "urgent" },
+  { company: "Lambda", text: "Series C announced ($150M) — hiring surge expected", time: "1d ago", severity: "info" },
+  { company: "Anyscale", text: "15% workforce reduction reported", time: "2d ago", severity: "urgent" },
 ];
 
+// ═══════════════════════════════════════════════════════════
+//  DASHBOARD — logged in
+// ═══════════════════════════════════════════════════════════
 function Dashboard() {
-  const router = useRouter();
   const { data: session } = useSession();
-  const searchRef = useRef<HTMLInputElement>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<FavoriteDev[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/favorites")
-      .then((r) => r.json())
-      .then((data) => setFavorites(data.favorites || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        searchRef.current?.focus();
-      }
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, []);
-
-  function search(q: string) {
-    if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
-  }
-
-  // Use display name, not username — fall back gracefully
   const rawName = session?.user?.name || "";
   const firstName = rawName.includes(" ") ? rawName.split(" ")[0] : (rawName || "there");
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="relative min-h-screen">
-      {/* Subtle gradient bg */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-indigo-500/[0.02] blur-[120px]" />
-        <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-violet-500/[0.015] blur-[100px]" />
+    <div style={{ maxWidth: 1020, padding: "28px 36px" }}>
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.03em", marginBottom: 4 }}>
+          {greeting}, {firstName}
+        </div>
+        <div style={{ fontSize: 13, color: "var(--color-text-tertiary)" }}>
+          {MOCK_STATS.activeMaps} active searches · {MOCK_STATS.candidatesTracked} candidates in pipeline · {MOCK_ALERTS.length} new alerts
+        </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* ── HEADER: Greeting + Search ── */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
-              {greeting}, {firstName}
-            </h1>
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-              <LiveDot />
-              Connected
-            </div>
-          </div>
-          <p className="text-sm text-neutral-500 mb-5">Your talent radar is active. Start sourcing or review your pipeline.</p>
+      {/* Quick actions */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
+        <QuickAction label="New market map" desc="Map the talent landscape for a role" href="/map" />
+        <QuickAction label="Search developers" desc="Find engineers by skills and activity" href="/search" />
+        <QuickAction label="Map connections" desc="Find warm paths into any company" href="/connections" />
+      </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); search(searchQuery); }} className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-neutral-400" />
-            <input
-              ref={searchRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by role, skill, location, or name..."
-              className="w-full rounded-xl border border-neutral-200/50 bg-white py-3 pl-11 pr-20 text-sm shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-indigo-400/50 focus:shadow-lg focus:shadow-indigo-500/5 dark:border-neutral-700/50 dark:bg-neutral-900/80 dark:text-white dark:focus:border-indigo-500/50"
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-              <kbd className="hidden rounded border border-neutral-200/50 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 sm:inline-flex dark:border-neutral-700/50">⌘K</kbd>
-              <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors">
-                Search
-              </button>
-            </div>
-          </form>
-        </div>
+      {/* Stats */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 28, flexWrap: "wrap" }}>
+        <StatCard label="Active maps" value={MOCK_STATS.activeMaps} />
+        <StatCard label="Candidates tracked" value={MOCK_STATS.candidatesTracked} />
+        <StatCard label="Warm connections" value={MOCK_STATS.warmConnections} accent="#8B6914" />
+        <StatCard label="Response rate" value={MOCK_STATS.responseRate} accent="#2D6A4F" />
+      </div>
 
-        {/* ── ROLE LANES ── */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Talent lanes</h2>
-            <Link href="/search" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
-              All searches →
+      {/* Two column layout */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 330px", gap: 20, alignItems: "start" }}>
+        {/* Recent searches */}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--color-text-primary)" }}>Recent searches</span>
+            <Link href="/map" style={{ fontSize: 12, color: "#8B6914", fontWeight: 500, textDecoration: "none" }}>
+              View all
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-            {ROLE_LANES.map((role) => {
-              const Icon = role.icon;
-              return (
-                <button
-                  key={role.label}
-                  onClick={() => search(role.query)}
-                  className="group relative overflow-hidden rounded-xl border border-neutral-200/50 bg-white p-3.5 text-left transition-all duration-200 hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 dark:border-neutral-800/80 dark:bg-neutral-900/40 dark:hover:border-indigo-500/30 dark:hover:bg-neutral-900/60"
-                >
-                  <Icon className={`h-5 w-5 mb-2 ${role.iconColor}`} />
-                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{role.label}</p>
-                  <div className="mt-1.5 flex items-center gap-1.5">
-                    {role.langs.map((l) => (
-                      <span key={l} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: getLanguageColor(l) }} />
-                    ))}
-                    <span className={`text-[10px] font-medium ${role.signalColor}`}>{role.signal}</span>
-                  </div>
-                  <ArrowRight className="absolute right-3 top-3.5 h-3.5 w-3.5 text-neutral-300 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 dark:text-neutral-600" />
-                </button>
-              );
-            })}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {MOCK_RECENT.map((m, i) => (
+              <MapCard key={i} map={m} />
+            ))}
           </div>
-        </section>
+        </div>
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          {/* ══ LEFT COLUMN (8 cols) ══ */}
-          <div className="lg:col-span-8 space-y-6">
-
-            {/* ── MARKET INTELLIGENCE ── */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-3.5 w-3.5 text-indigo-400" />
-                  <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Markets</h2>
-                </div>
-                <span className="text-[10px] text-neutral-400">GitHub developer activity, 30d</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {MARKETS.map((m) => (
-                  <button
-                    key={m.city}
-                    onClick={() => search(`developers in ${m.city}`)}
-                    className="group rounded-xl border border-neutral-200/50 bg-white p-4 text-left transition-all duration-200 glow-hover dark:border-neutral-700/50 dark:bg-neutral-900/60"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-lg">{m.flag}</span>
-                      <div className={`flex items-center gap-0.5 text-[10px] font-semibold ${m.trendUp ? "text-emerald-500" : "text-red-400"}`}>
-                        <TrendingUp className="h-3 w-3" />
-                        {m.trend}
-                      </div>
-                    </div>
-                    <p className="text-sm font-semibold text-neutral-900 dark:text-white">{m.city}</p>
-                    <p className="text-xs text-neutral-500 tabular-nums">{m.developers} developers</p>
-                    <div className="mt-3 flex items-end justify-between gap-2">
-                      <div className="flex gap-1">
-                        {m.topLangs.map((l) => (
-                          <span key={l} className="rounded-full px-1.5 py-0.5 text-[9px] font-medium" style={{ backgroundColor: `${getLanguageColor(l)}18`, color: getLanguageColor(l) }}>
-                            {l}
-                          </span>
-                        ))}
-                      </div>
-                      <Sparkline data={m.sparkline} color="#818cf8" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* ── WATCHLIST / SAVED DEVELOPERS ── */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Eye className="h-3.5 w-3.5 text-amber-400" />
-                  <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                    Your watchlist
-                  </h2>
-                  {favorites.length > 0 && (
-                    <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tabular-nums text-amber-500">
-                      {favorites.length}
-                    </span>
-                  )}
-                </div>
-                <Link href="/favorites" className="text-xs text-indigo-500 hover:text-indigo-400 transition-colors">
-                  View all →
-                </Link>
-              </div>
-
-              {loading ? (
-                <div className="space-y-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 animate-pulse rounded-xl bg-neutral-100 dark:bg-neutral-800/50" />
-                  ))}
-                </div>
-              ) : favorites.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-neutral-200/50 bg-neutral-50/50 p-8 text-center dark:border-neutral-700/30 dark:bg-neutral-900/30">
-                  <Bookmark className="mx-auto h-8 w-8 text-neutral-300 dark:text-neutral-600" />
-                  <p className="mt-2 text-sm font-medium text-neutral-500">No developers saved yet</p>
-                  <p className="text-xs text-neutral-400 mt-1">Search for developers and save them to your watchlist</p>
-                  <Link href="/search" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors">
-                    <Search className="h-3.5 w-3.5" />
-                    Start searching
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {favorites.slice(0, 6).map((fav, i) => {
-                    const dev = fav.developer;
-                    const langColor = dev.primaryLanguage ? getLanguageColor(dev.primaryLanguage) : "#888";
-                    const score = dev.score || 0;
-                    const scoreColor = score >= 75 ? "text-amber-500" : score >= 50 ? "text-indigo-400" : score >= 30 ? "text-emerald-500" : "text-neutral-400";
-
-                    return (
-                      <Link
-                        key={fav.id}
-                        href={`/profile/${dev.username}`}
-                        className="group flex items-center gap-4 rounded-xl border border-neutral-200/50 bg-white p-3.5 transition-all duration-200 hover:border-indigo-400/30 hover:shadow-md dark:border-neutral-700/50 dark:bg-neutral-900/60 dark:hover:border-indigo-500/30"
-                        style={{ animationDelay: `${i * 60}ms` }}
-                      >
-                        {/* Rank + Avatar */}
-                        <div className="relative">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={dev.avatarUrl || `https://github.com/${dev.username}.png`}
-                            alt=""
-                            className="h-10 w-10 rounded-full ring-2 ring-neutral-100 dark:ring-neutral-800"
-                          />
-                          {score > 0 && (
-                            <span className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[9px] font-bold ring-1 ring-neutral-200 dark:bg-neutral-900 dark:ring-neutral-700 ${scoreColor}`}>
-                              {Math.round(score)}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Info */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="truncate text-sm font-semibold text-neutral-900 group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400 transition-colors">
-                              {dev.name || dev.username}
-                            </p>
-                            {dev.primaryLanguage && (
-                              <span className="flex items-center gap-1 text-[10px] text-neutral-400">
-                                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: langColor }} />
-                                {dev.primaryLanguage}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-3 text-[11px] text-neutral-500">
-                            <span>@{dev.username}</span>
-                            {dev.location && (
-                              <span className="flex items-center gap-0.5">
-                                <MapPin className="h-2.5 w-2.5" />
-                                {dev.location}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Right side signal */}
-                        <ChevronRight className="h-4 w-4 text-neutral-300 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 dark:text-neutral-600" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
+        {/* Right column */}
+        <div>
+          {/* Alerts */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--color-text-primary)" }}>Alerts</span>
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  width: 17,
+                  height: 17,
+                  borderRadius: "50%",
+                  background: "#C2413C",
+                  color: "#fff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {MOCK_ALERTS.length}
+              </span>
+            </div>
+            <Link href="/alerts" style={{ fontSize: 12, color: "#8B6914", fontWeight: 500, textDecoration: "none" }}>
+              View all
+            </Link>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+            {MOCK_ALERTS.map((a, i) => (
+              <AlertCard key={i} alert={a} />
+            ))}
           </div>
 
-          {/* ══ RIGHT COLUMN (4 cols) ══ */}
-          <aside className="lg:col-span-4 space-y-4">
-
-            {/* ── ACTIVITY DIGEST ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="h-3.5 w-3.5 text-indigo-400" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Activity</h3>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { icon: Search, text: "Search engine", status: "Live", color: "text-emerald-500" },
-                  { icon: Zap, text: "Apollo enrichment", status: "Active", color: "text-emerald-500" },
-                  { icon: Target, text: "Ashby ATS", status: "Connected", color: "text-emerald-500" },
-                  { icon: Radio, text: "GitHub API", status: "5K req/hr", color: "text-indigo-400" },
-                ].map((item) => (
-                  <div key={item.text} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5 text-sm text-neutral-600 dark:text-neutral-400">
-                      <item.icon className="h-3.5 w-3.5 text-neutral-400" />
-                      {item.text}
-                    </div>
-                    <span className={`text-xs font-semibold ${item.color}`}>{item.status}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Connection CTA */}
+          <div
+            style={{
+              padding: "18px 20px",
+              borderRadius: 10,
+              background: "rgba(200,165,90,0.05)",
+              border: "0.5px solid rgba(200,165,90,0.15)",
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#6B5418", marginBottom: 4 }}>Connection mapper</div>
+            <div style={{ fontSize: 12, color: "#8B6914", lineHeight: 1.5, marginBottom: 12 }}>
+              Set up your company to find warm intros on every market map automatically.
             </div>
-
-            {/* ── QUICK ACTIONS ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">Quick actions</h3>
-              <div className="space-y-1">
-                {[
-                  { href: "/search", icon: Search, label: "Search developers", kbd: "⌘K" },
-                  { href: "/match", icon: Sparkles, label: "Match job description" },
-                  { href: "/lists", icon: Bookmark, label: "Candidate lists" },
-                  { href: "/settings", icon: Target, label: "Settings & Ashby" },
-                ].map((action) => (
-                  <Link
-                    key={action.href}
-                    href={action.href}
-                    className="flex items-center justify-between rounded-lg px-2.5 py-2 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-400 dark:hover:bg-neutral-800/50"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <action.icon className="h-3.5 w-3.5" />
-                      {action.label}
-                    </div>
-                    {action.kbd && (
-                      <kbd className="rounded border border-neutral-200/50 px-1.5 py-0.5 text-[9px] font-mono text-neutral-400 dark:border-neutral-700/50">{action.kbd}</kbd>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* ── DISCOVERY TIPS ── */}
-            <div className="rounded-xl border border-indigo-200/30 bg-indigo-50/30 p-5 dark:border-indigo-500/10 dark:bg-indigo-500/5">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Pro tip</h3>
-              </div>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                Try searching by what developers <strong className="text-neutral-900 dark:text-white">build</strong>, not
-                just their title. <em>&quot;kubernetes contributor&quot;</em> finds better
-                infra engineers than <em>&quot;devops engineer&quot;</em>.
-              </p>
-            </div>
-
-            {/* ── PIPELINE STATS ── */}
-            <div className="rounded-xl border border-neutral-200/50 bg-white p-5 dark:border-neutral-700/50 dark:bg-neutral-900/60">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">Your pipeline</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Saved", value: loading ? "..." : String(favorites.length), icon: Bookmark, color: "text-amber-500" },
-                  { label: "Enriched", value: "0", icon: Zap, color: "text-violet-500" },
-                  { label: "Contacted", value: "0", icon: Users, color: "text-blue-500" },
-                  { label: "Pushed to ATS", value: "0", icon: Target, color: "text-emerald-500" },
-                ].map((stat) => (
-                  <div key={stat.label} className="flex items-center gap-2.5">
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                    <div>
-                      <p className="text-lg font-bold tabular-nums text-neutral-900 dark:text-white">{stat.value}</p>
-                      <p className="text-[10px] text-neutral-500">{stat.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </aside>
+            <Link
+              href="/connections"
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 600,
+                padding: "8px 16px",
+                borderRadius: 7,
+                background: "#C8A55A",
+                color: "#19191A",
+                textDecoration: "none",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Set up connections
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -607,13 +439,7 @@ function Dashboard() {
 export default function Home() {
   const { data: session, status } = useSession();
 
-  if (status === "loading") {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-indigo-600" />
-      </div>
-    );
-  }
+  if (status === "loading") return null; // AppShell handles the loading spinner
 
   if (session) return <Dashboard />;
   return <Landing />;

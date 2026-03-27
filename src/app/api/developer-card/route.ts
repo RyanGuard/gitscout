@@ -6,7 +6,7 @@ const GITHUB_API = "https://api.github.com";
 function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "GitScout/1.0",
+    "User-Agent": "Scout/1.0",
   };
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -167,7 +167,7 @@ function buildSvg(data: CardData): string {
 
   <!-- Bottom branding -->
   <line x1="80" y1="560" x2="1120" y2="560" stroke="#262626" stroke-width="1"/>
-  <text x="80" y="595" fill="#525252" font-size="20" font-weight="600" font-family="system-ui, -apple-system, sans-serif">GitScout</text>
+  <text x="80" y="595" fill="#525252" font-size="20" font-weight="600" font-family="system-ui, -apple-system, sans-serif">Scout</text>
   <text x="220" y="595" fill="#404040" font-size="18" font-family="system-ui, -apple-system, sans-serif">gitscout.dev</text>
 </svg>`;
 }

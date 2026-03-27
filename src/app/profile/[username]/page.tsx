@@ -30,7 +30,7 @@ const GITHUB_API = "https://api.github.com";
 function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "GitScout/1.0",
+    "User-Agent": "Scout/1.0",
   };
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -166,15 +166,15 @@ export async function generateMetadata({
 
   if (!developer) {
     return {
-      title: "Developer Not Found — GitScout",
-      description: "This developer profile could not be found on GitScout.",
+      title: "Developer Not Found — Scout",
+      description: "This developer profile could not be found on Scout.",
     };
   }
 
   const displayName = developer.name || developer.username;
-  const title = `${displayName} (@${developer.username}) — GitScout`;
+  const title = `${displayName} (@${developer.username}) — Scout`;
   const description =
-    developer.bio || `Developer profile for ${developer.username} on GitScout`;
+    developer.bio || `Developer profile for ${developer.username} on Scout`;
   const avatarUrl =
     developer.avatarUrl || `https://github.com/${developer.username}.png`;
 

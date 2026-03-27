@@ -1,4 +1,4 @@
-// GitScout Scoring Engine V2 — 5 Pillar Framework
+// Scout Scoring Engine V2 — 5 Pillar Framework
 // Exact weights and thresholds from docs/SCORING_FRAMEWORK.md
 // Impact (30%) | Contribution Quality (25%) | Consistency (20%) | Technical Depth (15%) | Reputation (10%)
 

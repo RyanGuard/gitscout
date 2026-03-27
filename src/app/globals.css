@@ -1,34 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f5f3;
+  --foreground: #1c1c1a;
+
+  /* Scout brand colors */
+  --scout-gold: #C8A55A;
+  --scout-gold-muted: #8B6914;
+  --scout-gold-bg: rgba(200, 165, 90, 0.08);
+  --scout-gold-bg-hover: rgba(200, 165, 90, 0.12);
+  --scout-sidebar-bg: #19191A;
+  --scout-sidebar-text: #E8E6DF;
+  --scout-sidebar-muted: rgba(232, 230, 223, 0.35);
+  --scout-sidebar-section: rgba(232, 230, 223, 0.2);
+  --scout-sidebar-active-bg: rgba(232, 230, 223, 0.06);
+  --scout-urgent: #C2413C;
+  --scout-success: #2D6A4F;
+  --scout-warning: #8B6914;
+
+  /* Content area colors */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f7f7f5;
+  --color-background-tertiary: #f5f5f3;
+  --color-text-primary: #1c1c1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-border-primary: #e5e4e0;
+  --color-border-secondary: #ebebea;
+  --color-border-tertiary: #e5e4e0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-instrument-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0f;
-    --foreground: #ededed;
-  }
-}
-
-/* Force dark when class is applied */
-.dark {
-  --background: #0a0a0f;
-  --foreground: #ededed;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Instrument Sans', Arial, Helvetica, sans-serif;
 }
 
 /* Unicorn shimmer for tier badges */
@@ -41,7 +53,7 @@ body {
   animation: shimmer 3s ease-in-out infinite;
 }
 
-/* ── Live pulse dot ── */
+/* Live pulse dot */
 @keyframes pulse-live {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.8); }
@@ -50,7 +62,7 @@ body {
   animation: pulse-live 2s ease-in-out infinite;
 }
 
-/* ── Slow float ── */
+/* Slow float */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
@@ -59,7 +71,7 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
-/* ── Gradient text ── */
+/* Gradient text */
 .text-gradient {
   background: linear-gradient(135deg, #60a5fa, #a78bfa, #818cf8);
   -webkit-background-clip: text;
@@ -67,14 +79,14 @@ body {
   background-clip: text;
 }
 
-/* ── Glass card ── */
+/* Glass card */
 .glass-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
 }
 
-/* ── Glow ring on hover ── */
+/* Glow ring on hover */
 .glow-hover {
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
@@ -83,7 +95,7 @@ body {
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-/* ── Sparkline bar animation ── */
+/* Sparkline bar animation */
 @keyframes grow-bar {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
@@ -93,7 +105,7 @@ body {
   transform-origin: bottom;
 }
 
-/* ── Scan line ── */
+/* Scan line */
 @keyframes scan {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -102,7 +114,7 @@ body {
   animation: scan 3s ease-in-out infinite;
 }
 
-/* ── Subtle grain texture for depth ── */
+/* Subtle grain texture for depth */
 .grain::after {
   content: "";
   position: absolute;

@@ -82,7 +82,7 @@ export function KeyboardOverlay() {
       >
         <div className="text-center mb-6">
           <h2 className="text-xl font-semibold text-white">Keyboard Shortcuts</h2>
-          <p className="text-sm text-gray-400 mt-1">Navigate GitScout like a pro</p>
+          <p className="text-sm text-gray-400 mt-1">Navigate Scout like a pro</p>
         </div>
 
         <div className="space-y-6">
