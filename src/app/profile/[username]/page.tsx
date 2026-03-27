@@ -206,6 +206,7 @@ export default async function ProfilePage({
   if (!developer) notFound();
 
   return (
+    <div className="dark min-h-screen" style={{ background: "#0a0a0f" }}>
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <Link
         href="/search"
@@ -419,6 +420,7 @@ export default async function ProfilePage({
       )}
 
       {/* (AI features and Find Similar / Share Card are in the header toolbar above) */}
+    </div>
     </div>
   );
 }

@@ -178,7 +178,8 @@ function SearchPageInner() {
     (filters.hireable ? 1 : 0);
 
   return (
-    <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-6">
+    <div className="dark mx-auto w-full min-h-screen overflow-x-hidden" style={{ background: "#0a0a0f" }}>
+      <div className="mx-auto max-w-7xl px-4 py-6">
       <h1 className="sr-only">Search Developers</h1>
       {/* Search bar */}
       <form onSubmit={handleSearch} className="relative mx-auto max-w-3xl mb-6">
@@ -376,6 +377,7 @@ function SearchPageInner() {
             onPageChange={(page) => doSearch(query, page, filters)}
           />
         </div>
+      </div>
       </div>
     </div>
   );

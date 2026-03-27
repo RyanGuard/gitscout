@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f5f5f3;
   --foreground: #1c1c1a;
@@ -28,6 +31,21 @@
   --color-border-primary: #e5e4e0;
   --color-border-secondary: #ebebea;
   --color-border-tertiary: #e5e4e0;
+}
+
+/* Dark mode overrides */
+.dark {
+  --background: #0a0a0f;
+  --foreground: #ededed;
+  --color-background-primary: #111113;
+  --color-background-secondary: #0e0e11;
+  --color-background-tertiary: #0a0a0f;
+  --color-text-primary: #ededed;
+  --color-text-secondary: #a0a0a0;
+  --color-text-tertiary: #707070;
+  --color-border-primary: rgba(255, 255, 255, 0.08);
+  --color-border-secondary: rgba(255, 255, 255, 0.06);
+  --color-border-tertiary: rgba(255, 255, 255, 0.04);
 }
 
 @theme inline {

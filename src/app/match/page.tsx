@@ -70,6 +70,7 @@ export default function MatchPage() {
   }
 
   return (
+    <div className="dark min-h-screen" style={{ background: "#0a0a0f" }}>
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
@@ -137,6 +138,7 @@ export default function MatchPage() {
           )}
         </div>
       )}
+    </div>
     </div>
   );
 }

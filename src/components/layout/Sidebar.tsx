@@ -10,6 +10,7 @@ const SECTIONS = [
     label: "Source",
     items: [
       { id: "search", label: "Developer search", href: "/search", icon: "search", badge: null },
+      { id: "match", label: "Match", href: "/match", icon: "target", badge: null },
       { id: "market-map", label: "Market map", href: "/map", icon: "map", badge: "NEW" as const },
     ],
   },
@@ -110,6 +111,14 @@ function Icon({ name, color }: { name: string; color: string }) {
       return (
         <svg {...props} viewBox="0 0 16 16">
           <path d="M2 14V8M6 14V5M10 14V8M14 14V2" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      );
+    case "target":
+      return (
+        <svg {...props} viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="6" stroke={color} strokeWidth="1.1" />
+          <circle cx="8" cy="8" r="3.5" stroke={color} strokeWidth="1.1" />
+          <circle cx="8" cy="8" r="1" fill={color} />
         </svg>
       );
     case "settings":
