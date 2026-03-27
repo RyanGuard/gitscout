@@ -93,8 +93,10 @@ model User {
   ashbyConnection AshbyConnection?
   ashbyPushes     AshbyPush[]
   candidateLists  CandidateList[]
-  marketMaps        MarketMap[]
-  mapTemplates      MapTemplate[]
+  marketMaps          MarketMap[]
+  mapTemplates        MapTemplate[]
+  mapShares           MapShare[]
+  outreachTemplates   OutreachTemplate[]
   connectionHomeBases ConnectionHomeBase[]
   connectionLookups   ConnectionLookup[]
   linkedinImports     LinkedinImport[]
@@ -275,6 +277,7 @@ model MarketMap {
   updatedAt       DateTime        @updatedAt
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   companies       MapCompany[]
+  shares          MapShare[]
 
   @@index([userId])
 }
@@ -340,6 +343,7 @@ model MapCandidate {
   emailEnrichedAt   DateTime?
   githubUrl         String?
   gitscoutScore     Int?
+  outreachStatus    String?      // null | draft | sent | responded | bounced
   createdAt         DateTime     @default(now())
   company           MapCompany   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -384,6 +388,98 @@ model SyncLog {
   errors      Int      @default(0)
   startedAt   DateTime @default(now())
   completedAt DateTime?
+}
+
+// --- Phase 3: Sharing ---
+
+model MapShare {
+  id              String    @id @default(cuid())
+  mapId           String
+  userId          String
+  shareToken      String    @unique
+  permissionLevel String    @default("overview") // overview | full
+  recipientName   String?
+  recipientEmail  String?
+  expiresAt       DateTime?
+  viewCount       Int       @default(0)
+  lastViewedAt    DateTime?
+  createdAt       DateTime  @default(now())
+  map             MarketMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([mapId])
+  @@index([shareToken])
+}
+
+// --- Phase 3: Outreach ---
+
+model OutreachMessage {
+  id                 String    @id @default(cuid())
+  mapId              String
+  candidateId        String
+  userId             String
+  subjectLine        String?
+  firstLine          String?
+  body               String
+  variant            String    @default("direct") // direct | warm_intro | referral_ask
+  status             String    @default("draft")  // draft | sent | responded | bounced
+  sentAt             DateTime?
+  responseReceivedAt DateTime?
+  createdAt          DateTime  @default(now())
+
+  @@index([mapId])
+  @@index([candidateId])
+  @@index([userId])
+}
+
+model OutreachTemplate {
+  id                 String   @id @default(cuid())
+  userId             String
+  name               String
+  tone               String   @default("professional") // professional | casual | technical_peer
+  sellingPoints      String[] @default([])
+  customInstructions String?
+  bodyTemplate       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// --- Phase 3: Pipeline ---
+
+model CandidateStatusHistory {
+  id          String   @id @default(cuid())
+  candidateId String
+  mapId       String
+  fromStatus  String
+  toStatus    String
+  changedBy   String?
+  createdAt   DateTime @default(now())
+
+  @@index([candidateId])
+  @@index([mapId])
+  @@index([createdAt])
+}
+
+// --- Phase 3: Outreach Signals ---
+
+model OutreachSignal {
+  id                     String   @id @default(cuid())
+  companyDomain          String
+  candidateSeniority     String?
+  candidateTitleKeywords String[] @default([])
+  outreachTone           String?
+  outreachSentAt         DateTime?
+  responseReceived       Boolean  @default(false)
+  responseTimeHours      Int?
+  bounce                 Boolean  @default(false)
+  userId                 String
+  createdAt              DateTime @default(now())
+
+  @@index([companyDomain])
+  @@index([createdAt])
 }
 
 // --- Connection Mapper ---

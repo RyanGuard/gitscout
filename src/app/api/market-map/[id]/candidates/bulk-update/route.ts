@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logStatusChange } from "@/lib/map/statusHistory";
 
 const VALID_STATUSES = ["mapped", "shortlisted", "contacted", "responded", "screening", "offer", "rejected"];
 
@@ -31,6 +32,16 @@ export async function POST(
   }
 
   try {
+    // Fetch current statuses for history logging
+    let oldStatuses: Map<string, string> | null = null;
+    if (update.status) {
+      const current = await prisma.mapCandidate.findMany({
+        where: { id: { in: candidate_ids }, mapId },
+        select: { id: true, status: true },
+      });
+      oldStatuses = new Map(current.map((c) => [c.id, c.status]));
+    }
+
     const result = await prisma.mapCandidate.updateMany({
       where: {
         id: { in: candidate_ids },
@@ -38,6 +49,25 @@ export async function POST(
       },
       data: update,
     });
+
+    // Log status changes
+    if (update.status && oldStatuses) {
+      const historyPromises = [];
+      for (const [candidateId, oldStatus] of oldStatuses) {
+        if (oldStatus !== update.status) {
+          historyPromises.push(
+            logStatusChange(
+              candidateId,
+              mapId,
+              oldStatus,
+              update.status,
+              session.user.id
+            )
+          );
+        }
+      }
+      await Promise.allSettled(historyPromises);
+    }
 
     return Response.json({ updated: result.count });
   } catch (error) {
