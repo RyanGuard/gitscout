@@ -58,7 +58,7 @@ function SpotlightOverlay({
     }
 
     function updateCutout() {
-      const el = document.querySelector(targetSelector);
+      const el = document.querySelector(targetSelector!);
       if (el) {
         const rect = el.getBoundingClientRect();
         setCutout(rect);
