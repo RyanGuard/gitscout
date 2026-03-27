@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, TrendingUp, GitPullRequest, Activity, Code2, Users, ShieldCheck, AlertTriangle } from "lucide-react";
 import { ScoreRing } from "@/components/ui/ScoreRing";
+import { FeatureHint } from "@/components/ui/FeatureHint";
 import { cn } from "@/lib/utils";
 
 interface PillarData {
@@ -130,8 +131,9 @@ export function ScoreBreakdown({ username }: { username: string }) {
       <div className="flex items-center gap-6 mb-6">
         <ScoreRing score={data.score} size={110} />
         <div className="flex-1">
-          <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-neutral-900 dark:text-white">
             Scout Score
+            <FeatureHint id="profile-score" message="This shows 5 quality pillars based on actual code contributions — not a self-reported resume. Hover each bar for details." position="right" />
           </h2>
           <p className="text-xs text-neutral-500 mt-0.5">
             5-pillar analysis • {data.externalMergedPRs} external merged PRs

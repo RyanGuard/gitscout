@@ -17,6 +17,7 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useDroppable } from "@dnd-kit/core";
+import { FeatureHint } from "@/components/ui/FeatureHint";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -171,7 +172,7 @@ function FlightRiskBadge({ risk, signals, reasoning }: { risk: string | null; si
   if (!risk || risk === "low") return null;
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center gap-1">
       <button
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
@@ -185,6 +186,7 @@ function FlightRiskBadge({ risk, signals, reasoning }: { risk: string | null; si
         <AlertTriangle className="h-2.5 w-2.5" />
         {risk === "high" ? "High risk" : "Medium risk"}
       </button>
+      {risk === "high" && <FeatureHint id="map-flight-risk" message="High flight risk = signals this person may be open to moving. Great time to reach out." position="top" />}
       {showTooltip && (signals.length > 0 || reasoning) && (
         <div className="absolute left-0 top-7 z-50 w-64 rounded-lg border border-neutral-700/50 bg-neutral-900 p-3 shadow-xl text-xs">
           {signals.map((s) => (
@@ -251,8 +253,11 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
         </a>
       )}
       {candidate.fitScore != null && candidate.fitScore > 0 && (
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(candidate.fitScore)}`}>
-          {candidate.fitScore}
+        <span className="flex items-center gap-0.5">
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(candidate.fitScore)}`}>
+            {candidate.fitScore}
+          </span>
+          <FeatureHint id="map-fit-score" message="Fit score (0-100) measures how closely this person matches your specific role." position="left" />
         </span>
       )}
     </div>
@@ -299,8 +304,11 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold text-white truncate">{company.companyName}</p>
             {connectionCount && connectionCount > 0 ? (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 font-medium shrink-0 border border-teal-500/20" title={`${connectionCount} warm connection${connectionCount !== 1 ? "s" : ""}`}>
-                <Link2 className="inline h-2.5 w-2.5 mr-0.5" />{connectionCount}
+              <span className="flex items-center gap-0.5">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 font-medium shrink-0 border border-teal-500/20" title={`${connectionCount} warm connection${connectionCount !== 1 ? "s" : ""}`}>
+                  <Link2 className="inline h-2.5 w-2.5 mr-0.5" />{connectionCount}
+                </span>
+                <FeatureHint id="map-connections" message="Warm paths into this company. Set up Connection Mapper to see these everywhere." position="right" />
               </span>
             ) : null}
             {company.flightRiskCompany === "high" && (
@@ -482,6 +490,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
         <div className={`w-2.5 h-2.5 rounded ${cfg.dot}`} />
         <span className="text-sm font-semibold text-white">{cfg.label}</span>
         <span className="text-xs text-neutral-500">{cfg.sub}</span>
+        {tier === "A" && <FeatureHint id="map-tier-a" message="Tier A = closest competitors for this talent. Start your outreach here." position="right" />}
       </div>
       <div className="flex gap-2 mb-3">
         {[

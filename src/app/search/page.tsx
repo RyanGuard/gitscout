@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { Search, SlidersHorizontal, X, EyeOff } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
+import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
 
@@ -217,7 +218,10 @@ function SearchPageInner() {
 
             {/* Sort */}
             <div>
-              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">Sort by</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+                Sort by
+                {results && <FeatureHint id="search-sort" message="Scout Score ranks developers by real code quality — not followers or stars." position="right" />}
+              </label>
               <div className="mt-1.5 grid grid-cols-2 gap-1">
                 {SORT_OPTIONS.map((opt) => (
                   <button
@@ -237,7 +241,10 @@ function SearchPageInner() {
 
             {/* Languages */}
             <div>
-              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">Languages</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+                Languages
+                {results && <FeatureHint id="search-languages" message="Filter by programming language to narrow results. Select multiple for full-stack developers." position="right" />}
+              </label>
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {POPULAR_LANGUAGES.map((lang) => (
                   <button
@@ -257,7 +264,10 @@ function SearchPageInner() {
 
             {/* Location */}
             <div>
-              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">Location</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+                Location
+                {results && <FeatureHint id="search-location" message="Add a city to find developers in your target market." position="right" />}
+              </label>
               <input
                 type="text"
                 value={filters.location || ""}
@@ -345,21 +355,28 @@ function SearchPageInner() {
           )}
 
           {!query && !results && !loading && (
-            <div className="py-16 text-center">
-              <Search className="mx-auto h-12 w-12 text-neutral-200 dark:text-neutral-700" />
-              <h3 className="mt-4 text-lg font-medium text-neutral-600 dark:text-neutral-400">Find your next hire</h3>
-              <p className="mt-1 text-sm text-neutral-500">Search by role, language, location, or name</p>
+            <div className="py-12 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
+                <Search className="h-6 w-6 text-gold" />
+              </div>
+              <h3 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">Find your next hire</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">
+                Search by what developers have actually built — not just their job title. Scout scores engineers on real code contributions across GitHub.
+              </p>
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {["React developers in SF", "Python ML engineers", "Rust systems", "Go in Seattle", "TypeScript fullstack"].map((term) => (
                   <button
                     key={term}
                     onClick={() => { setInputValue(term); router.push(`/search?q=${encodeURIComponent(term)}`); }}
-                    className="rounded-full border border-neutral-200/30 px-3 py-1.5 text-sm text-neutral-500 transition-all hover:border-gold/40 hover:text-gold hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-500"
+                    className="rounded-full border border-neutral-200/50 bg-surface px-3.5 py-1.5 text-sm text-neutral-600 shadow-sm transition-all hover:border-gold/40 hover:text-gold hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:text-gold"
                   >
                     {term}
                   </button>
                 ))}
               </div>
+              <p className="mx-auto mt-5 max-w-md text-xs text-neutral-400 italic">
+                Pro tip: Be specific. &quot;kubernetes terraform&quot; finds DevOps engineers better than just &quot;infrastructure&quot;
+              </p>
             </div>
           )}
 

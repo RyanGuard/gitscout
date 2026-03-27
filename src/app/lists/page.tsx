@@ -139,14 +139,32 @@ export default function ListsPage() {
       )}
 
       {lists.length === 0 ? (
-        <div className="py-16 text-center">
-          <List className="mx-auto h-12 w-12 text-neutral-300 dark:text-neutral-600" />
-          <h2 className="mt-4 text-lg font-medium text-neutral-600 dark:text-neutral-400">
-            No lists yet
+        <div className="py-12 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
+            <List className="h-6 w-6 text-gold" />
+          </div>
+          <h2 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">
+            Your talent lists
           </h2>
-          <p className="mt-1 text-sm text-neutral-500">
-            Create a list to start organizing your candidates.
+          <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">
+            Lists are like playlists for candidates. Group engineers by role, team, or stage
+            and track them across your pipeline.
           </p>
+          <div className="mx-auto mt-6 flex flex-col items-center gap-3">
+            <button
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+            >
+              <Plus className="h-4 w-4" />
+              Create your first list
+            </button>
+            <a
+              href="/search"
+              className="text-sm text-neutral-500 hover:text-gold transition-colors"
+            >
+              or go to Search to start finding candidates →
+            </a>
+          </div>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">

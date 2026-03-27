@@ -330,19 +330,40 @@ function SetupCard({
   onSetup: () => void;
   loading: boolean;
 }) {
+  const connectionTypes = [
+    { label: "Former colleagues", desc: "People who worked at your company and moved to the target", icon: Users },
+    { label: "Shared investors", desc: "Companies backed by the same VCs as yours", icon: Building2 },
+    { label: "Education ties", desc: "Same university, bootcamp, or program alumni", icon: Link2 },
+    { label: "Open source overlap", desc: "Collaborated on the same GitHub projects", icon: Code2 },
+  ];
+
   return (
-    <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/30">
-        <Building2 className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+    <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 dark:border-neutral-700 dark:bg-neutral-900/50">
+      <div className="text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
+          <Link2 className="h-6 w-6 text-gold" />
+        </div>
+        <h2 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">
+          Map your warm paths
+        </h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm text-neutral-500 dark:text-neutral-400">
+          Stop cold outreach. Scout finds people at your company who can intro you to anyone.
+          Enter your company domain and we&apos;ll map every warm path you have.
+        </p>
       </div>
-      <h2 className="mt-4 text-lg font-semibold text-neutral-900 dark:text-white">
-        Set up your company
-      </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500 dark:text-neutral-400">
-        Scout will analyze your team&apos;s public career history to find
-        warm connections to target companies. We use Apollo&apos;s public
-        professional data — not internal HR systems.
-      </p>
+
+      <div className="mx-auto mt-6 grid max-w-lg grid-cols-2 gap-3">
+        {connectionTypes.map((ct) => (
+          <div key={ct.label} className="flex items-start gap-2.5 rounded-lg border border-neutral-200/50 bg-white p-3 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+            <ct.icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+            <div>
+              <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{ct.label}</p>
+              <p className="mt-0.5 text-[11px] leading-tight text-neutral-500">{ct.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="mx-auto mt-6 flex max-w-sm gap-3">
         <input
           type="text"

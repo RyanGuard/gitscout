@@ -25,19 +25,22 @@ export default async function FavoritesPage() {
 
   if (favorites.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-4xl px-4 py-16 text-center">
-        <Heart className="mx-auto h-12 w-12 text-neutral-300 dark:text-neutral-600" />
-        <h2 className="mt-4 text-lg font-medium text-neutral-600 dark:text-neutral-400">
-          No favorites yet
+      <div className="mx-auto w-full max-w-4xl px-4 py-12 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(200,165,90,0.08)", border: "1px solid rgba(200,165,90,0.25)" }}>
+          <Heart className="h-6 w-6" style={{ color: "#C8A55A" }} />
+        </div>
+        <h2 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">
+          Your saved developers
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Save developers from search results or profile pages to see them here.
+        <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">
+          Star any developer from search results or their profile to save them here.
+          Think of it as your personal shortlist across all searches.
         </p>
         <Link
           href="/search"
-          className="mt-4 inline-block rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white hover:bg-gold-hover"
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover"
         >
-          Search developers
+          Search developers →
         </Link>
       </div>
     );

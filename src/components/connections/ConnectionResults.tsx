@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useState } from "react";
+import { FeatureHint } from "@/components/ui/FeatureHint";
 
 interface ConnectionData {
   id: string;
@@ -226,10 +227,13 @@ function ConnectionCard({ connection }: { connection: ConnectionData }) {
     <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700">
       {/* Header: strength badge */}
       <div className="flex items-center justify-between">
-        <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${strength.classes}`}
-        >
-          {strength.label}
+        <span className="flex items-center gap-1.5">
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${strength.classes}`}
+          >
+            {strength.label}
+          </span>
+          <FeatureHint id="conn-strength" message="Strong = worked together directly. Medium = shared network. Start with strong connections for the warmest intro." position="right" />
         </span>
       </div>
 
@@ -274,6 +278,7 @@ function ConnectionCard({ connection }: { connection: ConnectionData }) {
       {connection.suggestedAction && (
         <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/10">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+          <FeatureHint id="conn-action" message="Scout suggests exactly how to leverage each connection. Click copy to use it in your outreach." position="top" />
           <p className="flex-1 text-sm text-amber-800 dark:text-amber-300">
             {connection.suggestedAction}
           </p>

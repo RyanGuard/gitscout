@@ -98,12 +98,17 @@ export default function TemplatesPage() {
         </div>
       ) : templates.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-700/40 bg-neutral-900/30 p-12 text-center">
-          <Map className="mx-auto h-10 w-10 text-neutral-600" />
-          <p className="mt-3 text-sm font-medium text-neutral-400">No templates yet</p>
-          <p className="mt-1 text-xs text-neutral-500">Generate a market map and save it as a template to reuse later</p>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(200,165,90,0.12)", border: "1px solid rgba(200,165,90,0.3)" }}>
+            <Copy className="h-6 w-6 text-gold" />
+          </div>
+          <h3 className="mt-5 text-sm font-semibold text-white">No templates yet</h3>
+          <p className="mx-auto mt-2 max-w-sm text-xs text-neutral-500">
+            Templates let you rerun the same market map for recurring roles.
+            Generate a map, then save it as a template to reuse anytime.
+          </p>
           <Link
             href="/map"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-white hover:bg-gold-hover transition-colors"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-white hover:bg-gold-hover transition-colors"
           >
             <Plus className="h-3.5 w-3.5" /> Create your first map
           </Link>

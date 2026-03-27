@@ -170,10 +170,32 @@ export default function DashboardPage() {
           </Link>
         ))}
         {maps.length === 0 && (
-          <div className="text-center py-12 text-neutral-500">
-            No maps yet.{" "}
-            <Link href="/map" className="text-gold hover:underline">
-              Create your first map
+          <div className="py-12 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
+              <Map className="h-6 w-6 text-gold" />
+            </div>
+            <h3 className="mt-5 text-lg font-semibold text-white">Your first Market Map</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-neutral-400">
+              See the entire talent landscape for any role in 30 seconds. Think of it as the research a $50K agency would do — instantly.
+            </p>
+            <div className="mx-auto mt-6 flex max-w-sm flex-col gap-2">
+              {["Sr. Frontend Engineer", "Staff Platform Engineer", "ML Infrastructure Lead"].map((role) => (
+                <Link
+                  key={role}
+                  href={`/map?prefill=${encodeURIComponent(role)}`}
+                  className="flex items-center justify-between rounded-lg border border-neutral-800/50 bg-neutral-900/50 px-4 py-3 text-sm text-neutral-300 transition-all hover:border-gold/30 hover:bg-gold/5"
+                >
+                  <span>{role}</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-neutral-500" />
+                </Link>
+              ))}
+            </div>
+            <Link
+              href="/map"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+            >
+              <Map className="h-4 w-4" />
+              Create a Market Map
             </Link>
           </div>
         )}

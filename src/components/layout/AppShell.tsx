@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { Sidebar } from "./Sidebar";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -26,6 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 min-w-0 overflow-auto bg-background">
         {children}
       </main>
+      <OnboardingFlow />
     </div>
   );
 }
