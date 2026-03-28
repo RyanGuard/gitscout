@@ -7,6 +7,14 @@
     {
       "path": "/api/cron/index-developers",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/scan-signals",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/sequences/process",
+      "schedule": "0 */2 * * *"
     }
   ]
 }
