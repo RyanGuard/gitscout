@@ -12,11 +12,10 @@ import {
   Check,
   Sparkles,
   ExternalLink,
-  PenLine,
 } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
 import { FeatureHint } from "@/components/ui/FeatureHint";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 
 interface ConnectionData {
   id: string;
@@ -296,24 +295,22 @@ function ConnectionCard({ connection }: { connection: ConnectionData }) {
             )}
           </button>
           {connection.targetPersonName && (
-            <Link
-              href={`/outreach?${new URLSearchParams({
+            <DraftInStudioButton
+              variant="icon"
+              candidate={{
                 name: connection.targetPersonName,
-                ...(connection.targetPersonTitle ? { title: connection.targetPersonTitle } : {}),
-                source: "connection",
-                ctx: JSON.stringify({
+                title: connection.targetPersonTitle || undefined,
+                sourceType: "connection",
+                context: {
                   connections: [{
                     name: connection.homePersonName,
                     type: connection.connectionType,
                     title: connection.homePersonTitle,
                   }],
-                }),
-              }).toString()}`}
+                },
+              }}
               className="shrink-0 rounded p-1 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/20"
-              title="Draft outreach"
-            >
-              <PenLine className="h-3.5 w-3.5" />
-            </Link>
+            />
           )}
         </div>
       )}

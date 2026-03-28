@@ -18,7 +18,6 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Check,
   X,
   Clock,
   ArrowRight,
@@ -27,6 +26,8 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { fromSurfacedCandidate } from "@/lib/outreach/candidateNormalizer";
 
 // ═══════════════════════════════════════════════════════════
 //  LINKEDIN ICON — lucide-react does not export one
@@ -369,6 +370,10 @@ function SurfacedCandidateRow({
           <Send className="h-3 w-3" />
           Sequence
         </button>
+        <DraftInStudioButton
+          variant="compact"
+          candidate={fromSurfacedCandidate(candidate)}
+        />
         <button
           onClick={() => onDismiss(candidate.id)}
           className="inline-flex items-center justify-center rounded-md border border-neutral-200/50 bg-surface p-1.5 text-text-dim transition-colors hover:border-red-300 hover:text-red-500 dark:border-neutral-700/50"
@@ -740,7 +745,7 @@ function EmptyState({ onScrollToAdd }: { onScrollToAdd: () => void }) {
 // ═══════════════════════════════════════════════════════════
 
 export default function AlertsPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { status: authStatus } = useSession();
   const router = useRouter();
 
   // Signals state
