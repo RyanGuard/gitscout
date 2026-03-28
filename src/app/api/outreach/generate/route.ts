@@ -207,6 +207,7 @@ Remember: each message needs a DIFFERENT personalization angle. ${effectiveChann
     });
   } catch (err) {
     console.error("Outreach generation error:", err);
-    return Response.json({ error: "Failed to generate outreach" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return Response.json({ error: `Generation failed: ${message}` }, { status: 500 });
   }
 }
