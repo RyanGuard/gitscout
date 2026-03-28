@@ -7,7 +7,7 @@ import {
   ChevronDown, X, Users, Building2, TrendingUp, MapPin,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
   CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
-  GripVertical, Search, Save, Copy, Clock,
+  GripVertical, Search, Save, Copy, Clock, PenLine,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -232,7 +232,7 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
   return (
     <div
       onClick={() => onSelectPerson(candidate)}
-      className={`grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-2 px-3 sm:px-4 py-2.5 cursor-pointer transition-all text-sm
+      className={`grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto_auto] items-center gap-2 px-3 sm:px-4 py-2.5 cursor-pointer transition-all text-sm
         ${isActive ? "bg-gold/5 border-l-2 border-l-gold" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
     >
       <button
@@ -253,6 +253,29 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
           <Link2 className="h-3.5 w-3.5" />
         </a>
       )}
+      <Link
+        href={`/outreach?${new URLSearchParams({
+          name: candidate.name,
+          ...(candidate.title ? { title: candidate.title } : {}),
+          ...(candidate.linkedinUrl ? { linkedin: candidate.linkedinUrl } : {}),
+          ...(candidate.email ? { email: candidate.email } : {}),
+          ...(candidate.city ? { location: [candidate.city, candidate.state, candidate.country].filter(Boolean).join(", ") } : {}),
+          source: "market_map",
+          mapId: mapId,
+          ctx: JSON.stringify({
+            fitScore: candidate.fitScore,
+            fitReasoning: candidate.fitReasoning,
+            flightRisk: candidate.flightRisk,
+            flightRiskSignals: candidate.flightRiskSignals,
+            seniority: candidate.seniority,
+          }),
+        }).toString()}`}
+        onClick={(e) => e.stopPropagation()}
+        className="hidden sm:inline-flex text-neutral-600 hover:text-gold transition-colors"
+        title="Write outreach"
+      >
+        <PenLine className="h-3.5 w-3.5" />
+      </Link>
       {candidate.fitScore != null && candidate.fitScore > 0 && (
         <span className="flex items-center gap-0.5">
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(candidate.fitScore)}`}>
