@@ -6,38 +6,32 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
   Search, Target, List, Map, Link2, BarChart3, Bell,
-  Settings, ChevronLeft, ChevronRight, Sparkles, Send, Copy,
+  Settings, ChevronLeft, ChevronRight, Sparkles, Send,
 } from "lucide-react";
 
 const SECTIONS = [
   {
-    label: "Source",
+    label: "Find",
     items: [
-      { id: "search", label: "Developer search", href: "/search", icon: Search },
-      { id: "match", label: "Match", href: "/match", icon: Target },
+      { id: "search", label: "Search", href: "/search", icon: Search },
       { id: "market-map", label: "Market map", href: "/map", icon: Map },
+      { id: "connections", label: "Connections", href: "/connections", icon: Link2 },
     ],
   },
   {
-    label: "Connect",
+    label: "Engage",
     items: [
-      { id: "connections", label: "Connection mapper", href: "/connections", icon: Link2 },
-      { id: "outreach", label: "Outreach", href: "/outreach", icon: Send },
+      { id: "outreach", label: "Sequences", href: "/outreach", icon: Send },
+      { id: "match", label: "Match", href: "/match", icon: Target },
+      { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles, soon: true },
     ],
   },
   {
-    label: "Manage",
+    label: "Track",
     items: [
-      { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles },
       { id: "lists", label: "Saved lists", href: "/lists", icon: List },
-      { id: "templates", label: "Templates", href: "/map/templates", icon: Copy },
-    ],
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { id: "alerts", label: "Alerts", href: "/alerts", icon: Bell },
-      { id: "analytics", label: "Analytics", href: "/analytics", icon: BarChart3 },
+      { id: "alerts", label: "Alerts", href: "/alerts", icon: Bell, soon: true },
+      { id: "analytics", label: "Analytics", href: "/analytics", icon: BarChart3, soon: true },
     ],
   },
 ];
@@ -114,8 +108,29 @@ export function Sidebar() {
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const active = isActive(pathname, item.href);
+                const active = !item.soon && isActive(pathname, item.href);
                 const Icon = item.icon;
+
+                if (item.soon) {
+                  return (
+                    <div
+                      key={item.id}
+                      className="group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] text-sidebar-muted/40 cursor-default"
+                      title={collapsed ? `${item.label} (coming soon)` : undefined}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && (
+                        <>
+                          <span className="truncate">{item.label}</span>
+                          <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-sidebar-muted/30 bg-sidebar-hover">
+                            Soon
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.id}
