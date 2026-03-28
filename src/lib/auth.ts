@@ -24,7 +24,7 @@ async function sendVerificationRequest({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM || "Scout <noreply@kogntios.com>",
+      from: process.env.EMAIL_FROM || "Scout <ryan@kognitos.com>",
       to: email,
       subject: "Sign in to Scout",
       html: `
