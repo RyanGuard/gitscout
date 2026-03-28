@@ -21,7 +21,7 @@ const SECTIONS = [
   {
     label: "Engage",
     items: [
-      { id: "outreach", label: "Outreach", href: "/outreach", icon: Send },
+      { id: "outreach", label: "Outreach Studio", href: "/outreach", icon: Send },
       { id: "match", label: "Match", href: "/match", icon: Target },
       { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles, soon: true },
     ],

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye, PenLine } from "lucide-react";
+import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
 import { markProfileViewed, isProfileViewed } from "@/lib/viewedProfiles";
 import { useState, useEffect } from "react";
@@ -50,33 +52,13 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
     >
       <div className="relative p-5">
         {/* Write outreach button */}
-        <a
-          href={`/outreach?${new URLSearchParams({
-            name: developer.name || developer.username,
-            ...(developer.company ? { company: developer.company.replace(/^@/, "") } : {}),
-            ...(developer.location ? { location: developer.location } : {}),
-            ...(developer.email ? { email: developer.email } : {}),
-            github: `https://github.com/${developer.username}`,
-            source: "search",
-            devId: developer.id,
-            ctx: JSON.stringify({
-              score: developer.score,
-              tier: tierInfo?.label,
-              bio: developer.bio,
-              topRepos: developer.repositories?.slice(0, 3).map((r) => ({
-                name: r.name,
-                stars: r.stars,
-                language: r.language,
-              })),
-              languages: developer.languages?.slice(0, 5).map((l) => l.language),
-            }),
-          }).toString()}`}
-          onClick={(e) => e.stopPropagation()}
-          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg text-neutral-400 opacity-0 transition-all hover:bg-gold-bg hover:text-gold group-hover:opacity-100"
-          title="Write outreach"
-        >
-          <PenLine className="h-3.5 w-3.5" />
-        </a>
+        <div className="absolute top-3 right-3 opacity-0 transition-all group-hover:opacity-100">
+          <DraftInStudioButton
+            variant="icon"
+            candidate={fromDeveloperProfile(developer, tierInfo?.label)}
+            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-gold-bg"
+          />
+        </div>
 
         <div className="flex items-start gap-4">
           {/* Avatar + Score */}

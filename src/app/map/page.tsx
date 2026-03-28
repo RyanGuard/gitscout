@@ -7,7 +7,7 @@ import {
   ChevronDown, X, Users, Building2, TrendingUp, MapPin,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
   CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
-  GripVertical, Search, Save, Copy, Clock, PenLine,
+  GripVertical, Search, Save, Copy, Clock,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -19,6 +19,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useDroppable } from "@dnd-kit/core";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { fromMapCandidate } from "@/lib/outreach/candidateNormalizer";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -253,29 +255,13 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
           <Link2 className="h-3.5 w-3.5" />
         </a>
       )}
-      <Link
-        href={`/outreach?${new URLSearchParams({
-          name: candidate.name,
-          ...(candidate.title ? { title: candidate.title } : {}),
-          ...(candidate.linkedinUrl ? { linkedin: candidate.linkedinUrl } : {}),
-          ...(candidate.email ? { email: candidate.email } : {}),
-          ...(candidate.city ? { location: [candidate.city, candidate.state, candidate.country].filter(Boolean).join(", ") } : {}),
-          source: "market_map",
-          mapId: mapId,
-          ctx: JSON.stringify({
-            fitScore: candidate.fitScore,
-            fitReasoning: candidate.fitReasoning,
-            flightRisk: candidate.flightRisk,
-            flightRiskSignals: candidate.flightRiskSignals,
-            seniority: candidate.seniority,
-          }),
-        }).toString()}`}
-        onClick={(e) => e.stopPropagation()}
-        className="hidden sm:inline-flex text-neutral-600 hover:text-gold transition-colors"
-        title="Write outreach"
-      >
-        <PenLine className="h-3.5 w-3.5" />
-      </Link>
+      <span className="hidden sm:inline-flex">
+        <DraftInStudioButton
+          variant="icon"
+          candidate={fromMapCandidate(candidate, mapId)}
+          className="text-neutral-600 hover:text-gold transition-colors"
+        />
+      </span>
       {candidate.fitScore != null && candidate.fitScore > 0 && (
         <span className="flex items-center gap-0.5">
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${scoreColor(candidate.fitScore)}`}>
@@ -404,7 +390,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
 //  CANDIDATE DETAIL PANEL
 // ═══════════════════════════════════════════════════════════
 
-function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () => void }) {
+function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClose: () => void; mapId: string }) {
   return (
     <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 relative">
       <button onClick={onClose} className="absolute top-3 right-3 text-neutral-600 hover:text-white transition-colors">
@@ -481,6 +467,11 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
         {person.id && (
           <AddToSequenceButton developerId={person.id} sourceType="map_candidate" className="flex-1 py-2 text-xs" />
         )}
+        <DraftInStudioButton
+          variant="button"
+          candidate={fromMapCandidate(person, mapId, "")}
+          className="flex-1 py-2 text-xs"
+        />
       </div>
     </div>
   );
@@ -1033,7 +1024,7 @@ function MarketMapInner() {
 
             {activePerson && (
               <div className="w-80 shrink-0 sticky top-20">
-                <CandidateDetail person={activePerson} onClose={() => setActivePerson(null)} />
+                <CandidateDetail person={activePerson} onClose={() => setActivePerson(null)} mapId={mapIdParam || ""} />
               </div>
             )}
           </div>

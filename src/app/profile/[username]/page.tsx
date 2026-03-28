@@ -19,6 +19,8 @@ import { ScoutingReport } from "@/components/features/ScoutingReport";
 import { OutreachDraft } from "@/components/features/OutreachDraft";
 import { FindSimilar } from "@/components/features/FindSimilar";
 import { ShareCard } from "@/components/features/ShareCard";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
 import { formatNumber, getLanguageColor } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -334,6 +336,21 @@ export default async function ProfilePage({
                 username={developer.username}
                 displayName={developer.name || developer.username}
                 score={developer.score}
+              />
+              <DraftInStudioButton
+                variant="button"
+                candidate={fromDeveloperProfile({
+                  id: developer.id,
+                  username: developer.username,
+                  name: developer.name,
+                  email: developer.email,
+                  company: developer.company,
+                  location: developer.location,
+                  bio: developer.bio,
+                  score: developer.score,
+                  languages: developer.languages?.map((l: { language: string; percentage: number }) => ({ language: l.language, percentage: l.percentage })),
+                  repositories: developer.repositories?.slice(0, 5).map((r: { name: string; stars: number; language: string | null }) => ({ name: r.name, stars: r.stars, language: r.language })),
+                })}
               />
             </div>
           </div>

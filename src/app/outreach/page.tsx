@@ -6,10 +6,12 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   Send, Mail, MessageSquare, Smartphone, Layers, Copy, Download,
   Bookmark, Loader2, RefreshCw, ArrowUp, ArrowDown, Plus, X,
-  User, Building2, MapPin, Link2, Sparkles, ChevronDown,
+  Building2, MapPin, Sparkles, ChevronDown,
   Minus, FileText, Zap, TrendingUp, AlertCircle, CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CandidateBrowser } from "@/components/outreach/CandidateBrowser";
+import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
 
 // ─── Custom Icons ───
 
@@ -40,20 +42,6 @@ interface OutreachMessage {
   channel: string;
   subjectLine: string | null;
   body: string;
-}
-
-interface CandidateData {
-  name: string;
-  title?: string;
-  company?: string;
-  location?: string;
-  linkedinUrl?: string;
-  email?: string;
-  githubUrl?: string;
-  context?: Record<string, unknown>;
-  sourceType?: string;
-  sourceDeveloperId?: string;
-  sourceMapId?: string;
 }
 
 interface AnalyticsData {
@@ -158,7 +146,6 @@ function OutreachStudio() {
 
   // ─── State ───
   const [candidate, setCandidate] = useState<CandidateData>({ name: "" });
-  const [mode, setMode] = useState<"scout" | "manual">("manual");
   const [messages, setMessages] = useState<OutreachMessage[]>([]);
   const [activeStep, setActiveStep] = useState(0);
   const [strategy, setStrategy] = useState("");
@@ -220,7 +207,6 @@ function OutreachStudio() {
         sourceMapId: searchParams.get("mapId") || undefined,
         context: searchParams.get("ctx") ? JSON.parse(searchParams.get("ctx")!) : undefined,
       });
-      setMode("scout");
       setFirstVisit(false);
 
       // Auto-set warm intro tone if from connections
@@ -250,6 +236,17 @@ function OutreachStudio() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // ─── Select candidate from browser ───
+  function handleSelectCandidate(data: CandidateData) {
+    setCandidate(data);
+    setMessages([]);
+    setActiveStep(0);
+    setSequenceId(null);
+    setStrategy("");
+    setSuggestions(null);
+    setFirstVisit(false);
+  }
 
   // ─── Generate sequence ───
   async function handleGenerate() {
@@ -667,294 +664,119 @@ function OutreachStudio() {
     );
   }
 
-  // ─── EMPTY STATE ───
-  if (firstVisit && messages.length === 0 && !candidate.name) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
-          <Send className="h-7 w-7 text-gold" />
-        </div>
-        <h1 className="mt-6 text-2xl font-bold text-text">Your Outreach Studio</h1>
-        <p className="mt-3 text-sm leading-relaxed text-text-secondary max-w-lg mx-auto">
-          Stop sending messages that get ignored. Scout writes personalized outreach that references
-          the candidate&apos;s actual work — not just their job title.
-        </p>
-
-        <div className="mt-8 rounded-xl border border-border bg-surface p-6 text-left">
-          <h3 className="text-sm font-semibold text-text mb-4">How it works</h3>
-          <ol className="space-y-3 text-sm text-text-secondary">
-            <li className="flex items-start gap-3">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white mt-0.5">1</span>
-              Pick a candidate from your search results or market map, or enter anyone manually
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white mt-0.5">2</span>
-              Set the channel and tone
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white mt-0.5">3</span>
-              Scout writes a full sequence — initial outreach + follow-ups
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white mt-0.5">4</span>
-              Edit, improve, or rewrite until it&apos;s perfect
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white mt-0.5">5</span>
-              Track responses to learn what works for you
-            </li>
-          </ol>
-          <p className="mt-4 text-xs text-text-muted">
-            Your outreach gets smarter over time. The more you use it, the better Scout understands what gets replies.
-          </p>
-        </div>
-
-        <div className="mt-6 flex items-center justify-center gap-3">
-          <button
-            onClick={() => { setMode("scout"); setFirstVisit(false); }}
-            className="inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
-          >
-            <Sparkles className="h-4 w-4" />
-            Import a candidate
-          </button>
-          <button
-            onClick={() => { setMode("manual"); setFirstVisit(false); }}
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-surface-secondary"
-          >
-            <User className="h-4 w-4" />
-            Enter manually
-          </button>
-        </div>
-
-        {/* Recent sequences */}
-        {savedSequences.length > 0 && (
-          <div className="mt-10 border-t border-border pt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted mb-3">Recent sequences</h3>
-            <div className="space-y-2">
-              {savedSequences.slice(0, 5).map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => loadSequence(s.id)}
-                  className="w-full flex items-center justify-between rounded-lg border border-border px-4 py-2.5 text-left text-sm transition-colors hover:bg-surface-secondary"
-                >
-                  <span className="font-medium text-text">{s.candidateName}</span>
-                  <span className="text-xs text-text-muted">{new Date(s.updatedAt).toLocaleDateString()}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ─── THREE-PANEL LAYOUT ───
+  // ─── THREE-PANEL LAYOUT (always shown — no separate empty state) ───
   return (
     <div className="flex h-[calc(100vh-1px)] overflow-hidden">
-      {/* ═══ LEFT PANEL — Candidate Context ═══ */}
-      <div className="w-[280px] shrink-0 border-r border-border overflow-y-auto bg-surface-secondary p-4">
-        {/* Mode toggle */}
-        <div className="mb-4 flex rounded-lg border border-border bg-surface p-0.5">
-          <button
-            onClick={() => setMode("scout")}
-            className={cn(
-              "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              mode === "scout" ? "bg-gold text-white" : "text-text-muted hover:text-text"
-            )}
-          >
-            From Scout
-          </button>
-          <button
-            onClick={() => setMode("manual")}
-            className={cn(
-              "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              mode === "manual" ? "bg-gold text-white" : "text-text-muted hover:text-text"
-            )}
-          >
-            Manual entry
-          </button>
+      {/* ═══ LEFT PANEL — Candidate Browser ═══ */}
+      <div className="w-[280px] shrink-0 border-r border-border flex flex-col bg-surface-secondary">
+        {/* Candidate browser */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <CandidateBrowser
+            onSelectCandidate={handleSelectCandidate}
+            currentCandidate={candidate.name ? candidate : null}
+            manualCandidate={candidate}
+            onManualChange={(c) => setCandidate(c)}
+          />
         </div>
 
-        {/* Import buttons (Scout mode) */}
-        {mode === "scout" && !candidate.name && (
-          <div className="space-y-2 mb-4">
-            <button
-              onClick={() => router.push("/search")}
-              className="w-full rounded-lg border border-dashed border-gold-border bg-gold-bg px-3 py-3 text-xs font-medium text-gold transition-colors hover:bg-gold-bg-strong"
-            >
-              Import from search
-            </button>
-            <button
-              onClick={() => router.push("/map")}
-              className="w-full rounded-lg border border-dashed border-gold-border bg-gold-bg px-3 py-3 text-xs font-medium text-gold transition-colors hover:bg-gold-bg-strong"
-            >
-              Import from market map
-            </button>
-          </div>
-        )}
-
-        {/* Manual entry form */}
-        {(mode === "manual" || !candidate.sourceType) && (
-          <div className="space-y-3">
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Name *</label>
-              <input
-                value={candidate.name}
-                onChange={(e) => setCandidate((c) => ({ ...c, name: e.target.value }))}
-                placeholder="Full name"
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Title</label>
-              <input
-                value={candidate.title || ""}
-                onChange={(e) => setCandidate((c) => ({ ...c, title: e.target.value }))}
-                placeholder="e.g. Senior Engineer"
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Company</label>
-              <input
-                value={candidate.company || ""}
-                onChange={(e) => setCandidate((c) => ({ ...c, company: e.target.value }))}
-                placeholder="Current company"
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">LinkedIn URL</label>
-              <input
-                value={candidate.linkedinUrl || ""}
-                onChange={(e) => setCandidate((c) => ({ ...c, linkedinUrl: e.target.value }))}
-                placeholder="linkedin.com/in/..."
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Notes</label>
-              <textarea
-                value={(candidate.context as Record<string, string>)?.notes || ""}
-                onChange={(e) => setCandidate((c) => ({ ...c, context: { ...c.context, notes: e.target.value } }))}
-                placeholder="Anything relevant..."
-                rows={2}
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Candidate summary card */}
+        {/* Candidate summary card (below the browser, when selected) */}
         {candidate.name && (
-          <div className="mt-4 rounded-xl border border-border bg-surface p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-bg text-gold text-xs font-bold">
-                {candidate.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+          <div className="shrink-0 border-t border-border overflow-y-auto max-h-[40%] p-3">
+            <div className="rounded-xl border border-border bg-surface p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-bg text-gold text-[9px] font-bold">
+                  {candidate.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-text truncate">{candidate.name}</p>
+                  {candidate.title && <p className="text-[10px] text-text-muted truncate">{candidate.title}</p>}
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-text truncate">{candidate.name}</p>
-                {candidate.title && <p className="text-xs text-text-muted truncate">{candidate.title}</p>}
-              </div>
+              {candidate.company && (
+                <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-1">
+                  <Building2 className="h-3 w-3" />
+                  <span>{candidate.company}</span>
+                </div>
+              )}
+              {candidate.location && (
+                <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>{candidate.location}</span>
+                </div>
+              )}
+              {candidate.githubUrl && (
+                <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-1">
+                  <GithubIcon className="h-3 w-3" />
+                  <span className="truncate">{candidate.githubUrl}</span>
+                </div>
+              )}
+              {candidate.linkedinUrl && (
+                <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-1">
+                  <LinkedinIcon className="h-3 w-3" />
+                  <span className="truncate">{candidate.linkedinUrl}</span>
+                </div>
+              )}
+              {candidate.context && (
+                <div className="mt-2 space-y-1.5 border-t border-border pt-2">
+                  {!!(candidate.context as Record<string, unknown>).score && (
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-text-muted">Score</span>
+                      <span className="font-semibold text-gold">{String((candidate.context as Record<string, unknown>).score)}</span>
+                    </div>
+                  )}
+                  {!!(candidate.context as Record<string, unknown>).fitScore && (
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-text-muted">Fit</span>
+                      <span className="font-semibold text-text">{String((candidate.context as Record<string, unknown>).fitScore)}/100</span>
+                    </div>
+                  )}
+                  {!!(candidate.context as Record<string, unknown>).flightRisk && (
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-text-muted">Flight Risk</span>
+                      <span className={cn(
+                        "font-semibold capitalize",
+                        (candidate.context as Record<string, unknown>).flightRisk === "high" ? "text-danger" :
+                        (candidate.context as Record<string, unknown>).flightRisk === "medium" ? "text-warning" : "text-success"
+                      )}>
+                        {String((candidate.context as Record<string, unknown>).flightRisk)}
+                      </span>
+                    </div>
+                  )}
+                  {((candidate.context as Record<string, unknown>).connections as unknown[])?.length > 0 && (
+                    <div className="rounded bg-gold-bg border border-gold-border px-2 py-1.5 mt-1">
+                      <p className="text-[10px] font-semibold text-gold">
+                        {((candidate.context as Record<string, unknown>).connections as unknown[]).length} warm connection{((candidate.context as Record<string, unknown>).connections as unknown[]).length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {candidate.company && (
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary mt-2">
-                <Building2 className="h-3 w-3" />
-                <span>{candidate.company}</span>
-              </div>
-            )}
-            {candidate.location && (
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary mt-1">
-                <MapPin className="h-3 w-3" />
-                <span>{candidate.location}</span>
-              </div>
-            )}
-            {candidate.githubUrl && (
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary mt-1">
-                <GithubIcon className="h-3 w-3" />
-                <span className="truncate">{candidate.githubUrl}</span>
-              </div>
-            )}
-            {candidate.linkedinUrl && (
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary mt-1">
-                <LinkedinIcon className="h-3 w-3" />
-                <span className="truncate">{candidate.linkedinUrl}</span>
-              </div>
-            )}
-
-            {/* Scout intelligence */}
-            {candidate.context && (
-              <div className="mt-3 space-y-2 border-t border-border pt-3">
-                {!!(candidate.context as Record<string, unknown>).score && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-text-muted">Scout Score</span>
-                    <span className="font-semibold text-gold">{String((candidate.context as Record<string, unknown>).score)}</span>
-                  </div>
-                )}
-                {!!(candidate.context as Record<string, unknown>).fitScore && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-text-muted">Fit Score</span>
-                    <span className="font-semibold text-text">{String((candidate.context as Record<string, unknown>).fitScore)}/100</span>
-                  </div>
-                )}
-                {!!(candidate.context as Record<string, unknown>).flightRisk && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-text-muted">Flight Risk</span>
-                    <span className={cn(
-                      "font-semibold capitalize",
-                      (candidate.context as Record<string, unknown>).flightRisk === "high" ? "text-danger" :
-                      (candidate.context as Record<string, unknown>).flightRisk === "medium" ? "text-warning" : "text-success"
-                    )}>
-                      {String((candidate.context as Record<string, unknown>).flightRisk)}
-                    </span>
-                  </div>
-                )}
-                {((candidate.context as Record<string, unknown>).topRepos as { name: string }[])?.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-1">Top Repos</p>
-                    {((candidate.context as Record<string, unknown>).topRepos as { name: string; stars: number; language: string }[]).slice(0, 3).map((r) => (
-                      <div key={r.name} className="flex items-center justify-between text-xs py-0.5">
-                        <span className="text-text-secondary truncate">{r.name}</span>
-                        <span className="text-text-muted">{r.stars}★</span>
-                      </div>
+            {/* Recent sequences */}
+            {savedSequences.length > 0 && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-1.5"
+                >
+                  <span>Recent</span>
+                  <ChevronDown className={cn("h-3 w-3 transition-transform", showHistory && "rotate-180")} />
+                </button>
+                {showHistory && (
+                  <div className="space-y-1">
+                    {savedSequences.slice(0, 5).map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => loadSequence(s.id)}
+                        className="w-full rounded-lg border border-border px-2.5 py-1.5 text-left text-[11px] transition-colors hover:bg-surface"
+                      >
+                        <p className="font-medium text-text truncate">{s.candidateName}</p>
+                        <p className="text-[10px] text-text-muted">{s.status}</p>
+                      </button>
                     ))}
                   </div>
                 )}
-                {((candidate.context as Record<string, unknown>).connections as { name: string; type: string }[])?.length > 0 && (
-                  <div className="rounded-lg bg-gold-bg border border-gold-border px-3 py-2 mt-2">
-                    <p className="text-xs font-semibold text-gold">
-                      {((candidate.context as Record<string, unknown>).connections as unknown[]).length} warm connection{((candidate.context as Record<string, unknown>).connections as unknown[]).length !== 1 ? "s" : ""} at this company
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* History */}
-        {savedSequences.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wide text-text-muted mb-2"
-            >
-              <span>Recent sequences</span>
-              <ChevronDown className={cn("h-3 w-3 transition-transform", showHistory && "rotate-180")} />
-            </button>
-            {showHistory && (
-              <div className="space-y-1.5">
-                {savedSequences.slice(0, 8).map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => loadSequence(s.id)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-left text-xs transition-colors hover:bg-surface"
-                  >
-                    <p className="font-medium text-text truncate">{s.candidateName}</p>
-                    <p className="text-text-muted">{s.status} · {new Date(s.updatedAt).toLocaleDateString()}</p>
-                  </button>
-                ))}
               </div>
             )}
           </div>
@@ -1022,7 +844,7 @@ function OutreachStudio() {
                 <>
                   <FileText className="h-10 w-10 text-text-dim mb-3" />
                   <p className="text-sm text-text-muted">
-                    Fill in the candidate info and click &quot;Generate sequence&quot; to get started.
+                    Select a candidate from the left panel, then click &quot;Generate sequence&quot; to get started.
                   </p>
                 </>
               )}

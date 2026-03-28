@@ -6,6 +6,8 @@ import { StageDropdown } from "./StageDropdown";
 import { TagInput } from "./TagInput";
 import { NoteInput } from "./NoteInput";
 import { timeAgo } from "@/lib/utils";
+import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { fromListEntry } from "@/lib/outreach/candidateNormalizer";
 
 interface Note {
   id: string;
@@ -103,6 +105,11 @@ export function CandidateRow({
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
+          <DraftInStudioButton
+            variant="icon"
+            candidate={fromListEntry(entry)}
+            className="rounded p-1 hover:bg-gold-bg"
+          />
           <button
             type="button"
             onClick={() => onRemove(entry.id)}
