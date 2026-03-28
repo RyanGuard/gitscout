@@ -3,13 +3,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic();
-
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return Response.json({ error: "Anthropic API key not configured" }, { status: 500 });
+  }
+
+  const anthropic = new Anthropic();
 
   const body = await request.json();
   const {

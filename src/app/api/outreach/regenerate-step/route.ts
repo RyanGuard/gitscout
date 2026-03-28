@@ -2,14 +2,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic();
-
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const anthropic = new Anthropic();
   const { stepNumber, otherMessages, candidateContext, channel, tone } = await request.json();
 
   if (stepNumber === undefined || !otherMessages) {

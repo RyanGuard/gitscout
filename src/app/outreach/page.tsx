@@ -163,6 +163,7 @@ function OutreachStudio() {
   const [generating, setGenerating] = useState(false);
   const [improving, setImproving] = useState(false);
   const [rewriting, setRewriting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -253,6 +254,7 @@ function OutreachStudio() {
     if (!candidate.name.trim()) return;
     setGenerating(true);
     setStrategy("");
+    setError(null);
 
     try {
       const res = await fetch("/api/outreach/generate", {
@@ -280,8 +282,8 @@ function OutreachStudio() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        console.error("Generate failed:", data.error);
+        const data = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
+        setError(data.error || "Failed to generate outreach");
         return;
       }
 
@@ -295,6 +297,7 @@ function OutreachStudio() {
       loadData();
     } catch (err) {
       console.error("Generate error:", err);
+      setError("Network error — check your connection and try again");
     } finally {
       setGenerating(false);
     }
@@ -829,6 +832,16 @@ function OutreachStudio() {
             </div>
           )}
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="mx-5 mt-3 rounded-lg border border-danger/30 bg-danger-bg px-4 py-2.5 text-sm text-danger flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="text-danger/60 hover:text-danger">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Editor area */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
