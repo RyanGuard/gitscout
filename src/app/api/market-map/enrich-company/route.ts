@@ -120,7 +120,6 @@ export async function POST(request: Request) {
       const seniorities = mapSeniorityToApollo(role_level);
 
       const searchBody: Record<string, unknown> = {
-        api_key: apiKey,
         organization_domains: [company_domain],
         person_titles: titles,
         person_seniorities: seniorities,
@@ -134,7 +133,7 @@ export async function POST(request: Request) {
 
       const res = await fetch(`${APOLLO_API}/mixed_people/api_search`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
         body: JSON.stringify(searchBody),
       });
 
@@ -172,7 +171,9 @@ export async function POST(request: Request) {
       companyInfo = cachedCompany as Record<string, unknown>;
     } else {
       try {
-        const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?api_key=${apiKey}&domain=${company_domain}`);
+        const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?domain=${company_domain}`, {
+          headers: { "X-Api-Key": apiKey },
+        });
         if (orgRes.ok) {
           const orgData = await orgRes.json();
           companyInfo = orgData.organization || null;

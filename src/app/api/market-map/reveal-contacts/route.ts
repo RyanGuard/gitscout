@@ -73,9 +73,8 @@ export async function POST(request: Request) {
       if (uncached.length > 0) {
         const enrichRes = await fetch(`${APOLLO_API}/people/bulk_match`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
           body: JSON.stringify({
-            api_key: apiKey,
             reveal_personal_emails: reveal_email,
             reveal_phone_number: reveal_phone,
             details: uncached.map((c) => ({ id: c.apolloPersonId })),

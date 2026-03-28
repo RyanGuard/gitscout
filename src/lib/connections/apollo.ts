@@ -67,7 +67,8 @@ export async function enrichOrganization(
 
   const apiKey = getApiKey();
   const res = await fetch(
-    `${APOLLO_API}/organizations/enrich?api_key=${apiKey}&domain=${domain}`
+    `${APOLLO_API}/organizations/enrich?domain=${domain}`,
+    { headers: { "X-Api-Key": apiKey } }
   );
 
   if (!res.ok) {
@@ -123,7 +124,6 @@ export async function searchPeopleAtCompany(
 
   for (let page = 1; page <= maxPages; page++) {
     const searchBody: Record<string, unknown> = {
-      api_key: apiKey,
       organization_domains: [domain],
       per_page: perPage,
       page,
@@ -141,7 +141,7 @@ export async function searchPeopleAtCompany(
 
     const res = await fetch(`${APOLLO_API}/mixed_people/api_search`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
       body: JSON.stringify(searchBody),
     });
 

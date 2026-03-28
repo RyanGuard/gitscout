@@ -38,9 +38,8 @@ export async function POST(request: Request) {
       // Fetch news from Apollo
       const newsRes = await fetch(`${APOLLO_API}/news_articles/search`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
         body: JSON.stringify({
-          api_key: apiKey,
           q_organization_name: company_name,
           page: 1,
           per_page: 10,
