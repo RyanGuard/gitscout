@@ -100,6 +100,7 @@ model User {
   connectionHomeBases ConnectionHomeBase[]
   connectionLookups   ConnectionLookup[]
   linkedinImports     LinkedinImport[]
+  sequences           Sequence[]
 }
 
 model Account {
@@ -609,4 +610,95 @@ model LinkedinImport {
 
   @@index([userId])
   @@index([connectionCompany])
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SEQUENCES
+// ═══════════════════════════════════════════════════════════
+
+model Sequence {
+  id                 String               @id @default(cuid())
+  userId             String
+  name               String
+  description        String?
+  status             String               @default("draft") // draft | active | paused | completed
+  tone               String               @default("professional") // professional | casual | technical_peer
+  sellingPoints      String[]             @default([])
+  customInstructions String?
+  roleTitle          String?
+  roleDescription    String?
+  companyName        String?
+  totalEnrolled      Int                  @default(0)
+  totalCompleted     Int                  @default(0)
+  totalReplied       Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps              SequenceStep[]
+  enrollments        SequenceEnrollment[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SequenceStep {
+  id           String   @id @default(cuid())
+  sequenceId   String
+  order        Int
+  channel      String   // email | linkedin | inmail
+  delayDays    Int      @default(0)
+  subjectLine  String?
+  bodyTemplate String?
+  purpose      String?  // initial_outreach | follow_up | value_add | breakup
+  createdAt    DateTime @default(now())
+  sequence     Sequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@index([sequenceId])
+  @@unique([sequenceId, order])
+}
+
+model SequenceEnrollment {
+  id                  String            @id @default(cuid())
+  sequenceId          String
+  candidateEmail      String
+  candidateName       String
+  candidateTitle      String?
+  candidateCompany    String?
+  candidateLinkedinUrl String?
+  mapCandidateId      String?
+  developerId         String?
+  candidateEntryId    String?
+  candidateContext    Json?
+  currentStep         Int               @default(0)
+  status              String            @default("active") // active | paused | completed | replied | bounced | unsubscribed
+  nextSendAt          DateTime?
+  enrolledAt          DateTime          @default(now())
+  completedAt         DateTime?
+  sequence            Sequence          @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  messages            SequenceMessage[]
+
+  @@index([sequenceId])
+  @@index([status])
+  @@index([nextSendAt])
+  @@unique([sequenceId, candidateEmail])
+}
+
+model SequenceMessage {
+  id              String             @id @default(cuid())
+  enrollmentId    String
+  stepOrder       Int
+  channel         String
+  subjectLine     String?
+  body            String
+  status          String             @default("draft") // draft | scheduled | sent | opened | replied | bounced
+  resendMessageId String?
+  generatedAt     DateTime           @default(now())
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  openedAt        DateTime?
+  repliedAt       DateTime?
+  enrollment      SequenceEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@index([enrollmentId])
+  @@index([status])
 }
