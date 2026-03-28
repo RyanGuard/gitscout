@@ -15,7 +15,7 @@ const SECTIONS = [
     items: [
       { id: "search", label: "Search", href: "/search", icon: Search },
       { id: "market-map", label: "Market map", href: "/map", icon: Map },
-      { id: "connections", label: "Connections", href: "/connections", icon: Link2 },
+      { id: "connections", label: "Network map", href: "/connections", icon: Link2 },
     ],
   },
   {
