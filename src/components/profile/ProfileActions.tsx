@@ -7,6 +7,7 @@ import { FavoriteButton } from "@/components/auth/FavoriteButton";
 import { EnrichButton } from "@/components/profile/EnrichButton";
 import { PushToAshbyButton } from "@/components/ashby/PushToAshbyButton";
 import { AddToListButton } from "@/components/crm/AddToListButton";
+import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton";
 
 interface ProfileActionsProps {
   developerId: string;
@@ -71,6 +72,7 @@ export function ProfileActions({ developerId, username, isLocal }: ProfileAction
       <EnrichButton developerId={localId} />
       <PushToAshbyButton developerId={localId} />
       <AddToListButton developerId={localId} />
+      <AddToSequenceButton developerId={localId} />
     </>
   );
 }

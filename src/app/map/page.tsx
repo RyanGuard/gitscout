@@ -18,6 +18,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useDroppable } from "@dnd-kit/core";
 import { FeatureHint } from "@/components/ui/FeatureHint";
+import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -454,12 +455,9 @@ function CandidateDetail({ person, onClose }: { person: Candidate; onClose: () =
       </div>
 
       <div className="flex gap-2">
-        <button className="flex-1 py-2 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold-hover transition-colors">
-          Add to outreach
-        </button>
-        <button className="flex-1 py-2 rounded-lg border border-neutral-700/50 text-neutral-300 text-xs font-medium hover:bg-neutral-800/50 transition-colors">
-          Save to list
-        </button>
+        {person.id && (
+          <AddToSequenceButton developerId={person.id} sourceType="map_candidate" className="flex-1 py-2 text-xs" />
+        )}
       </div>
     </div>
   );
