@@ -30,7 +30,7 @@ const SECTIONS = [
     label: "Track",
     items: [
       { id: "lists", label: "Saved lists", href: "/lists", icon: List },
-      { id: "alerts", label: "Market intel", href: "/alerts", icon: Bell },
+      { id: "alerts", label: "Market research", href: "/alerts", icon: Bell },
       { id: "analytics", label: "Analytics", href: "/analytics", icon: BarChart3, soon: true },
     ],
   },
