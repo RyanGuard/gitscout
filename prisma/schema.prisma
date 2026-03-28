@@ -102,6 +102,8 @@ model User {
   linkedinImports     LinkedinImport[]
   sequences           Sequence[]
   watchedCompanies    WatchedCompany[]
+  outreachSequences   OutreachSequence[]
+  outreachStudioTemplates OutreachStudioTemplate[]
 }
 
 model Account {
@@ -785,4 +787,100 @@ model SurfacedCandidate {
   @@index([signalId])
   @@index([status])
   @@index([apolloPersonId])
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OUTREACH STUDIO
+// ═══════════════════════════════════════════════════════════
+
+model OutreachSequence {
+  id                   String             @id @default(cuid())
+  userId               String
+  candidateName        String
+  candidateTitle       String?
+  candidateCompany     String?
+  candidateLocation    String?
+  candidateLinkedinUrl String?
+  candidateEmail       String?
+  candidateGithubUrl   String?
+  candidateContext     Json?              // scores, repos, fit, flight risk, connections
+  sourceType           String             @default("manual") // search | market_map | connection | manual
+  sourceDeveloperId    String?
+  sourceMapId          String?
+  roleTitle            String?
+  roleCompany          String?
+  sellingPoints        String[]           @default([])
+  channel              String             @default("email") // email | linkedin | text | multi_channel
+  tone                 String             @default("professional") // professional | casual | technical_peer | executive | warm_intro
+  sequenceLength       Int                @default(3)
+  status               String             @default("draft") // draft | ready | sending | completed
+  responseReceived     Boolean            @default(false)
+  responseSentiment    String?            // positive | neutral | negative
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages             OutreachStudioMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OutreachStudioMessage {
+  id              String           @id @default(cuid())
+  sequenceId      String
+  stepNumber      Int
+  delayDays       Int              @default(0)
+  channel         String           // email | linkedin | text
+  subjectLine     String?
+  body            String
+  sentAt          DateTime?
+  respondedAt     DateTime?
+  revisionHistory Json?            // array of { body, timestamp }
+  createdAt       DateTime         @default(now())
+  sequence        OutreachSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@index([sequenceId])
+  @@unique([sequenceId, stepNumber])
+}
+
+model OutreachStudioTemplate {
+  id               String   @id @default(cuid())
+  userId           String
+  name             String
+  description      String?
+  channel          String   @default("email")
+  tone             String   @default("professional")
+  sequenceLength   Int      @default(3)
+  roleContext       String?
+  sellingPoints    String[] @default([])
+  templateMessages Json?    // array of { step_number, delay_days, channel, subject_line, body }
+  timesUsed        Int      @default(0)
+  responseRate     Float?
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OutreachAnalytic {
+  id                     String   @id @default(cuid())
+  userId                 String
+  channel                String
+  tone                   String
+  sequenceLength         Int
+  candidateSeniority     String?
+  roleType               String?
+  usedOssReference       Boolean  @default(false)
+  usedCompanyNews        Boolean  @default(false)
+  usedMutualConnection   Boolean  @default(false)
+  messageWordCount       Int?
+  personalizationScore   Float?
+  responseReceived       Boolean  @default(false)
+  responseSentiment      String?
+  responseTimeHours      Int?
+  createdAt              DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
