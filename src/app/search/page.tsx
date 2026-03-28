@@ -2,11 +2,42 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
-import { Search, SlidersHorizontal, X, EyeOff } from "lucide-react";
+import { Search, SlidersHorizontal, X, EyeOff, ExternalLink, ArrowRight, Loader2 as Spinner } from "lucide-react";
+import Link from "next/link";
 import { SearchResults } from "@/components/search/SearchResults";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
+
+interface LinkedinLookupResult {
+  person: {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    title: string | null;
+    headline: string | null;
+    company: string | null;
+    city: string | null;
+    state: string | null;
+    country: string | null;
+    photoUrl: string | null;
+    seniority: string | null;
+    linkedinUrl: string;
+    githubUsername: string | null;
+    employmentHistory: Array<{ organization_name: string; title: string | null; current: boolean }>;
+  };
+  developer: {
+    id: string;
+    username: string;
+    score: number | null;
+    avatarUrl: string | null;
+    profileUrl: string;
+  } | null;
+}
+
+function isLinkedInUrl(q: string): boolean {
+  return /linkedin\.com\/in\//i.test(q.trim());
+}
 
 const POPULAR_LANGUAGES = [
   "TypeScript", "JavaScript", "Python", "Rust", "Go", "Java",
@@ -71,6 +102,8 @@ function SearchPageInner() {
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
   const [hideViewed, setHideViewed] = useState(false);
   const [viewedCount, setViewedCount] = useState(0);
+  const [linkedinResult, setLinkedinResult] = useState<LinkedinLookupResult | null>(null);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
 
   useEffect(() => {
     setViewedCount(getViewedCount());
@@ -140,9 +173,41 @@ function SearchPageInner() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  async function handleLinkedInLookup(url: string) {
+    setLinkedinLoading(true);
+    setLinkedinResult(null);
+    setResults(null);
+    setSearchError(null);
+    try {
+      const res = await fetch("/api/lookup/linkedin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ linkedin_url: url.trim() }),
+      });
+      if (res.ok) {
+        setLinkedinResult(await res.json());
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setSearchError(err.error || "LinkedIn lookup failed");
+      }
+    } catch {
+      setSearchError("LinkedIn lookup failed. Please try again.");
+    } finally {
+      setLinkedinLoading(false);
+    }
+  }
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!inputValue.trim()) return;
+
+    // Detect LinkedIn URLs
+    if (isLinkedInUrl(inputValue)) {
+      handleLinkedInLookup(inputValue.trim());
+      return;
+    }
+
+    setLinkedinResult(null);
     const params = buildSearchParams(inputValue.trim(), filters);
     router.push(`/search?${params}`);
   }
@@ -187,7 +252,7 @@ function SearchPageInner() {
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Search developers — try 'rust engineers in San Francisco' or 'karpathy'"
+          placeholder="Search developers or paste a LinkedIn URL"
           className="w-full rounded-xl border border-neutral-200/50 bg-surface py-3 pl-12 pr-24 text-base shadow-sm outline-none transition-all placeholder:text-neutral-400/60 focus:border-gold/50 focus:shadow-lg focus:shadow-gold/5 dark:border-neutral-700/50 dark:bg-surface dark:text-white"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -354,7 +419,123 @@ function SearchPageInner() {
             </div>
           )}
 
-          {!query && !results && !loading && (
+          {/* LinkedIn lookup loading */}
+          {linkedinLoading && (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Spinner className="h-8 w-8 animate-spin text-gold" />
+              <p className="text-sm text-neutral-500">Looking up LinkedIn profile...</p>
+            </div>
+          )}
+
+          {/* LinkedIn lookup result */}
+          {linkedinResult && !linkedinLoading && (
+            <div className="mb-6">
+              <p className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-400">LinkedIn Lookup Result</p>
+              <div className="rounded-xl border border-neutral-200/50 bg-surface p-6 shadow-sm dark:border-neutral-800/80">
+                <div className="flex items-start gap-4">
+                  {linkedinResult.person.photoUrl ? (
+                    <img src={linkedinResult.person.photoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-bg text-lg font-bold text-gold">
+                      {linkedinResult.person.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+                      {linkedinResult.person.name}
+                    </h3>
+                    {linkedinResult.person.title && (
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {linkedinResult.person.title}
+                        {linkedinResult.person.company && <span className="text-neutral-400"> at {linkedinResult.person.company}</span>}
+                      </p>
+                    )}
+                    {linkedinResult.person.city && (
+                      <p className="mt-0.5 text-xs text-neutral-500">
+                        {[linkedinResult.person.city, linkedinResult.person.state, linkedinResult.person.country].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+
+                    {/* Contact info */}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {linkedinResult.person.email && (
+                        <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
+                          {linkedinResult.person.email}
+                        </span>
+                      )}
+                      {linkedinResult.person.phone && (
+                        <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                          {linkedinResult.person.phone}
+                        </span>
+                      )}
+                      {linkedinResult.person.seniority && (
+                        <span className="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                          {linkedinResult.person.seniority}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Employment history */}
+                    {linkedinResult.person.employmentHistory.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-400 mb-1.5">Experience</p>
+                        <div className="space-y-1">
+                          {linkedinResult.person.employmentHistory.map((job, i) => (
+                            <div key={i} className="flex items-center gap-2 text-xs">
+                              {job.current && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                              {!job.current && <span className="h-1.5 w-1.5 rounded-full bg-neutral-300 dark:bg-neutral-600 shrink-0" />}
+                              <span className="text-neutral-700 dark:text-neutral-300">{job.organization_name}</span>
+                              {job.title && <span className="text-neutral-400">— {job.title}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="mt-4 flex items-center gap-2">
+                      <a
+                        href={linkedinResult.person.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 rounded-lg border border-neutral-200/50 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        LinkedIn
+                      </a>
+                      {linkedinResult.developer && (
+                        <Link
+                          href={linkedinResult.developer.profileUrl}
+                          className="flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-gold-hover"
+                        >
+                          View Scout Profile
+                          {linkedinResult.developer.score && (
+                            <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px]">
+                              {Math.round(linkedinResult.developer.score)}
+                            </span>
+                          )}
+                          <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      )}
+                      {!linkedinResult.developer && linkedinResult.person.githubUsername && (
+                        <Link
+                          href={`/profile/${linkedinResult.person.githubUsername}`}
+                          className="flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-gold-hover"
+                        >
+                          View GitHub Profile <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      )}
+                      {!linkedinResult.developer && !linkedinResult.person.githubUsername && (
+                        <span className="text-xs text-neutral-400 italic">No GitHub profile found</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!query && !results && !loading && !linkedinResult && !linkedinLoading && (
             <div className="py-12 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
                 <Search className="h-6 w-6 text-gold" />
