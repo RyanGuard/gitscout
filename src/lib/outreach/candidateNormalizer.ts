@@ -120,7 +120,7 @@ export function fromSurfacedCandidate(candidate: {
   };
 }
 
-// From a saved list entry
+// From a saved list entry (includes Apollo enrichment data if available)
 export function fromListEntry(entry: {
   id: string;
   developer: {
@@ -134,16 +134,35 @@ export function fromListEntry(entry: {
     score?: number;
     languages?: { language: string; percentage: number }[];
     repositories?: { name: string; stars: number; language: string | null }[];
+    contactInfo?: {
+      primaryEmail?: string | null;
+      emails?: string[];
+      phone?: string | null;
+      linkedinUrl?: string | null;
+      twitterUrl?: string | null;
+      currentTitle?: string | null;
+      headline?: string | null;
+      normalizedCompany?: string | null;
+      seniorityLevel?: string | null;
+      employmentHistory?: unknown;
+      photoUrl?: string | null;
+      enrichedAt?: string | null;
+      enrichmentSource?: string | null;
+    } | null;
   };
   tags?: string[];
   lastNote?: string | null;
 }): CandidateData {
   const dev = entry.developer;
+  const contact = dev.contactInfo;
+
   return {
     name: dev.name || dev.username,
-    company: dev.company?.replace(/^@/, "") || undefined,
+    title: contact?.currentTitle || undefined,
+    company: contact?.normalizedCompany || dev.company?.replace(/^@/, "") || undefined,
     location: dev.location || undefined,
-    email: dev.email || undefined,
+    linkedinUrl: contact?.linkedinUrl || undefined,
+    email: contact?.primaryEmail || dev.email || undefined,
     githubUrl: `https://github.com/${dev.username}`,
     sourceType: "list",
     sourceDeveloperId: dev.id,
@@ -158,6 +177,16 @@ export function fromListEntry(entry: {
       languages: dev.languages?.slice(0, 5).map((l) => l.language),
       tags: entry.tags,
       lastNote: entry.lastNote,
+      // Enrichment data
+      phone: contact?.phone,
+      headline: contact?.headline,
+      seniority: contact?.seniorityLevel,
+      employmentHistory: contact?.employmentHistory,
+      photoUrl: contact?.photoUrl,
+      enriched: !!contact?.enrichedAt,
+      enrichmentSource: contact?.enrichmentSource,
+      twitterUrl: contact?.twitterUrl,
+      allEmails: contact?.emails,
     },
   };
 }

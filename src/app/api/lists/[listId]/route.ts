@@ -19,7 +19,10 @@ export async function GET(
       entries: {
         include: {
           developer: {
-            include: { languages: { take: 3, orderBy: { percentage: "desc" } } },
+            include: {
+              languages: { take: 3, orderBy: { percentage: "desc" } },
+              contactInfo: true,
+            },
           },
           tags: true,
           notes: { take: 1, orderBy: { createdAt: "desc" } },
@@ -62,6 +65,21 @@ export async function GET(
         following: e.developer.following,
         languages: e.developer.languages,
         repositories: [],
+        contactInfo: e.developer.contactInfo ? {
+          primaryEmail: e.developer.contactInfo.primaryEmail,
+          emails: e.developer.contactInfo.emails,
+          phone: e.developer.contactInfo.phone,
+          linkedinUrl: e.developer.contactInfo.linkedinUrl,
+          twitterUrl: e.developer.contactInfo.twitterUrl,
+          currentTitle: e.developer.contactInfo.currentTitle,
+          headline: e.developer.contactInfo.headline,
+          normalizedCompany: e.developer.contactInfo.normalizedCompany,
+          seniorityLevel: e.developer.contactInfo.seniorityLevel,
+          employmentHistory: e.developer.contactInfo.employmentHistory,
+          photoUrl: e.developer.contactInfo.photoUrl,
+          enrichedAt: e.developer.contactInfo.enrichedAt?.toISOString() ?? null,
+          enrichmentSource: e.developer.contactInfo.enrichmentSource,
+        } : null,
       },
       tags: e.tags.map((t) => t.tag),
       lastNote: e.notes[0]?.content ?? null,

@@ -42,6 +42,15 @@ interface Ctx {
   tags?: string[];
   lastNote?: string;
   signalContext?: string;
+  // Enrichment data from Apollo
+  phone?: string;
+  headline?: string;
+  employmentHistory?: Array<{ organization_name: string; title: string | null; current: boolean }>;
+  photoUrl?: string;
+  enriched?: boolean;
+  enrichmentSource?: string;
+  twitterUrl?: string;
+  allEmails?: string[];
 }
 
 function ctx(candidate: CandidateData): Ctx {
@@ -143,6 +152,50 @@ export function CandidateProfileCard({ candidate }: { candidate: CandidateData }
                 {candidate.email}
               </a>
             )}
+            {c.phone && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] text-text-secondary">
+                📱 {c.phone}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Enrichment status + CTA */}
+        {candidate.sourceDeveloperId && (
+          <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
+            {c.enriched ? (
+              <span className="inline-flex items-center gap-1 text-[10px] text-success">
+                <Shield className="h-3 w-3" />
+                Enriched via {c.enrichmentSource || "Apollo"}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] text-text-dim">
+                Not enriched
+              </span>
+            )}
+            {!c.enriched && (
+              <button
+                onClick={() => {
+                  fetch(`/api/enrich/${candidate.sourceDeveloperId}`, { method: "POST" })
+                    .then(() => window.location.reload())
+                    .catch(() => {});
+                }}
+                className="text-[10px] font-medium text-gold hover:text-gold-hover transition-colors"
+              >
+                Enrich now
+              </button>
+            )}
+            {c.enriched && !candidate.linkedinUrl && !candidate.email && (
+              <span className="text-[10px] text-warning">LinkedIn & email missing — re-enrich?</span>
+            )}
+          </div>
+        )}
+
+        {/* Missing data warnings for outreach */}
+        {!candidate.linkedinUrl && !candidate.email && (
+          <div className="mt-2 rounded-lg bg-warning-bg border border-warning/20 px-3 py-2 text-[10px] text-warning flex items-center gap-1.5">
+            <AlertTriangle className="h-3 w-3 shrink-0" />
+            No LinkedIn URL or email found. Enrich this candidate before sending outreach.
           </div>
         )}
       </div>
