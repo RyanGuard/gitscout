@@ -75,25 +75,43 @@ export function RoleContextPanel({ value, onChange }: RoleContextPanelProps) {
     setLoadingJobDetails(true);
     try {
       const res = await fetch(`/api/ashby/jobs/${jobId}`);
-      const { job } = await res.json();
+      const data = await res.json();
+      console.log("[ATS] Job details response:", JSON.stringify(data, null, 2));
+      const job = data.job;
       if (job) {
-        onChange({
+        const updates: typeof value = {
           ...value,
           roleTitle: job.title || value.roleTitle,
-          company: value.company, // Keep existing company
-          payRange: job.compensationMin ? {
-            min: String(job.compensationMin),
-            max: String(job.compensationMax || job.compensationMin),
+          company: value.company,
+        };
+
+        // Compensation — try multiple field names
+        if (job.compensationMin || job.compensationMax) {
+          updates.payRange = {
+            min: String(job.compensationMin || ""),
+            max: String(job.compensationMax || ""),
             showToCandidate: false,
-          } : value.payRange,
-          workModel: inferWorkModel(job.location, job.customFields) || value.workModel,
-          teamSize: value.teamSize,
-          companyStage: value.companyStage,
-          recentNews: value.recentNews,
-          techStack: value.techStack,
-        });
+          };
+        }
+
+        // Location
+        if (job.location) {
+          updates.workModel = inferWorkModel(job.location, job.customFields) || value.workModel;
+        }
+
+        // Department can hint at team
+        if (job.department) {
+          // Keep as hint, don't overwrite if user already set
+          if (!value.teamSize) {
+            updates.teamSize = value.teamSize;
+          }
+        }
+
+        onChange(updates);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[ATS] Failed to load job details:", err);
+    }
     setLoadingJobDetails(false);
   }
 

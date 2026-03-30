@@ -110,21 +110,61 @@ interface JobInfoResponse {
 }
 
 export async function getJobDetails(apiKey: string, jobId: string) {
-  const data = await ashbyRequest<JobInfoResponse>("job.info", apiKey, { jobId });
-  const job = data.results;
+  // Use loose typing to handle whatever Ashby returns
+  const data = await ashbyRequest<{ success: boolean; results: Record<string, unknown> }>("job.info", apiKey, { jobId });
+  const job = data.results as Record<string, any>;
 
-  // Extract useful fields for the outreach role context
+  console.log("[ashby] job.info raw keys:", Object.keys(job));
+
+  // Extract compensation — Ashby uses different field names across versions
+  let compensationMin: number | null = null;
+  let compensationMax: number | null = null;
+  let currency = "USD";
+
+  // Try compensationTier (newer API)
+  if (job.compensationTier) {
+    compensationMin = job.compensationTier.min?.value || null;
+    compensationMax = job.compensationTier.max?.value || null;
+    currency = job.compensationTier.min?.currencyCode || "USD";
+  }
+  // Try compensation (older API)
+  if (!compensationMin && job.compensation) {
+    compensationMin = job.compensation.min || job.compensation.low || null;
+    compensationMax = job.compensation.max || job.compensation.high || null;
+  }
+  // Try customFields for compensation
+  if (!compensationMin && Array.isArray(job.customFields)) {
+    const compField = job.customFields.find((f: any) =>
+      f.title?.toLowerCase().includes("salary") ||
+      f.title?.toLowerCase().includes("compensation") ||
+      f.title?.toLowerCase().includes("pay")
+    );
+    if (compField?.value) {
+      const nums = String(compField.value).match(/\d[\d,]+/g);
+      if (nums && nums.length >= 2) {
+        compensationMin = parseInt(nums[0].replace(/,/g, ""), 10);
+        compensationMax = parseInt(nums[1].replace(/,/g, ""), 10);
+      }
+    }
+  }
+
+  // Location — try multiple paths
+  const location = job.location?.name
+    || job.locationName
+    || (Array.isArray(job.customFields) ? job.customFields.find((f: any) => f.title?.toLowerCase().includes("location"))?.value : null)
+    || null;
+
   return {
     id: job.id,
     title: job.title,
-    department: job.department?.name || null,
-    location: job.location?.name || null,
-    employmentType: job.employmentType,
-    compensationMin: job.compensationTier?.min?.value || null,
-    compensationMax: job.compensationTier?.max?.value || null,
-    currency: job.compensationTier?.min?.currencyCode || 'USD',
-    customFields: job.customFields,
-    hiringTeam: job.hiringTeam,
+    department: job.department?.name || job.departmentName || null,
+    location,
+    employmentType: job.employmentType || null,
+    compensationMin,
+    compensationMax,
+    currency,
+    customFields: Array.isArray(job.customFields) ? job.customFields : [],
+    hiringTeam: Array.isArray(job.hiringTeam) ? job.hiringTeam : [],
   };
 }
 
