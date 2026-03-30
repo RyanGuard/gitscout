@@ -27,12 +27,30 @@ export function fromDeveloperProfile(dev: {
   score?: number;
   languages?: { language: string; percentage: number }[];
   repositories?: { name: string; stars: number; language: string | null }[];
+  contactInfo?: {
+    primaryEmail?: string | null;
+    emails?: string[];
+    phone?: string | null;
+    linkedinUrl?: string | null;
+    twitterUrl?: string | null;
+    currentTitle?: string | null;
+    headline?: string | null;
+    normalizedCompany?: string | null;
+    seniorityLevel?: string | null;
+    employmentHistory?: unknown;
+    photoUrl?: string | null;
+    enrichedAt?: string | Date | null;
+    enrichmentSource?: string | null;
+  } | null;
 }, tier?: string): CandidateData {
+  const contact = dev.contactInfo;
   return {
     name: dev.name || dev.username,
-    company: dev.company?.replace(/^@/, "") || undefined,
+    title: contact?.currentTitle || undefined,
+    company: contact?.normalizedCompany || dev.company?.replace(/^@/, "") || undefined,
     location: dev.location || undefined,
-    email: dev.email || undefined,
+    linkedinUrl: contact?.linkedinUrl || undefined,
+    email: contact?.primaryEmail || dev.email || undefined,
     githubUrl: `https://github.com/${dev.username}`,
     sourceType: "search",
     sourceDeveloperId: dev.id,
@@ -46,6 +64,16 @@ export function fromDeveloperProfile(dev: {
         language: r.language,
       })),
       languages: dev.languages?.slice(0, 5).map((l) => l.language),
+      // Enrichment data
+      phone: contact?.phone,
+      headline: contact?.headline,
+      seniority: contact?.seniorityLevel,
+      employmentHistory: contact?.employmentHistory,
+      photoUrl: contact?.photoUrl,
+      enriched: !!contact?.enrichedAt,
+      enrichmentSource: contact?.enrichmentSource,
+      twitterUrl: contact?.twitterUrl,
+      allEmails: contact?.emails,
     },
   };
 }

@@ -48,6 +48,7 @@ async function getDeveloper(username: string) {
     include: {
       languages: { orderBy: { percentage: "desc" } },
       repositories: { orderBy: { stars: "desc" } },
+      contactInfo: true,
     },
   });
 
@@ -85,6 +86,21 @@ async function getDeveloper(username: string) {
         topics: r.topics,
         pushedAt: r.pushedAt?.toISOString() ?? null,
       })),
+      contactInfo: local.contactInfo ? {
+        primaryEmail: local.contactInfo.primaryEmail,
+        emails: local.contactInfo.emails,
+        phone: local.contactInfo.phone,
+        linkedinUrl: local.contactInfo.linkedinUrl,
+        twitterUrl: local.contactInfo.twitterUrl,
+        currentTitle: local.contactInfo.currentTitle,
+        headline: local.contactInfo.headline,
+        normalizedCompany: local.contactInfo.normalizedCompany,
+        seniorityLevel: local.contactInfo.seniorityLevel,
+        employmentHistory: local.contactInfo.employmentHistory,
+        photoUrl: local.contactInfo.photoUrl,
+        enrichedAt: local.contactInfo.enrichedAt?.toISOString() ?? null,
+        enrichmentSource: local.contactInfo.enrichmentSource,
+      } : null,
     };
   }
 
@@ -350,6 +366,7 @@ export default async function ProfilePage({
                   score: developer.score,
                   languages: developer.languages?.map((l: { language: string; percentage: number }) => ({ language: l.language, percentage: l.percentage })),
                   repositories: developer.repositories?.slice(0, 5).map((r: { name: string; stars: number; language: string | null }) => ({ name: r.name, stars: r.stars, language: r.language })),
+                  contactInfo: (developer as any).contactInfo ?? null,
                 })}
               />
             </div>
