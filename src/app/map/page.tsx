@@ -7,7 +7,7 @@ import {
   ChevronDown, X, Users, Building2, TrendingUp, MapPin,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
   CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
-  GripVertical, Search, Save, Copy, Clock,
+  GripVertical, Search, Save, Copy, Clock, Mail, Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -300,12 +300,35 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
   const openCount = company.candidates.filter((c) => c.flightRisk === "high").length;
   const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
 
+  const candidateIds = company.candidates.map((c) => c.id);
+  const selectedCount = candidateIds.filter((id) => selectedIds.has(id)).length;
+  const allSelected = candidateIds.length > 0 && selectedCount === candidateIds.length;
+  const someSelected = selectedCount > 0 && !allSelected;
+
+  function handleSelectAll(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (allSelected) {
+      candidateIds.forEach((id) => onSelectCandidate(id));
+    } else {
+      candidateIds.filter((id) => !selectedIds.has(id)).forEach((id) => onSelectCandidate(id));
+    }
+  }
+
   return (
     <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-300/50 dark:border-neutral-700/80 ${expanded ? "ring-1 ring-gold/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-gold/30 scale-[1.02]" : ""}`}>
       <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer group">
         <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 transition-colors shrink-0 touch-none"
           onClick={(e) => e.stopPropagation()}>
           <GripVertical className="h-4 w-4" />
+        </button>
+        <button onClick={handleSelectAll} className="shrink-0 text-neutral-600 hover:text-neutral-900 dark:text-white transition-colors">
+          {allSelected ? (
+            <CheckSquare className="h-4 w-4 text-gold" />
+          ) : someSelected ? (
+            <CheckSquare className="h-4 w-4 text-neutral-500" />
+          ) : (
+            <Square className="h-4 w-4" />
+          )}
         </button>
         <div className={`w-9 h-9 rounded-lg ${cfg.badge} border flex items-center justify-center text-sm font-bold shrink-0`}>
           {company.companyName.charAt(0)}
@@ -581,6 +604,7 @@ function MarketMapInner() {
   const [addCompanyLoading, setAddCompanyLoading] = useState(false);
   const [flightRiskFilter, setFlightRiskFilter] = useState(false);
   const [connectionCounts, setConnectionCounts] = useState<Record<string, number>>({});
+  const [revealLoading, setRevealLoading] = useState(false);
 
   // DnD sensors
   const sensors = useSensors(
@@ -802,8 +826,75 @@ function MarketMapInner() {
     loadMap(mapData.id);
   }
 
+  async function bulkRevealContacts() {
+    if (!mapData || selectedIds.size === 0) return;
+    setRevealLoading(true);
+    try {
+      const ids = Array.from(selectedIds);
+      for (let i = 0; i < ids.length; i += 10) {
+        const batch = ids.slice(i, i + 10);
+        await fetch("/api/market-map/reveal-contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ candidate_ids: batch }),
+        });
+      }
+      loadMap(mapData.id);
+    } catch (err) {
+      console.error("Reveal contacts error:", err);
+    } finally {
+      setRevealLoading(false);
+    }
+  }
+
+  function getSelectedCandidates(): Array<Candidate & { companyName: string }> {
+    if (!mapData) return [];
+    const results: Array<Candidate & { companyName: string }> = [];
+    for (const companies of Object.values(mapData.tiers)) {
+      for (const co of companies as Company[]) {
+        for (const c of co.candidates) {
+          if (selectedIds.has(c.id)) {
+            results.push({ ...c, companyName: co.companyName });
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  function handleDraftInStudio() {
+    if (!mapData) return;
+    const candidates = getSelectedCandidates();
+    if (candidates.length === 0) return;
+    const batch = {
+      mapId: mapData.id,
+      candidates: candidates.map((c) => ({
+        id: c.id,
+        name: c.name,
+        title: c.title,
+        company: c.companyName,
+        location: [c.city, c.state, c.country].filter(Boolean).join(", ") || null,
+        linkedinUrl: c.linkedinUrl,
+        email: c.email,
+        fitScore: c.fitScore,
+        fitReasoning: c.fitReasoning,
+        flightRisk: c.flightRisk,
+        flightRiskSignals: c.flightRiskSignals,
+        seniority: c.seniority,
+      })),
+    };
+    sessionStorage.setItem("gitscout_outreach_batch", JSON.stringify(batch));
+    router.push(`/outreach?batch=map&mapId=${mapData.id}`);
+  }
+
   const allCompanies = mapData ? Object.values(mapData.tiers).flat() : [];
   const totalCandidates = allCompanies.reduce((s, c) => s + c.candidates.length, 0);
+
+  const allSelectedHaveEmail = (() => {
+    if (!mapData || selectedIds.size === 0) return false;
+    const candidates = getSelectedCandidates();
+    return candidates.every((c) => c.email);
+  })();
 
   return (
     <div className="mx-auto max-w-6xl overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8">
@@ -1085,6 +1176,21 @@ function MarketMapInner() {
               <button onClick={() => bulkUpdateStatus("contacted")}
                 className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-neutral-900 dark:text-white hover:bg-amber-500 transition-colors">
                 Mark contacted
+              </button>
+              <button
+                onClick={bulkRevealContacts}
+                disabled={revealLoading || allSelectedHaveEmail}
+                className="rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-gold hover:border-gold/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+              >
+                {revealLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Mail className="h-3 w-3" />}
+                {revealLoading ? "Revealing..." : allSelectedHaveEmail ? "Emails revealed" : "Reveal emails"}
+              </button>
+              <button
+                onClick={handleDraftInStudio}
+                className="rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-gold hover:border-gold/30 transition-colors flex items-center gap-1.5"
+              >
+                <Pencil className="h-3 w-3" />
+                Draft in Studio
               </button>
               <button onClick={() => bulkUpdateStatus("rejected")}
                 className="rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors">

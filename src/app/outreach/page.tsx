@@ -6,8 +6,8 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   Send, Mail, MessageSquare, Smartphone, Layers, Copy, Download,
   Bookmark, Loader2, ArrowUp, ArrowDown, Plus, X,
-  Building2, MapPin, ChevronDown,
-  Minus, FileText, AlertCircle, CheckCircle2,
+  Building2, MapPin, ChevronDown, ChevronLeft, ChevronRight,
+  Minus, FileText, AlertCircle, CheckCircle2, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CandidateBrowser } from "@/components/outreach/CandidateBrowser";
@@ -27,7 +27,7 @@ import {
   AshbyLogSection,
 } from "@/components/outreach/settings";
 import type { RoleContext } from "@/components/outreach/settings";
-import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
+import { fromMapCandidate, type CandidateData } from "@/lib/outreach/candidateNormalizer";
 import { CandidateProfileCard } from "@/components/outreach/CandidateProfileCard";
 import { CompactCandidateHeader } from "@/components/outreach/CompactCandidateHeader";
 import { SequenceStatusCard } from "@/components/outreach/SequenceStatusCard";
@@ -209,6 +209,25 @@ function OutreachStudio() {
   const [suggestions, setSuggestions] = useState<{ suggestions: string[]; recommendedChannel?: string; recommendedTone?: string; recommendedLength?: number } | null>(null);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
+  // Batch queue
+  interface BatchCandidate {
+    id: string;
+    name: string;
+    title?: string | null;
+    company?: string | null;
+    location?: string | null;
+    linkedinUrl?: string | null;
+    email?: string | null;
+    fitScore?: number | null;
+    fitReasoning?: string | null;
+    flightRisk?: string | null;
+    flightRiskSignals?: string[];
+    seniority?: string | null;
+  }
+  const [batchCandidates, setBatchCandidates] = useState<BatchCandidate[]>([]);
+  const [batchIndex, setBatchIndex] = useState(0);
+  const [batchMapId, setBatchMapId] = useState<string | null>(null);
+
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   // ─── Auth check ───
@@ -217,6 +236,27 @@ function OutreachStudio() {
       router.push("/api/auth/signin?callbackUrl=/outreach");
     }
   }, [authStatus, router]);
+
+  // ─── Load batch from sessionStorage (map bulk action) ───
+  useEffect(() => {
+    if (searchParams.get("batch") !== "map") return;
+    const raw = sessionStorage.getItem("gitscout_outreach_batch");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw) as { mapId: string; candidates: BatchCandidate[] };
+      if (parsed.candidates?.length > 0) {
+        setBatchCandidates(parsed.candidates);
+        setBatchIndex(0);
+        setBatchMapId(parsed.mapId);
+        const first = parsed.candidates[0];
+        setCandidate(fromMapCandidate(first, parsed.mapId, first.company ?? undefined));
+        setFirstVisit(false);
+      }
+    } catch { /* ignore malformed data */ }
+    return () => {
+      sessionStorage.removeItem("gitscout_outreach_batch");
+    };
+  }, [searchParams]);
 
   // ─── Load from URL params (integration entry points) ───
   useEffect(() => {
@@ -274,6 +314,26 @@ function OutreachStudio() {
     setStrategy("");
     setSuggestions(null);
     setFirstVisit(false);
+  }
+
+  // ─── Batch navigation ───
+  function goToBatchCandidate(index: number) {
+    if (index < 0 || index >= batchCandidates.length || !batchMapId) return;
+    setBatchIndex(index);
+    const c = batchCandidates[index];
+    setCandidate(fromMapCandidate(c, batchMapId, c.company ?? undefined));
+    setMessages([]);
+    setActiveStep(0);
+    setSequenceId(null);
+    setStrategy("");
+    setSuggestions(null);
+  }
+
+  function clearBatch() {
+    sessionStorage.removeItem("gitscout_outreach_batch");
+    setBatchCandidates([]);
+    setBatchIndex(0);
+    setBatchMapId(null);
   }
 
   // ─── Generate sequence ───
@@ -825,6 +885,57 @@ function OutreachStudio() {
 
       {/* ═══ CENTER PANEL — Message Editor ═══ */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Batch queue banner */}
+        {batchCandidates.length > 1 && (
+          <div className="border-b border-border bg-gold-bg px-5 py-2.5">
+            <div className="flex items-center gap-3">
+              <Users className="h-4 w-4 text-gold shrink-0" />
+              <span className="text-xs font-semibold text-gold">
+                Queue &mdash; candidate {batchIndex + 1} of {batchCandidates.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => goToBatchCandidate(batchIndex - 1)}
+                  disabled={batchIndex === 0}
+                  className="rounded p-1 text-gold hover:bg-gold/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => goToBatchCandidate(batchIndex + 1)}
+                  disabled={batchIndex === batchCandidates.length - 1}
+                  className="rounded p-1 text-gold hover:bg-gold/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1 overflow-x-auto flex-1 min-w-0">
+                {batchCandidates.map((bc, i) => (
+                  <button
+                    key={bc.id}
+                    onClick={() => goToBatchCandidate(i)}
+                    className={cn(
+                      "shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors truncate max-w-[100px]",
+                      i === batchIndex
+                        ? "bg-gold text-white"
+                        : "bg-surface border border-border text-text-muted hover:border-gold/30"
+                    )}
+                    title={bc.name}
+                  >
+                    {bc.name.split(" ")[0]}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={clearBatch}
+                className="shrink-0 text-[10px] font-medium text-text-muted hover:text-danger transition-colors"
+              >
+                Clear queue
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Compact candidate header (visible after generation) */}
         {messages.length > 0 && candidate.name && (
           <CompactCandidateHeader candidate={candidate} />
