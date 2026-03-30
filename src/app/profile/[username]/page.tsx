@@ -43,14 +43,26 @@ function githubHeaders(): HeadersInit {
 // Fetch a developer: local DB first, then GitHub live
 async function getDeveloper(username: string) {
   // Check local DB first
-  const local = await prisma.developer.findUnique({
-    where: { username },
-    include: {
-      languages: { orderBy: { percentage: "desc" } },
-      repositories: { orderBy: { stars: "desc" } },
-      contactInfo: true,
-    },
-  });
+  let local;
+  try {
+    local = await prisma.developer.findUnique({
+      where: { username },
+      include: {
+        languages: { orderBy: { percentage: "desc" } },
+        repositories: { orderBy: { stars: "desc" } },
+        contactInfo: true,
+      },
+    });
+  } catch {
+    // Fallback without contactInfo if the relation query fails
+    local = await prisma.developer.findUnique({
+      where: { username },
+      include: {
+        languages: { orderBy: { percentage: "desc" } },
+        repositories: { orderBy: { stars: "desc" } },
+      },
+    });
+  }
 
   if (local) {
     return {
@@ -86,20 +98,20 @@ async function getDeveloper(username: string) {
         topics: r.topics,
         pushedAt: r.pushedAt?.toISOString() ?? null,
       })),
-      contactInfo: local.contactInfo ? {
-        primaryEmail: local.contactInfo.primaryEmail,
-        emails: local.contactInfo.emails,
-        phone: local.contactInfo.phone,
-        linkedinUrl: local.contactInfo.linkedinUrl,
-        twitterUrl: local.contactInfo.twitterUrl,
-        currentTitle: local.contactInfo.currentTitle,
-        headline: local.contactInfo.headline,
-        normalizedCompany: local.contactInfo.normalizedCompany,
-        seniorityLevel: local.contactInfo.seniorityLevel,
-        employmentHistory: local.contactInfo.employmentHistory,
-        photoUrl: local.contactInfo.photoUrl,
-        enrichedAt: local.contactInfo.enrichedAt?.toISOString() ?? null,
-        enrichmentSource: local.contactInfo.enrichmentSource,
+      contactInfo: (local as any).contactInfo ? {
+        primaryEmail: (local as any).contactInfo.primaryEmail,
+        emails: (local as any).contactInfo.emails,
+        phone: (local as any).contactInfo.phone,
+        linkedinUrl: (local as any).contactInfo.linkedinUrl,
+        twitterUrl: (local as any).contactInfo.twitterUrl,
+        currentTitle: (local as any).contactInfo.currentTitle,
+        headline: (local as any).contactInfo.headline,
+        normalizedCompany: (local as any).contactInfo.normalizedCompany,
+        seniorityLevel: (local as any).contactInfo.seniorityLevel,
+        employmentHistory: (local as any).contactInfo.employmentHistory,
+        photoUrl: (local as any).contactInfo.photoUrl,
+        enrichedAt: (local as any).contactInfo.enrichedAt?.toISOString() ?? null,
+        enrichmentSource: (local as any).contactInfo.enrichmentSource,
       } : null,
     };
   }
