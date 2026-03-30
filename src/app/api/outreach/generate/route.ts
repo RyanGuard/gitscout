@@ -94,17 +94,17 @@ export async function POST(request: Request) {
 
   const channelConstraints: Record<string, string> = {
     email: "Email: subject line 5-8 words, initial body under 100 words, follow-up body under 60 words.",
-    linkedin: "LinkedIn: InMail under 150 words, connection request under 300 characters. No subject line for connection requests.",
+    linkedin: "LinkedIn connection request: MUST be under 200 characters (hard limit). Keep it to 1-3 sentences MAX. InMail: under 150 words. No subject line for connection requests.",
     text: "Text/SMS: under 160 characters per message. No subject line.",
-    multi_channel: "Multi-channel: mix email, LinkedIn, and text. Email: subject 5-8 words, body under 100 words. LinkedIn InMail: under 150 words. Connection request: under 300 chars. Text: under 160 chars.",
+    multi_channel: "Multi-channel: mix email, LinkedIn, and text. Email: subject 5-8 words, body under 100 words. LinkedIn connection: under 200 chars. InMail: under 150 words. Text: under 160 chars.",
   };
 
   const toneInstructions: Record<string, string> = {
-    professional: "Professional and polished. Respectful, clear, and direct.",
-    casual: "Casual and conversational. Friendly, approachable, natural.",
-    technical_peer: "Engineer-to-engineer. Reference code, projects, and technical depth. Speak as a peer, not a recruiter.",
-    executive: "Executive tone. Strategic, concise, focused on business impact and leadership.",
-    warm_intro: "Warm introduction style. Lead with the mutual connection. Conversational and personal.",
+    professional: "Professional and polished. Respectful, clear, and direct. For LinkedIn connections: 2-3 sentences max.",
+    casual: "Ultra-casual and SHORT. Think quick LinkedIn DM energy. 1-2 sentences MAXIMUM. Example: 'Hey [name], love what you're building at [company]. I work with top engineers in [city] — would love to connect in case you're ever exploring.' NO long paragraphs. NO multiple talking points. Just one quick, friendly line.",
+    technical_peer: "Engineer-to-engineer. Reference ONE specific repo or technical detail. Keep it concise — 2-3 sentences max. Speak as a peer, not a recruiter.",
+    executive: "Executive tone. Strategic, concise, 1-2 sentences. Focused on business impact.",
+    warm_intro: "Warm introduction style. Lead with the mutual connection. 1-2 sentences. Conversational and personal.",
   };
 
   const systemPrompt = `You are an expert recruiting outreach writer for Scout, a recruiting intelligence platform. You write personalized outreach sequences that get responses.
