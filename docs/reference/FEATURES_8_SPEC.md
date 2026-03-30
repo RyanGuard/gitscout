@@ -71,7 +71,7 @@ One-click personalized cold outreach message based on the developer's actual Git
 
 ---
 
-### Feature 3: Daily Scout Briefing (`/components/features/DailyBriefing.tsx`)
+### Feature 3: Daily GitScout Briefing (`/components/features/DailyBriefing.tsx`)
 
 Replace the static "Good morning" dashboard greeting with a dynamic, personalized daily briefing.
 
@@ -182,7 +182,7 @@ Subtle, satisfying audio feedback for key actions.
 
 ---
 
-### Feature 6: Keyboard Scout Mode (`/lib/keyboard.ts` + `/components/features/KeyboardOverlay.tsx`)
+### Feature 6: Keyboard GitScout Mode (`/lib/keyboard.ts` + `/components/features/KeyboardOverlay.tsx`)
 
 Vim-inspired keyboard navigation for power-user sourcers.
 
