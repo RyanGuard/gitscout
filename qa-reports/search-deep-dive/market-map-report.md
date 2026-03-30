@@ -35,7 +35,7 @@
 |---|------|--------|
 | 1.1 | Page title "Market Map" visible | PASS |
 | 1.2 | Subtitle "AI-powered talent landscape for targeted recruiting" | PASS |
-| 1.3 | GitScout branding badge | PASS |
+| 1.3 | Scout branding badge | PASS |
 | 1.4 | Generate form visible when logged out | PASS |
 | 1.5 | Clicking Generate shows "Please sign in" error | PASS |
 | 1.6 | Map nav link in header | PASS |

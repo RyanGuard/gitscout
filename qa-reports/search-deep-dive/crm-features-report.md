@@ -195,7 +195,7 @@ The header navigation contains these links:
 
 | Nav Item | Route | Has Dedicated Page? |
 |----------|-------|-------------------|
-| GitScout (logo) | `/` | ✅ Yes — homepage |
+| Scout (logo) | `/` | ✅ Yes — homepage |
 | Search | `/search` | ✅ Yes — full search UI |
 | Match | `/match` | ✅ Yes — JD parsing UI |
 | Lists | `/lists` | ❌ No — renders homepage |

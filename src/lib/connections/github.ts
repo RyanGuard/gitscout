@@ -6,7 +6,7 @@ const GITHUB_API = "https://api.github.com";
 function githubHeaders(): HeadersInit {
   const h: HeadersInit = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "GitScout/2.0",
+    "User-Agent": "Scout/2.0",
   };
   const token = process.env.GITHUB_TOKEN;
   if (token) h.Authorization = `Bearer ${token}`;

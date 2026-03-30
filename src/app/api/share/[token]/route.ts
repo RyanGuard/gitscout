@@ -168,7 +168,7 @@ export async function GET(
 
   return Response.json({
     permissionLevel: share.permissionLevel,
-    sharedBy: share.user.name || "A GitScout recruiter",
+    sharedBy: share.user.name || "A Scout recruiter",
     sharedByImage: share.user.image,
     expiresAt: share.expiresAt?.toISOString() || null,
     map: {

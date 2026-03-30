@@ -1,4 +1,4 @@
-# GitScout Master QA Report
+# Scout Master QA Report
 
 **Date:** 2026-03-26
 **Environment:** localhost:3000 (Next.js 16.2.1 + Turbopack dev server)
@@ -11,7 +11,7 @@
 
 **Overall Health: 5 / 10**
 
-GitScout's core search pipeline works and returns results in ~200ms. The Market Map feature is impressively polished with 94% pass rate. XSS protection is solid, responsive design is mostly excellent, and the app handles edge cases gracefully.
+Scout's core search pipeline works and returns results in ~200ms. The Market Map feature is impressively polished with 94% pass rate. XSS protection is solid, responsive design is mostly excellent, and the app handles edge cases gracefully.
 
 However, the product has **serious structural problems** that would embarrass you in a demo:
 

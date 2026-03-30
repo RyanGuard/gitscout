@@ -63,8 +63,8 @@ Take the existing functional UI and make it production-quality. Add loading skel
     // Fetch developer, return title + description + og:image
   }
   ```
-- Title format: `"{name} (@{username}) — GitScout"`
-- Description: `"{bio}"` or `"Developer profile for {username} on GitScout"`
+- Title format: `"{name} (@{username}) — Scout"`
+- Description: `"{bio}"` or `"Developer profile for {username} on Scout"`
 - `og:image`: Use the developer's `avatarUrl`
 - If developer not found, return generic metadata (don't error)
 

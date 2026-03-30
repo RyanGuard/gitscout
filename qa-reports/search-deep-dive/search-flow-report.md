@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-26
 **Tester:** Playwright automated suite (headless Chromium 1440x900)
-**Target:** http://localhost:3000 (GitScout dev server)
+**Target:** http://localhost:3000 (Scout dev server)
 **Test Script:** `test-search-flow.mjs` + `test-followup.mjs`
 
 ---

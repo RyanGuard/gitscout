@@ -8,9 +8,9 @@ const anthropic = new Anthropic();
 const SYSTEM_PROMPT = `You are a technical recruiter writing personalized outreach messages to engineering candidates. Your messages should feel human, specific, and respectful of the candidate's time.
 
 RULES:
-- Never mention flight risk, fit scores, or GitScout scores in the message. Those are internal signals.
+- Never mention flight risk, fit scores, or Scout scores in the message. Those are internal signals.
 - If flight risk is high, make the outreach slightly more urgent but don't reference why.
-- If the candidate has a GitScout score, you can reference their open source work naturally: "I noticed your contributions to [relevant area]" — but only if it feels organic.
+- If the candidate has a Scout score, you can reference their open source work naturally: "I noticed your contributions to [relevant area]" — but only if it feels organic.
 - Each message must be different. Do not use the same opening formula twice.
 - Keep total message length under 150 words. Shorter is better.
 - Never start with "I came across your profile" or any generic opener.
@@ -118,7 +118,7 @@ export async function POST(
   Fit reasoning: ${c.fitReasoning || "N/A"}
   Flight risk: ${c.flightRisk || "unknown"}
   Flight risk signals: ${c.flightRiskSignals.length > 0 ? c.flightRiskSignals.join(", ") : "none"}
-  ${c.gitscoutScore ? `GitScout score: ${c.gitscoutScore} (based on open source contributions)` : ""}`
+  ${c.gitscoutScore ? `Scout score: ${c.gitscoutScore} (based on open source contributions)` : ""}`
     )
     .join("\n\n");
 
@@ -178,7 +178,7 @@ ${candidateContext}`;
   Fit reasoning: ${c.fitReasoning || "N/A"}
   Flight risk: ${c.flightRisk || "unknown"}
   Flight risk signals: ${c.flightRiskSignals.length > 0 ? c.flightRiskSignals.join(", ") : "none"}
-  ${c.gitscoutScore ? `GitScout score: ${c.gitscoutScore} (based on open source contributions)` : ""}`
+  ${c.gitscoutScore ? `Scout score: ${c.gitscoutScore} (based on open source contributions)` : ""}`
       )
       .join("\n\n");
 

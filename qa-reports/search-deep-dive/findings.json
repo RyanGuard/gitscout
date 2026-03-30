@@ -5,7 +5,7 @@
   },
   {
     "category": "empty-state",
-    "detail": "Page title: \"GitScout - Discover Talented Developers\""
+    "detail": "Page title: \"Scout - Discover Talented Developers\""
   },
   {
     "category": "empty-state",
@@ -29,7 +29,7 @@
   },
   {
     "category": "empty-state",
-    "detail": "Visible body text (first 500 chars): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only"
+    "detail": "Visible body text (first 500 chars): Scout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only"
   },
   {
     "category": "loading-state",
@@ -93,7 +93,7 @@
   },
   {
     "category": "error-state",
-    "detail": "Long query result text (first 500): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
+    "detail": "Long query result text (first 500): Scout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
   },
   {
     "category": "error-state",
@@ -101,7 +101,7 @@
   },
   {
     "category": "error-state",
-    "detail": "XSS query result text (first 500): GitScout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
+    "detail": "XSS query result text (first 500): Scout\nSearch\nMatch\nLists\nSign in\n⌘K\nSearch\nFilters\nSORT BY\nScore\nFollowers\nStars\nNewest\nLANGUAGES\nTypeScript\nJavaScript\nPython\nRust\nGo\nJava\nC++\nRuby\nPHP\nSwift\nKotlin\nC#\nScala\nElixir\nLOCATION\nMIN STARS\nOpen to work only\n0 developers found\n\nNo developers found\n\nTry adjusting your search query or filters.\n\nSearch tips\nTry broader terms like \"python\" or \"frontend\"\nSearch by location: \"San Francisco\"\nRemove filters to widen results"
   },
   {
     "category": "error-state",

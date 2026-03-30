@@ -97,27 +97,27 @@ When GitHub profile fetches fail (rate limiting), results 3+ degrade to fabricat
 
 ### Developer 1: trekhleb (Score: 23.7 in search, stored locally)
 **GitHub reality:** 17.8k followers, 6 following, 26 repos, 255k+ total stars. Sr SWE @ Uber. `javascript-algorithms` repo has 196k stars. Active contributor.
-**GitScout score:** 23.7 -- "Limited Data"
+**Scout score:** 23.7 -- "Limited Data"
 **Verdict: WILDLY INACCURATE.** Should be 80+ (Strong/On Fire tier). The 196k-star educational repo alone demonstrates massive impact. `totalCommits: 0` stored locally proves the scoring pipeline failed to fetch contribution data during indexing.
 
 ### Developer 2: mahseema (Score: 56 in search, stored locally)
 **GitHub reality:** 6.3k followers, 10.9k following (unfavorable 0.57:1 ratio), 13 repos, curates awesome-lists (markdown, not code). "Part time Data Scientist." No TypeScript repos.
-**GitScout score:** 56 -- "Emerging"
+**Scout score:** 56 -- "Emerging"
 **Verdict: OVERSCORED relative to peers.** Ranked above trekhleb (255k stars, Uber engineer) in both query variants. The 10.9k following vs 6.3k followers suggests follow-for-follow behavior. Primary repos are curated lists with no programming language. This is not a TypeScript developer and should not appear in results.
 
 ### Developer 3: alxhub (Score: 55.3 quickScore / 23 positional)
 **GitHub reality:** Angular team lead at Google. 76 public repos, 1,200+ followers, 0 following. Core contributor to Angular framework. Multiple Pull Shark badges. TypeScript developer.
-**GitScout quickScore:** 55.3 -- "Emerging"
+**Scout quickScore:** 55.3 -- "Emerging"
 **Verdict: UNDERSCORED.** A core contributor to one of the most popular TypeScript frameworks deserves 70+. The quickScore has no way to account for his massive impact on the Angular project since it ignores stars and contributions.
 
 ### Developer 4: scttcper (Score: 52.7 quickScore)
 **GitHub reality:** Engineer at Sentry. 80 public repos, 327 followers, 59 following. `ngx-toastr` has 2.6k stars. Member of @getsentry. Primarily TypeScript. Based in San Francisco.
-**GitScout quickScore:** 52.7 -- "Emerging"
+**Scout quickScore:** 52.7 -- "Emerging"
 **Verdict: REASONABLE but understated.** A solid working engineer with 4k+ combined stars across Angular TypeScript packages. The quickScore is in the right ballpark but ignores his star count entirely.
 
 ### Developer 5: torvalds (Score: 30.5 via /api/score)
 **GitHub reality:** Creator of Linux (225k stars) and Git. 293k followers. The most influential developer in computing history.
-**GitScout score:** 30.5 -- "Limited Data"
+**Scout score:** 30.5 -- "Limited Data"
 **Verdict: ABSURDLY INACCURATE.** Score is lower than mahseema (a part-time data scientist who curates markdown lists). The scoring engine cannot detect his contributions because (a) he works via email-based patch workflows, not GitHub PRs, and (b) the GraphQL contribution data is returning zero. The reputation pillar gives only 6.8/10 for 293k followers because the tiered scale tops out at `[10000, 10]`.
 
 ---

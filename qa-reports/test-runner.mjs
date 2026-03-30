@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * GitScout API QA Test Runner
+ * Scout API QA Test Runner
  * Tests all API routes with valid, empty, and malformed inputs.
  * Checks response shapes, status codes, error handling, response times, and secret leaks.
  */
@@ -881,7 +881,7 @@ async function testResponseTimes() {
 // MAIN
 // ============================================================
 async function main() {
-  console.log("=== GitScout API QA Test Runner ===\n");
+  console.log("=== Scout API QA Test Runner ===\n");
   console.log(`Target: ${BASE}`);
   console.log(`Started: ${new Date().toISOString()}\n`);
 

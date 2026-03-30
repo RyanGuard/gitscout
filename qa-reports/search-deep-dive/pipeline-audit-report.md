@@ -11,7 +11,7 @@
 
 ### 1.1 Architecture Overview
 
-GitScout has **three search endpoints** that serve different use cases:
+Scout has **three search endpoints** that serve different use cases:
 
 | Endpoint | Method | Purpose | Speed | Quality |
 |----------|--------|---------|-------|---------|

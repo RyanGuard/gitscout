@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * GitScout Market Map — Comprehensive QA Test Suite
+ * Scout Market Map — Comprehensive QA Test Suite
  * Uses Playwright to test all interactive features of /map and /map/templates.
  *
  * Strategy: Since NEXTAUTH_URL points to HTTPS (production) but we test on HTTP localhost,
@@ -69,8 +69,8 @@ async function main() {
       // 1.2 Subtitle
       bodyText.includes("AI-powered talent landscape") ? pass("1.2 Subtitle visible") : fail("1.2 Subtitle missing");
 
-      // 1.3 GitScout badge
-      bodyText.includes("GitScout") ? pass("1.3 GitScout branding badge") : fail("1.3 GitScout badge missing");
+      // 1.3 Scout badge
+      bodyText.includes("Scout") ? pass("1.3 Scout branding badge") : fail("1.3 Scout badge missing");
 
       // 1.4 Form visible even logged out
       const hasForm = bodyText.includes("Role title") && bodyText.includes("Generate market map");

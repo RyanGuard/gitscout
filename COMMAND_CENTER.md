@@ -1,4 +1,4 @@
-# GitScout Command Center
+# Scout Command Center
 ## Last updated: March 30, 2026
 
 Everything you need to access, run, and manage every project in one place. Print this. Pin this. Bookmark this.
@@ -9,9 +9,9 @@ Everything you need to access, run, and manage every project in one place. Print
 
 | What | Where | How to access |
 |---|---|---|
-| GitScout web app | Vercel | https://gitscout-beta.vercel.app |
-| GitScout codebase | Mac | `cd ~/gitscout` |
-| GitScout Agent (Electron) | Mac | `cd ~/gitscout-agent && npm run dev` |
+| Scout web app | Vercel | https://gitscout-beta.vercel.app |
+| Scout codebase | Mac | `cd ~/gitscout` |
+| Scout Agent (Electron) | Mac | `cd ~/gitscout-agent && npm run dev` |
 | Eval system | Hetzner VPS | `ssh root@89.167.106.102` → `su - scout` → `cd /opt/scout-eval` |
 | LinkedIn Agent | Hetzner VPS | `ssh root@89.167.106.102` → `su - scout` → `cd /opt/linkedin-agent` |
 | Supabase dashboard | Browser | https://supabase.com → GITSCOUT project |
@@ -21,7 +21,7 @@ Everything you need to access, run, and manage every project in one place. Print
 
 ---
 
-## 1. GitScout Web App (Main Product)
+## 1. Scout Web App (Main Product)
 
 **What:** Recruiting intelligence platform — developer search, market map, connection mapper
 **Stack:** Next.js, React, Tailwind, Prisma, Supabase, Vercel
@@ -59,7 +59,7 @@ claude --dangerously-skip-permissions
 
 ---
 
-## 2. GitScout Agent (Electron Desktop App)
+## 2. Scout Agent (Electron Desktop App)
 
 **What:** LinkedIn automation agent — stealth browser with behavioral engine
 **Stack:** Electron, React, Vite, Tailwind, playwright-extra, Supabase
@@ -179,7 +179,7 @@ claude --dangerously-skip-permissions
 
 ### Tables by system
 
-**GitScout App (Prisma-managed):**
+**Scout App (Prisma-managed):**
 - User/auth tables
 - Developer profiles, scores
 - Market maps, companies, candidates
@@ -208,7 +208,7 @@ claude --dangerously-skip-permissions
 - Settings → API: for keys
 
 ### Keys
-- **Publishable (anon):** Used by client-side apps (GitScout web, Electron agent)
+- **Publishable (anon):** Used by client-side apps (Scout web, Electron agent)
 - **Service role:** Used by server-side only (eval system on VPS). NEVER expose client-side.
 
 ---
@@ -220,8 +220,8 @@ claude --dangerously-skip-permissions
 | Supabase URL | Everywhere | Supabase Settings → API |
 | Supabase anon key | Web app, Electron agent | Supabase Settings → API → Publishable |
 | Supabase service role key | VPS eval system only | Supabase Settings → API → Secret |
-| Anthropic API key | VPS eval system, GitScout app | ~/gitscout/.env |
-| Apollo API key | GitScout app | ~/gitscout/.env |
+| Anthropic API key | VPS eval system, Scout app | ~/gitscout/.env |
+| Apollo API key | Scout app | ~/gitscout/.env |
 | GitHub token (autofix) | VPS eval system | /opt/scout-eval/.env |
 | Hetzner VPS | SSH access | console.hetzner.cloud → Rescue → Reset password |
 | VPS IP | 89.167.106.102 | Hetzner dashboard |
@@ -230,7 +230,7 @@ claude --dangerously-skip-permissions
 
 ## 6. Spec Files Index
 
-All specs live in the GitScout repo at `~/gitscout/docs/` or in your Downloads:
+All specs live in the Scout repo at `~/gitscout/docs/` or in your Downloads:
 
 | Spec | What it covers | Status |
 |---|---|---|
@@ -240,7 +240,7 @@ All specs live in the GitScout repo at `~/gitscout/docs/` or in your Downloads:
 | MARKET_MAP_PHASE_3_SPEC.md | Phase 3: sharing, outreach, pipeline | Built |
 | MARKET_MAP_PHASE_4_SPEC.md | Phase 4: living maps, alerts | Planned |
 | CONNECTION_MAPPER_SPEC.md | Connection detection algorithms | Built |
-| SCOUT_REDESIGN_SPEC.md | Platform rebrand + sidebar | Reverted (keeping GitScout for now) |
+| SCOUT_REDESIGN_SPEC.md | Platform rebrand + sidebar | Completed (renamed to Scout) |
 | SCOUT_EVAL_SYSTEM_SPEC.md | Eval agents, tickets, scoring | Running on VPS |
 | AUTO_FIX_AGENT_SPEC.md | Auto-fix from tickets | Replaced by builder |
 | AUTONOMOUS_DEV_AGENT_SPEC.md | Full self-improving loop | Running on VPS |
@@ -306,7 +306,7 @@ Go to Supabase → SQL Editor → paste SQL → Run
 ### Reset VPS password
 Hetzner Console → click server → Rescue tab → Reset Root Password
 
-### Check deployed GitScout
+### Check deployed Scout
 Open https://gitscout-beta.vercel.app in browser
 
 ---
@@ -317,7 +317,7 @@ Open https://gitscout-beta.vercel.app in browser
 ┌─────────────────────────────────────────────────────────┐
 │                    YOUR MAC                              │
 │                                                         │
-│  ~/gitscout/          — GitScout web app (Next.js)      │
+│  ~/gitscout/          — Scout web app (Next.js)      │
 │  ~/gitscout-agent/    — Electron LinkedIn agent         │
 │  ~/gitscout-*/        — Feature worktrees               │
 │                                                         │
@@ -328,7 +328,7 @@ Open https://gitscout-beta.vercel.app in browser
 ┌──────────────▼──────────────────────────────────────────┐
 │              VERCEL                                      │
 │  https://gitscout-beta.vercel.app                       │
-│  Hosts the GitScout web app                             │
+│  Hosts the Scout web app                             │
 └──────────────┬──────────────────────────────────────────┘
                │ API calls
                │

@@ -1,11 +1,11 @@
-# GitScout UX Deep Dive
+# Scout UX Deep Dive
 ## Full Platform Audit: What to Keep, What to Kill, What's Missing
 
 ---
 
 ## Current State Assessment
 
-Based on the current deployment, GitScout has a clean landing page with dark theme, a single search bar ("Search developers by name, language, or location"), tag-based quick filters (ios developers, San Francisco, machine learning, TypeScript), and the beginnings of a sourcing tool. The brand identity — the fork/branch icon + "GitScout" name — is solid.
+Based on the current deployment, Scout has a clean landing page with dark theme, a single search bar ("Search developers by name, language, or location"), tag-based quick filters (ios developers, San Francisco, machine learning, TypeScript), and the beginnings of a sourcing tool. The brand identity — the scout icon + "Scout" name — is solid.
 
 **The honest assessment:** Right now it looks like a developer search demo, not a recruiter's daily-driver tool. That's fine for MVP — but let's map the full platform UX that makes this something recruiters can't live without.
 
@@ -27,7 +27,7 @@ Based on the current deployment, GitScout has a clean landing page with dark the
 The dashboard is not a landing page. It's a recruiter's morning briefing — "here's what matters right now." Think Bloomberg terminal for hiring, not a marketing page.
 
 ### Current Problem
-Right now, the landing page IS the search page. There's no logged-in state, no persistent context, no sense of "my work." A recruiter opens GitScout and has zero context about what they were doing yesterday.
+Right now, the landing page IS the search page. There's no logged-in state, no persistent context, no sense of "my work." A recruiter opens Scout and has zero context about what they were doing yesterday.
 
 ### What to Build
 
@@ -113,7 +113,7 @@ After search results load, show a left sidebar with refinable filters:
 - **Activity** — Active in last 30/90/180/365 days
 - **Hireable** — Toggle (only show profiles with hireable: true)
 - **Has Email** — Toggle (critical for sourcing, this is gold)
-- **GitScout Score** — Range slider (once scoring is implemented)
+- **Scout Score** — Range slider (once scoring is implemented)
 - **Organization** — Text input (find people at specific companies)
 
 **Results Display — Needs a Complete Overhaul**
@@ -139,7 +139,7 @@ Current tag-based display needs to become a results list that shows enough to ma
 
 **Each result card MUST show:**
 1. Name + username + avatar
-2. GitScout Score (the big number — this is your differentiator)
+2. Scout Score (the big number — this is your differentiator)
 3. Location
 4. Email availability indicator (don't show the email, show that it exists)
 5. Bio snippet
@@ -148,7 +148,7 @@ Current tag-based display needs to become a results list that shows enough to ma
 8. Quick actions: Save, View Profile, Copy Email
 
 **Results Sorting**
-- Default: GitScout Score (highest first)
+- Default: Scout Score (highest first)
 - Options: Stars, Followers, Most Recently Active, Account Age
 - Toggle: Grid view vs List view
 
@@ -185,7 +185,7 @@ When a recruiter clicks into a profile, they need everything to make a sourcing 
 **Header Section**
 ```
 ┌──────────────────────────────────────────────────────┐
-│  [Avatar]   Sarah Chen           GitScout Score: 87  │
+│  [Avatar]   Sarah Chen           Scout Score: 87     │
 │             @sarahchen           ████████░░  High     │
 │             Staff Engineer                           │
 │             San Francisco, CA                        │
@@ -197,7 +197,7 @@ When a recruiter clicks into a profile, they need everything to make a sourcing 
 ```
 
 **Score Breakdown Panel**
-This is GitScout's differentiator. Don't just show a number — show WHY.
+This is Scout's differentiator. Don't just show a number — show WHY.
 
 ```
 ┌─ Score Breakdown ────────────────────────────────────┐
@@ -267,7 +267,7 @@ Visual bar chart or pie chart showing percentage of code by language across all 
 ## Screen 4: SAVED LISTS / PIPELINE (Currently Missing — MUST BUILD)
 
 ### Why This Is Critical
-Without saved lists, GitScout is a search engine. With saved lists, it's a sourcing platform. This is the difference between a tool someone uses once and a tool they live in.
+Without saved lists, Scout is a search engine. With saved lists, it's a sourcing platform. This is the difference between a tool someone uses once and a tool they live in.
 
 ### What to Build
 
@@ -293,11 +293,11 @@ Without saved lists, GitScout is a search engine. With saved lists, it's a sourc
 **Export Functionality**
 - CSV export with all profile data
 - Columns: Name, Username, Email, Location, Score, Top Languages, Stars, Followers, GitHub URL, Bio
-- This is the bridge to your ATS/CRM. Without export, recruiters can't integrate GitScout into their workflow
+- This is the bridge to your ATS/CRM. Without export, recruiters can't integrate Scout into their workflow
 
 **Status Tracking (V2)**
 - Pipeline stages: New → Contacted → Replied → Interviewing → Passed
-- This turns GitScout from a search tool into a mini-CRM
+- This turns Scout from a search tool into a mini-CRM
 - Don't go too deep here — you're not building an ATS
 
 ---
@@ -385,7 +385,7 @@ Keep it minimal. Four items max. Recruiters don't want to think about navigation
 5. "Has email" and "Hireable" filter toggles
 
 ### Phase 3: Power Features (Month 2)
-1. GitScout Score with full 5-pillar breakdown
+1. Scout Score with full 5-pillar breakdown
 2. Contribution calendar visualization
 3. Bulk actions (select multiple, save all, export all)
 4. Score-based sorting and filtering
@@ -402,18 +402,18 @@ Keep it minimal. Four items max. Recruiters don't want to think about navigation
 
 ## Competitive Gaps to Exploit
 
-| What Competitors Do Poorly | GitScout's Opportunity |
+| What Competitors Do Poorly | Scout's Opportunity |
 |---------------------------|----------------------|
-| SeekOut is $12K/year and complex | GitScout: affordable, simple, GitHub-focused |
-| GitRoll shows scores but no sourcing workflow | GitScout: search + score + save + export in one flow |
-| GitHunt has no saved lists or pipeline | GitScout: full sourcing workflow, not just search |
-| All competitors are black-box scoring | GitScout: transparent, explainable scores |
-| Most tools require onboarding calls | GitScout: self-serve, paste your GitHub token, go |
-| LinkedIn Recruiter misses GitHub-only devs | GitScout: finds developers LinkedIn can't see |
+| SeekOut is $12K/year and complex | Scout: affordable, simple, GitHub-focused |
+| GitRoll shows scores but no sourcing workflow | Scout: search + score + save + export in one flow |
+| GitHunt has no saved lists or pipeline | Scout: full sourcing workflow, not just search |
+| All competitors are black-box scoring | Scout: transparent, explainable scores |
+| Most tools require onboarding calls | Scout: self-serve, paste your GitHub token, go |
+| LinkedIn Recruiter misses GitHub-only devs | Scout: finds developers LinkedIn can't see |
 
 ---
 
-## The One Thing That Will Make or Break GitScout
+## The One Thing That Will Make or Break Scout
 
 **Speed.**
 

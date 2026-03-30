@@ -2,7 +2,7 @@
 
 ## Your Job
 
-Build a job description parsing system and a matching page where recruiters can select an Ashby job (or paste a JD), have GitScout extract requirements via keyword extraction, and see a ranked list of matching candidates from the database. This turns GitScout from "search by keyword" into "match candidates to a role."
+Build a job description parsing system and a matching page where recruiters can select an Ashby job (or paste a JD), have Scout extract requirements via keyword extraction, and see a ranked list of matching candidates from the database. This turns Scout from "search by keyword" into "match candidates to a role."
 
 ---
 
@@ -27,7 +27,7 @@ Build a job description parsing system and a matching page where recruiters can 
    b. "Paste a JD" → textarea input
 3. JD is parsed → requirements extracted (languages, skills, location, seniority keywords)
 4. Requirements are shown as editable chips/tags — user can add/remove/adjust
-5. GitScout queries the database with extracted criteria
+5. Scout queries the database with extracted criteria
 6. Results are ranked by fit score (not just generic score)
 7. User can push matched candidates to Ashby (uses PushToAshbyButton from AGENT_ASHBY)
 ```

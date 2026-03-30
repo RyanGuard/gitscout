@@ -1,4 +1,4 @@
-# GitScout QA Report: Authentication & User Features
+# Scout QA Report: Authentication & User Features
 
 **Date:** 2026-03-26
 **Tester:** Automated Playwright (headless Chromium)
@@ -31,7 +31,7 @@
 
 - Homepage loads with dark theme by default
 - "Sign in" button clearly visible in header (top-right, bordered pill button with arrow icon)
-- Header nav shows: GitScout logo, Search, Match, Lists, Map, theme toggle, Sign in
+- Header nav shows: Scout logo, Search, Match, Lists, Map, theme toggle, Sign in
 - Hero section: "Scout top talent from GitHub" with search bar and filter chips
 - Stats displayed: 45M+ developers searchable, 120+ languages indexed, 3 enrichment sources
 - Footer: "Powered by GitHub REST + GraphQL, Apollo enrichment, Ashby ATS integration"
@@ -75,7 +75,7 @@
 **Status: WARN -- Silent redirect, no auth feedback**
 
 - Navigating to `/lists` silently redirects to the homepage (`/`)
-- Page title remains "GitScout - Discover Talented Developers"
+- Page title remains "Scout - Discover Talented Developers"
 - No sign-in prompt, no flash message, no "you must sign in" notice
 - User has no idea they were redirected or why
 
@@ -130,7 +130,7 @@ All four nav links are present in the header:
 | Map     | /map      | PASS   | Market Map page with role title, level, tech stack, geography inputs |
 
 Additional nav elements:
-- GitScout logo (links to `/`)
+- Scout logo (links to `/`)
 - Settings gear icon (links to `/settings`, no text label)
 - Theme toggle (sun/moon icon)
 - "Sign in" button
@@ -172,7 +172,7 @@ Additional nav elements:
 **Status: WARN -- Mobile nav does not collapse**
 
 ### Desktop (1280px)
-- Full horizontal nav: GitScout, Search, Match, Lists, Map, theme toggle, Sign in
+- Full horizontal nav: Scout, Search, Match, Lists, Map, theme toggle, Sign in
 - All items visible, well-spaced
 - **Screenshot:** `screenshots/09-responsive-1280.png`
 
@@ -255,7 +255,7 @@ All three test URLs render a custom 404 page:
 | /map/nonexistent   | 404    | Custom page shown |
 
 **404 page design:**
-- GitScout header with full nav (maintains navigation context)
+- Scout header with full nav (maintains navigation context)
 - Centered content: Git branch icon, "Page not found" heading
 - Subtitle: "The page you're looking for doesn't exist or has been moved."
 - "Go home" button (blue, links to `/`)
@@ -274,9 +274,9 @@ All three test URLs render a custom 404 page:
 
 | Tag | Value |
 |-----|-------|
-| `<title>` | GitScout - Discover Talented Developers |
+| `<title>` | Scout - Discover Talented Developers |
 | `description` | Search and discover talented developers on GitHub. Filter by language, location, and expertise. |
-| `og:title` | GitScout - Discover Talented Developers |
+| `og:title` | Scout - Discover Talented Developers |
 | `og:description` | Search and discover talented developers on GitHub. Filter by language, location, and expertise. |
 | `viewport` | width=device-width, initial-scale=1 |
 
@@ -285,9 +285,9 @@ All three test URLs render a custom 404 page:
 
 | Tag | Value |
 |-----|-------|
-| `<title>` | GitScout - Discover Talented Developers |
+| `<title>` | Scout - Discover Talented Developers |
 | `description` | Search and discover talented developers on GitHub. Filter by language, location, and expertise. |
-| `og:title` | GitScout - Discover Talented Developers |
+| `og:title` | Scout - Discover Talented Developers |
 | `og:description` | Search and discover talented developers on GitHub. Filter by language, location, and expertise. |
 | `viewport` | width=device-width, initial-scale=1 |
 
@@ -308,7 +308,7 @@ All three test URLs render a custom 404 page:
 - Browser tab shows no meaningful title
 - Sharing a profile link on Slack/Twitter shows no preview
 - SEO is nonexistent for profile pages
-- Should dynamically set: `<title>Linus Torvalds (@torvalds) - GitScout</title>` etc.
+- Should dynamically set: `<title>Linus Torvalds (@torvalds) - Scout</title>` etc.
 
 ---
 

@@ -1,4 +1,4 @@
-# GitScout Scoring & Data Quality Report
+# Scout Scoring & Data Quality Report
 
 **Date:** 2026-03-26
 **Tester:** QA Data Quality Engineer
@@ -167,7 +167,7 @@ Expected this to score very low (test/mascot account with 8 repos, no real devel
 
 **The problem:** Positions 6-20 are ALL score=0 "Unscored" profiles from GitHub source — rate limiting killed their data. There's no meaningful ranking beyond the 5 locally-cached profiles. **Sorting by score is useless when 75% of results have no score.**
 
-**BUG-SEARCH-004 [CRITICAL]:** `rustdesk` at position #3 (score 66.3) is an **organization account**, not a developer. Bio: "Making affordable remote desktop service for everyone." Company: "Purslane Ltd." Following: 0. This is a company's official GitHub account that slipped through both GitHub's `type:user` filter and GitScout's own scoring.
+**BUG-SEARCH-004 [CRITICAL]:** `rustdesk` at position #3 (score 66.3) is an **organization account**, not a developer. Bio: "Making affordable remote desktop service for everyone." Company: "Purslane Ltd." Following: 0. This is a company's official GitHub account that slipped through both GitHub's `type:user` filter and Scout's own scoring.
 
 **BUG-SORT-001 [MINOR]:** Sorting by score creates a binary cliff — locally-cached profiles with scores float to the top, then ALL other results show 0. There's no graceful degradation. Even the `quickScore` function (which computes a score from REST API data) produces 0 when rate limited because followers/repos are 0 in the fallback.
 

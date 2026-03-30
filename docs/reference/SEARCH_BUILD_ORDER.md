@@ -51,7 +51,7 @@ Boston — aliases: "boston", "boston, ma", "cambridge", "cambridge, ma", "bosto
 
 Miami — aliases: "miami", "miami, fl", "miami, florida", "south florida", "fort lauderdale", "boca raton", "coral gables"
 
-**Tier 3 — International (GitScout's competitive edge — LinkedIn is weak here, GitHub is strong)**
+**Tier 3 — International (Scout's competitive edge — LinkedIn is weak here, GitHub is strong)**
 
 Buenos Aires — aliases: "buenos aires", "buenos aires, argentina", "caba", "capital federal", "argentina", "córdoba", "cordoba", "rosario", "mendoza"
 
@@ -101,7 +101,7 @@ Wire the search page to:
 1. Query Supabase first for pre-indexed developers (instant results)
 2. Then stream live API results from the orchestrator
 3. Merge and deduplicate by username
-4. Sort by GitScout score
+4. Sort by Scout score
 5. Show the radar animation during deep search
 6. Trigger unicorn celebration when 90+ score developers appear
 

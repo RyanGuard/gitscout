@@ -1,4 +1,4 @@
-# GitScout Documentation
+# Scout Documentation
 
 ## Architecture
 - [System Overview](architecture/SYSTEM_OVERVIEW.md) — how all pieces connect

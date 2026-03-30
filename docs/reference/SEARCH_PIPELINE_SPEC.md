@@ -1,6 +1,6 @@
 ## Task: Build a Dual-Pipeline Search Architecture That Actually Finds Top Developers
 
-GitScout's search needs a complete overhaul. The current approach of using GitHub's Search Users API directly is broken — it sorts by "relevance" (keyword matching on bios/usernames), not engineering quality. We need a search → enrich → score pipeline that finds actual unicorns.
+Scout's search needs a complete overhaul. The current approach of using GitHub's Search Users API directly is broken — it sorts by "relevance" (keyword matching on bios/usernames), not engineering quality. We need a search → enrich → score pipeline that finds actual unicorns.
 
 This is a Next.js App Router project (TypeScript, Tailwind, Supabase, Vercel). Read the CLAUDE.md for full project context.
 
@@ -245,7 +245,7 @@ Step 5: For remaining matches (should be ~30-60 after filtering):
         }
 
 Step 6: Run the 5-pillar scoring engine on each enriched profile
-        Return results sorted by GitScout score, tagged with source: "deep"
+        Return results sorted by Scout score, tagged with source: "deep"
 ```
 
 **Response:**
@@ -637,7 +637,7 @@ Wire the new search architecture into the existing search page.
 3. Call `POST /api/search` with an EventSource for SSE streaming
 4. On `quick_results` event: render results immediately with the staggered card animation. Each card shows the quick score (followers-based) with a "Quick match" badge
 5. On `deep_progress` events: update the loading message ("Scanning React contributors...")
-6. On `deep_results` event: merge deep results into the list, re-sort by GitScout score. Deep results get a "Deep match" badge and show the full 5-pillar score + tier emoji
+6. On `deep_results` event: merge deep results into the list, re-sort by Scout score. Deep results get a "Deep match" badge and show the full 5-pillar score + tier emoji
 7. On `complete` event: stop the radar animation, show final count. If unicorns > 0, trigger the unicorn celebration + sound
 
 **Also check Supabase first:**
@@ -689,9 +689,9 @@ async function handleSearch(filters: SearchFilters) {
 
 **Result card updates:**
 - Quick results show: avatar, name, location, followers, repos, languages, "Quick match" pill (gray)
-- Deep results show: avatar, name, location, GitScout score ring, tier emoji, top repos, languages, contribution count, "Deep match" pill (green)
+- Deep results show: avatar, name, location, Scout score ring, tier emoji, top repos, languages, contribution count, "Deep match" pill (green)
 - All cards show: email indicator (✉️ if available), hireable badge if true, "Save" button, "Copy email" button
-- Sort dropdown: "GitScout Score" (default for deep), "Followers", "Most Active", "Newest"
+- Sort dropdown: "Scout Score" (default for deep), "Followers", "Most Active", "Newest"
 
 **Empty state improvements:**
 - If 0 results: "No developers matched. Try broadening your location or lowering the follower minimum."

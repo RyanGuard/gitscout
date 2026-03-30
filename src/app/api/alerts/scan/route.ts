@@ -275,19 +275,15 @@ Respond ONLY in JSON:
         per_page: 25,
       };
 
-      if (
-        watchedCompany.titleFilters &&
-        watchedCompany.titleFilters.length > 0
-      ) {
-        searchBody.person_titles = watchedCompany.titleFilters;
-      }
+      const titleFilters = watchedCompany.titleFilters?.length
+        ? watchedCompany.titleFilters
+        : ["engineer", "developer", "architect", "SRE", "devops"];
+      const seniorityFilters = watchedCompany.seniorityFilters?.length
+        ? watchedCompany.seniorityFilters
+        : ["senior", "manager", "director"];
 
-      if (
-        watchedCompany.seniorityFilters &&
-        watchedCompany.seniorityFilters.length > 0
-      ) {
-        searchBody.person_seniorities = watchedCompany.seniorityFilters;
-      }
+      searchBody.person_titles = titleFilters;
+      searchBody.person_seniorities = seniorityFilters;
 
       const peopleRes = await fetch(
         `${APOLLO_API}/mixed_people/api_search`,

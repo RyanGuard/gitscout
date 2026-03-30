@@ -100,7 +100,7 @@ test.describe("Profile Page QA Suite", () => {
 
     // Check for the score section — it's loaded async via /api/score/:username
     // First we see "Computing developer score..." then the actual score or it disappears on error
-    const scoreSection = page.locator("text=GitScout Score");
+    const scoreSection = page.locator("text=Scout Score");
 
     // Wait for computing text to appear then resolve, or timeout
     const computingText = page.locator("text=Computing developer score...");

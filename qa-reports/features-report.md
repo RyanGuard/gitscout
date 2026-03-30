@@ -1,4 +1,4 @@
-# GitScout Interactive Features QA Report
+# Scout Interactive Features QA Report
 
 **Date:** 2026-03-25
 **Tester:** Automated (Playwright) + Manual Code Review

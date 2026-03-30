@@ -832,7 +832,7 @@ async function testExternalLinks(page) {
 // MAIN
 // ============================================
 async function main() {
-  console.log('🔬 GitScout QA — Profile Pages Deep Dive');
+  console.log('🔬 Scout QA — Profile Pages Deep Dive');
   console.log('Started:', new Date().toISOString());
   console.log('='.repeat(60));
 

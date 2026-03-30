@@ -1,4 +1,4 @@
-# GitScout Search Deep-Dive QA
+# Scout Search Deep-Dive QA
 # Run each agent in a separate terminal tab
 # Make sure dev server is running first: cd ~/gitscout && npm run dev
 
@@ -17,7 +17,7 @@ mkdir -p qa-reports/screenshots
 # Tests whether the search actually returns relevant, high-quality developers
 
 ```bash
-cd ~/gitscout && claude "You are a senior QA engineer doing a deep audit of GitScout's search quality. The app is running at http://localhost:3000. Use Playwright to run REAL searches and evaluate the quality of results.
+cd ~/gitscout && claude "You are a senior QA engineer doing a deep audit of Scout's search quality. The app is running at http://localhost:3000. Use Playwright to run REAL searches and evaluate the quality of results.
 
 Install Playwright if needed. Create tests in tests/qa-search-quality/.
 
@@ -77,7 +77,7 @@ Write an extremely detailed report to qa-reports/search-deep-dive/query-quality-
 # Tests the actual API layer — what's the search hitting, what data comes back
 
 ```bash
-cd ~/gitscout && claude "You are a backend QA engineer auditing GitScout's search API pipeline. The app is running at http://localhost:3000.
+cd ~/gitscout && claude "You are a backend QA engineer auditing Scout's search API pipeline. The app is running at http://localhost:3000.
 
 Your job is to understand EXACTLY what happens when a search is executed. Trace the entire flow from request to response.
 
@@ -110,7 +110,7 @@ Test 4: POST /api/search with just {location: 'buenos aires'}
 
 Test 5: Hit the GitHub API directly from a test script with the same queries
 - Compare: what does GitHub's Search Users API actually return for 'language:typescript location:san francisco'?
-- Compare those results against what GitScout returns
+- Compare those results against what Scout returns
 - Are they the same? Different? Better? Worse?
 
 STEP 3 — Identify the bottlenecks:
@@ -149,7 +149,7 @@ Write an extremely detailed technical report to qa-reports/search-deep-dive/pipe
 # Tests the frontend rendering, interactions, and user experience of search
 
 ```bash
-cd ~/gitscout && claude "You are a UX-focused QA engineer auditing GitScout's search results interface. The app is running at http://localhost:3000. Use Playwright for all testing.
+cd ~/gitscout && claude "You are a UX-focused QA engineer auditing Scout's search results interface. The app is running at http://localhost:3000. Use Playwright for all testing.
 
 Install Playwright if needed. Create tests in tests/qa-search-ux/.
 
@@ -178,7 +178,7 @@ For the result CARDS specifically, document every single field shown:
 - Languages/skills? (yes/no, shown as tags?)
 - Stars count? (yes/no)
 - Followers count? (yes/no)
-- GitScout score? (yes/no, with ring animation?)
+- Scout score? (yes/no, with ring animation?)
 - Tier badge/emoji? (yes/no)
 - Email indicator? (yes/no)
 - Hireable badge? (yes/no)
@@ -240,7 +240,7 @@ Write an extremely detailed report to qa-reports/search-deep-dive/ui-ux-report.m
 # Tests speed, caching, rate limits, error handling under stress
 
 ```bash
-cd ~/gitscout && claude "You are a performance QA engineer stress-testing GitScout's search. The app is running at http://localhost:3000. Use Playwright and direct fetch calls.
+cd ~/gitscout && claude "You are a performance QA engineer stress-testing Scout's search. The app is running at http://localhost:3000. Use Playwright and direct fetch calls.
 
 Create tests in tests/qa-search-performance/.
 
@@ -321,11 +321,11 @@ Write report to qa-reports/search-deep-dive/performance-report.md with:
 # Tests whether the scoring engine is actually running and producing good rankings
 
 ```bash
-cd ~/gitscout && claude "You are a data quality engineer auditing GitScout's developer scoring and ranking system. The app is running at http://localhost:3000.
+cd ~/gitscout && claude "You are a data quality engineer auditing Scout's developer scoring and ranking system. The app is running at http://localhost:3000.
 
 PART 1 — Is scoring implemented?
 1. Run a search for 'TypeScript San Francisco'
-2. Look at the results — do ANY results have a GitScout score displayed?
+2. Look at the results — do ANY results have a Scout score displayed?
 3. If yes: what's the score range across results? (all 0s = broken, all same = broken, varied = working)
 4. If no: check if /api/score/{username} endpoint exists. Hit it directly for a few usernames from search results.
 5. Read the scoring engine source code: find lib/scoring/ or wherever scores are calculated
@@ -333,7 +333,7 @@ PART 1 — Is scoring implemented?
 
 PART 2 — Score accuracy check:
 Pick 5 developers from search results. For each one:
-1. Note their GitScout score (if any)
+1. Note their Scout score (if any)
 2. Visit their actual GitHub profile (https://github.com/{username})
 3. Manually check:
    - How many stars do their repos have?
@@ -341,7 +341,7 @@ Pick 5 developers from search results. For each one:
    - How active are they? (contribution graph)
    - Do they contribute to major OSS projects?
    - What languages do they use?
-4. Does their GitScout score feel right given their actual GitHub presence?
+4. Does their Scout score feel right given their actual GitHub presence?
 5. Would a recruiter agree this person is ranked correctly relative to the others?
 
 PART 3 — Ranking order:
@@ -379,7 +379,7 @@ Read the search API source code and determine:
 - What field are results being sorted by?
 - Is it GitHub's default 'best match' sort?
 - Is it followers?
-- Is it the GitScout score?
+- Is it the Scout score?
 - Or is it unsorted (random order from API)?
 - Is there a sort dropdown in the UI? Does changing it actually re-sort?
 

@@ -4,7 +4,7 @@
       "url": "http://localhost:3000/search",
       "hasSearchBar": true,
       "hasFilters": true,
-      "bodySnippet": "GitScoutSearchMatchListsSign in⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersself.__next_r=\"q0M9vTquIcrolg1JFDl79\"(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"9:I[\\\"[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\\\",[\\\"/_next/static/chunks/node_modules_034t3jw._.js\\\",\\\"/_next/static/chunks/src_"
+      "bodySnippet": "ScoutSearchMatchListsSign in⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersself.__next_r=\"q0M9vTquIcrolg1JFDl79\"(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"9:I[\\\"[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\\\",[\\\"/_next/static/chunks/node_modules_034t3jw._.js\\\",\\\"/_next/static/chunks/src_"
     },
     "loading": {
       "captured": true,
@@ -18,7 +18,7 @@
     "error": {
       "note": "Triggered by blocking /api/search requests",
       "hasErrorMessage": true,
-      "visibleText": "GitScoutSearchMatchLists⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersSearch failed. Please try again.self.__next_r=\"nJTecetyJ0lAL2sYkQq8N\"(self.__next_f=self.__next_f||[]).push(["
+      "visibleText": "ScoutSearchMatchLists⌘KSearchFiltersSort byScoreFollowersStarsNewestLanguagesTypeScriptJavaScriptPythonRustGoJavaC++RubyPHPSwiftKotlinC#ScalaElixirLocationMin StarsOpen to work onlyFiltersSearch failed. Please try again.self.__next_r=\"nJTecetyJ0lAL2sYkQq8N\"(self.__next_f=self.__next_f||[]).push(["
     }
   },
   "cardFields": [],

@@ -2,7 +2,7 @@
 
 All tables live in a single Supabase PostgreSQL instance (project: GITSCOUT).
 
-## GitScout App Tables (Prisma-managed)
+## Scout App Tables (Prisma-managed)
 
 Schema managed via `prisma/schema.prisma` in the gitscout repo. Run `npx prisma db push` to sync.
 

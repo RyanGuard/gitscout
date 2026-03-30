@@ -49,7 +49,7 @@
     {
       "test": "Landing hero heading",
       "passed": true,
-      "details": "Heading text: \"GitScout\""
+      "details": "Heading text: \"Scout\""
     },
     {
       "test": "Search input on landing",

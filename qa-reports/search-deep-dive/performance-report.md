@@ -1,4 +1,4 @@
-# GitScout Performance Benchmark Report
+# Scout Performance Benchmark Report
 
 **Date:** 2026-03-26
 **Environment:** localhost:3000 (Next.js 16 + Turbopack dev server)

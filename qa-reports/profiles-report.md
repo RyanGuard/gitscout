@@ -50,7 +50,7 @@ The following components exist in `src/components/features/` but are **never imp
 
 | URL Pattern | 404 Page Shown | Style |
 |---|---|---|
-| `/profile/this-user-definitely-does-not-exist-xyz-12345` | Custom "Developer not found" | GitScout-branded, "Search developers" CTA |
+| `/profile/this-user-definitely-does-not-exist-xyz-12345` | Custom "Developer not found" | Scout-branded, "Search developers" CTA |
 | `/profile/<script>alert('xss')</script>` | Generic "Page not found" | Next.js default, "Go home" CTA |
 | `/profile/` (empty) | Generic "Page not found" | Next.js default, "Go home" CTA |
 

@@ -178,7 +178,7 @@ test.describe("Navigation - top nav links", () => {
       const header = page.locator("header");
       await expect(header).toBeVisible();
 
-      // Check GitScout logo/link
+      // Check Scout logo/link
       const logoLink = header.locator('a[href="/"]');
       await expect(logoLink).toBeVisible();
 
@@ -275,7 +275,7 @@ test.describe("Dashboard - landing page content", () => {
     const heading = page.locator("h1");
     await expect(heading).toBeVisible();
     const headingText = await heading.textContent();
-    expect(headingText).toContain("GitScout");
+    expect(headingText).toContain("Scout");
 
     // Search input should be present
     const searchInput = page.locator('input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]');
@@ -307,7 +307,7 @@ test.describe("Dashboard - landing page content", () => {
 
     reportData.navigation.push({
       test: "Landing hero heading",
-      passed: headingText?.includes("GitScout") ?? false,
+      passed: headingText?.includes("Scout") ?? false,
       details: `Heading text: "${headingText}"`,
     });
 

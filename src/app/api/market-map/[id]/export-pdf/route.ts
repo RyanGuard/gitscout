@@ -76,7 +76,7 @@ export async function POST(
       roleLevel: map.roleLevel,
       roleStack: map.roleStack,
       geography: map.geography,
-      recruiterName: session.user.name || "GitScout User",
+      recruiterName: session.user.name || "Scout User",
       tiers,
       stats: {
         totalCompanies: map.companies.length,

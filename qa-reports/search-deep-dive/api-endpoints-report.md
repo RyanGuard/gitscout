@@ -1,4 +1,4 @@
-# GitScout API Endpoints — QA Report
+# Scout API Endpoints — QA Report
 
 **Date:** 2026-03-26
 **Environment:** http://localhost:3000 (development)

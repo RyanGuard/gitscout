@@ -1,4 +1,4 @@
-# GitScout QA Report: Navigation & Visual Quality
+# Scout QA Report: Navigation & Visual Quality
 
 **Date:** 2026-03-25
 **Environment:** localhost:3000 (Next.js dev server)
@@ -26,7 +26,7 @@
 
 ## Executive Summary
 
-GitScout's navigation and visual quality are **generally solid**. The top nav is consistent across all routes, dark theme adapts cleanly, and page load times are excellent (sub-1s for most routes). Two accessibility violations were found (color contrast), and one navigation bug was discovered with browser back/forward behavior. Several UX observations worth addressing are noted below.
+Scout's navigation and visual quality are **generally solid**. The top nav is consistent across all routes, dark theme adapts cleanly, and page load times are excellent (sub-1s for most routes). Two accessibility violations were found (color contrast), and one navigation bug was discovered with browser back/forward behavior. Several UX observations worth addressing are noted below.
 
 **Severity breakdown:**
 - **P1 (Bug):** 1 -- Browser back/forward skips intermediate history entries
@@ -55,7 +55,7 @@ GitScout's navigation and visual quality are **generally solid**. The top nav is
 
 ### Top Nav Links
 
-The header contains three nav links (Search, Match, Lists) plus the GitScout logo (links to /) and a Sign In button. All were tested on every route.
+The header contains three nav links (Search, Match, Lists) plus the Scout logo (links to /) and a Sign In button. All were tested on every route.
 
 | Route | Search link | Match link | Lists link | Logo link | Header visible |
 |-------|------------|------------|------------|-----------|----------------|
@@ -116,7 +116,7 @@ Tested in **logged-out** state (the Dashboard view with greeting/role cards requ
 
 | Element | Status | Notes |
 |---------|--------|-------|
-| "GitScout" heading (h1) | PASS | Centered, with GitBranch icon |
+| "Scout" heading (h1) | PASS | Centered, with GitBranch icon |
 | Tagline text | PASS | "Source engineering talent from GitHub..." |
 | Search input | PASS | Placeholder: "Search developers by name, language, or location..." |
 | "Live GitHub search" feature | PASS | With Globe icon |

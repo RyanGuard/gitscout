@@ -1,5 +1,5 @@
 /**
- * GitScout Performance Benchmark Suite
+ * Scout Performance Benchmark Suite
  * Playwright-based performance testing
  */
 
@@ -422,7 +422,7 @@ async function bench15_memoryLeaks(browser) {
 // MAIN
 // ============================================================
 async function main() {
-  console.log('GitScout Performance Benchmark Suite');
+  console.log('Scout Performance Benchmark Suite');
   console.log('====================================');
   console.log(`Started: ${new Date().toISOString()}`);
   console.log(`Target: ${BASE}`);

@@ -1,4 +1,4 @@
-# GitScout QA Executive Summary
+# Scout QA Executive Summary
 
 **Date:** 2026-03-25
 **Environment:** localhost:3000 (Next.js 16.2.1 dev, Chromium/Playwright)

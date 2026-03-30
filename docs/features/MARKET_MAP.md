@@ -1,4 +1,4 @@
-# GitScout Market Map — Complete Spec
+# Scout Market Map — Complete Spec
 
 The market map lets recruiters type a role brief and get back an interactive, tiered landscape of companies and candidates — auto-enriched with Apollo data and AI-powered classification.
 

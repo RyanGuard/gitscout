@@ -1,4 +1,4 @@
-# GitScout API QA Report
+# Scout API QA Report
 
 **Date:** 2026-03-25
 **Target:** http://localhost:3000
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-The GitScout API is largely well-built with consistent error handling across most endpoints. Authentication gates are solid — all protected routes correctly return 401 for unauthenticated requests. Input validation is strong on POST endpoints.
+The Scout API is largely well-built with consistent error handling across most endpoints. Authentication gates are solid — all protected routes correctly return 401 for unauthenticated requests. Input validation is strong on POST endpoints.
 
 **Critical issues found:**
 1. XSS payload reflected unescaped in `/api/search` response `query` field

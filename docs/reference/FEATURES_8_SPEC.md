@@ -1,6 +1,6 @@
-## Task: Build 8 Differentiating Features That Make GitScout Unforgettable
+## Task: Build 8 Differentiating Features That Make Scout Unforgettable
 
-This is a Next.js App Router project (TypeScript, Tailwind, Supabase, Vercel). The app has a dark theme, persistent top nav (Search, Match, Lists), role-based quick search cards, and a developer search flow. We're adding features that turn GitScout from a search tool into an intelligence platform recruiters can't live without.
+This is a Next.js App Router project (TypeScript, Tailwind, Supabase, Vercel). The app has a dark theme, persistent top nav (Search, Match, Lists), role-based quick search cards, and a developer search flow. We're adding features that turn Scout from a search tool into an intelligence platform recruiters can't live without.
 
 Build all 8 features below. Work through them in order — some depend on earlier ones.
 
@@ -27,17 +27,17 @@ A one-click AI-generated natural language summary of a developer that recruiters
   - The generated text
   - A "Copy to clipboard" button (shows "Copied!" toast for 2 seconds)
   - A "Regenerate" button (in case they want a different angle)
-  - A "Share" button that copies a formatted version with the GitScout score header
+  - A "Share" button that copies a formatted version with the Scout score header
 - Cache the generated report in Supabase so it doesn't re-generate on every page visit (cache for 24 hours)
 - The report card should have a subtle green left border accent to make it stand out on the profile page
 
 **Copy format when shared:**
 ```
-🦄 GitScout Scouting Report — Sarah Chen (Score: 87/100)
+🦄 Scout Scouting Report — Sarah Chen (Score: 87/100)
 ───────────────────────────
 Sarah Chen is a Staff-level TypeScript engineer based in San Francisco...
 ───────────────────────────
-Sourced via GitScout · gitscout.dev
+Sourced via Scout · gitscout.dev
 ```
 
 ---
@@ -71,7 +71,7 @@ One-click personalized cold outreach message based on the developer's actual Git
 
 ---
 
-### Feature 3: Daily GitScout Briefing (`/components/features/DailyBriefing.tsx`)
+### Feature 3: Daily Scout Briefing (`/components/features/DailyBriefing.tsx`)
 
 Replace the static "Good morning" dashboard greeting with a dynamic, personalized daily briefing.
 
@@ -117,7 +117,7 @@ Generate a beautiful, branded card image for any developer profile that can be s
 
 **Card design specs (generate as an SVG that gets converted to PNG):**
 - Dimensions: 1200x630px (OpenGraph standard — works in Slack previews, Twitter, etc.)
-- Dark background matching GitScout theme (#0a0a0a or your app's bg color)
+- Dark background matching Scout theme (#0a0a0a or your app's bg color)
 - Layout:
   ```
   ┌────────────────────────────────────────────────┐
@@ -132,18 +132,18 @@ Generate a beautiful, branded card image for any developer profile that can be s
   │  Go         ██░░░░░░░░  18%                    │
   │                                                │
   │  ─────────────────────────────────────────     │
-  │  GitScout · gitscout.dev            [QR?]      │
+  │  Scout · gitscout.dev               [QR?]      │
   └────────────────────────────────────────────────┘
   ```
 - Include the tier emoji (unicorn, fire, gem, etc.) next to the score
 - Language bars with percentage fills in accent colors
-- GitScout branding at the bottom — subtle, not obnoxious
+- Scout branding at the bottom — subtle, not obnoxious
 - The card should look good on both light and dark Slack themes
 
 **Implementation:**
 - Use `@vercel/og` (Vercel's OG image generation) or `satori` to render the SVG server-side
 - API route accepts a username and returns a PNG image
-- Also expose this as the OpenGraph image for developer profile pages so when someone shares a GitScout profile link in Slack, the card auto-previews
+- Also expose this as the OpenGraph image for developer profile pages so when someone shares a Scout profile link in Slack, the card auto-previews
 
 **Component specs:**
 - "Share Card" button on the developer profile
@@ -182,7 +182,7 @@ Subtle, satisfying audio feedback for key actions.
 
 ---
 
-### Feature 6: Keyboard GitScout Mode (`/lib/keyboard.ts` + `/components/features/KeyboardOverlay.tsx`)
+### Feature 6: Keyboard Scout Mode (`/lib/keyboard.ts` + `/components/features/KeyboardOverlay.tsx`)
 
 Vim-inspired keyboard navigation for power-user sourcers.
 
@@ -275,7 +275,7 @@ Micro-celebrations for milestone moments that create emotional payoff.
 - `useCelebration()` hook with methods: `celebrateUnicorn()`, `celebrateMilestone(count)`, `celebrateExport()`, `celebrateStreak(days)`
 - Confetti: use canvas-confetti library (`npm install canvas-confetti`) — it's tiny and battle-tested
 - Toasts: use a custom toast component or sonner (`npm install sonner`) — position bottom-right, dark themed, auto-dismiss after 4 seconds
-- Track all milestone flags in localStorage under a single `gitscout_celebrations` key
+- Track all milestone flags in localStorage under a single `scout_celebrations` key
 - Each celebration only fires ONCE per milestone (don't spam)
 - Respect `prefers-reduced-motion` — show toast text only, skip animations
 

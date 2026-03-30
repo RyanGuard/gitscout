@@ -6,7 +6,7 @@
 ┌─────────────────────────────────────────────────────────┐
 │                    YOUR MAC                              │
 │                                                         │
-│  ~/gitscout/          — GitScout web app (Next.js)      │
+│  ~/gitscout/          — Scout web app (Next.js)          │
 │  ~/gitscout-agent/    — Electron LinkedIn agent         │
 │                                                         │
 │  Claude Code agents run here for app development        │
@@ -16,7 +16,7 @@
 ┌──────────────▼──────────────────────────────────────────┐
 │              VERCEL                                      │
 │  https://gitscout-beta.vercel.app                       │
-│  Hosts the GitScout web app (Next.js API routes)        │
+│  Hosts the Scout web app (Next.js API routes)            │
 └──────────────┬──────────────────────────────────────────┘
                │ API calls
                │
@@ -41,14 +41,14 @@
 
 ## Components
 
-### GitScout Web App
+### Scout Web App
 - **Stack:** Next.js (App Router), React, Tailwind, Prisma ORM
 - **Hosted on:** Vercel (auto-deploys from main branch)
 - **URL:** https://gitscout-beta.vercel.app
 - **Local:** `cd ~/gitscout && npm run dev` (localhost:3000)
 - **Features:** Developer search, market map, connection mapper, outreach studio, saved lists
 
-### GitScout Agent (Electron Desktop App)
+### Scout Agent (Electron Desktop App)
 - **Stack:** Electron, React, Vite, Tailwind, playwright-extra
 - **Location:** ~/gitscout-agent
 - **Purpose:** LinkedIn automation agent with stealth browser and behavioral simulation
@@ -62,7 +62,7 @@
 - **See:** [VPS Guide](../infrastructure/VPS_GUIDE.md) for access and management
 
 ### Supabase Database
-- **Project:** GITSCOUT
+- **Project:** SCOUT
 - **URL:** https://pdjyzontpwiwkvklerea.supabase.co
 - **Shared by:** Web app (Prisma-managed tables), eval system (SQL-managed tables), LinkedIn agent (SQL-managed tables)
 

@@ -1,16 +1,16 @@
-# GitScout Connection Mapper — Build Spec
+# Scout Connection Mapper — Build Spec
 
 ## What is this?
 
-The Connection Mapper is a standalone tool inside GitScout that maps warm paths between a recruiter's company and any target company. Instead of cold outreach, the recruiter sees: "3 people at your company used to work at CoreWeave. Your investors share a board connection. 2 of your engineers contribute to the same OSS repos as their team."
+The Connection Mapper is a standalone tool inside Scout that maps warm paths between a recruiter's company and any target company. Instead of cold outreach, the recruiter sees: "3 people at your company used to work at CoreWeave. Your investors share a board connection. 2 of your engineers contribute to the same OSS repos as their team."
 
 It also integrates with the Market Map — every company card shows a connection count badge so the recruiter naturally prioritizes companies where they have warm intros.
 
 ## How It Works
 
-**One-time setup:** The recruiter registers their "home base" company (e.g. kognitos.com). GitScout enriches the full team from Apollo: names, titles, employment history, education. For the engineering team, it also pulls GitHub profiles and maps their OSS contributions. This home base becomes the dataset that all future connection mapping runs against.
+**One-time setup:** The recruiter registers their "home base" company (e.g. kognitos.com). Scout enriches the full team from Apollo: names, titles, employment history, education. For the engineering team, it also pulls GitHub profiles and maps their OSS contributions. This home base becomes the dataset that all future connection mapping runs against.
 
-**Per-target lookup:** When the recruiter picks a target company (from the market map or manually), GitScout cross-references the home base against the target's data and surfaces every connection it finds — organized by type and strength.
+**Per-target lookup:** When the recruiter picks a target company (from the market map or manually), Scout cross-references the home base against the target's data and surfaces every connection it finds — organized by type and strength.
 
 **Market map integration:** On the market map, each company card shows a connection count badge. Companies with warm paths get prioritized visually.
 
@@ -350,7 +350,7 @@ For each person T in target_company_people (where github matched):
 }
 ```
 
-**Rate limiting:** This algorithm requires GitHub API calls for target company engineers. Use the same rate limiting and caching strategy as the rest of GitScout. Cache target person repo data in enrichment_cache with 7-day TTL.
+**Rate limiting:** This algorithm requires GitHub API calls for target company engineers. Use the same rate limiting and caching strategy as the rest of Scout. Cache target person repo data in enrichment_cache with 7-day TTL.
 
 ### Algorithm 5: LinkedIn Import Cross-Reference
 
@@ -402,7 +402,7 @@ Respond in JSON:
 
 ### Connection Mapper Page: `/connections`
 
-Add "Connections" to the GitScout top nav (between Lists and Map, or after Map).
+Add "Connections" to the Scout top nav (between Lists and Map, or after Map).
 
 **Layout:**
 
@@ -555,7 +555,7 @@ Connection lookups are expensive (multiple API calls + computation). Cache aggre
 
 ### Privacy
 The home base enrichment pulls your own company's team data. Some recruiters might feel uncomfortable pulling employment history on their own colleagues. Consider:
-- Clear explanation during setup: "GitScout will analyze your team's public career history to find warm connections to target companies"
+- Clear explanation during setup: "Scout will analyze your team's public career history to find warm connections to target companies"
 - Don't expose the full employment history of home base people to the recruiter in the UI — only show the relevant connection detail
 - The data is from Apollo (public/professional data), not from internal HR systems
 

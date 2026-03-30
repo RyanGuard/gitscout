@@ -1,7 +1,7 @@
-# CLAUDE.md — GitScout
+# CLAUDE.md — Scout
 
 ## What is this?
-GitScout is a recruiting intelligence platform. Three core features:
+Scout is a recruiting intelligence platform. Three core features:
 1. Developer search — GitHub-powered, scores developers on code quality
 2. Market map — maps the talent landscape for any role using Apollo + Claude
 3. Outreach Studio — AI-powered personalized outreach writing

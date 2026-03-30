@@ -1,10 +1,10 @@
-# GitScout Expert Outreach Writer — Build Spec
+# Scout Expert Outreach Writer — Build Spec
 
 ## What Is This
 
-An interactive outreach writing tool that lives in the Sequences tab of GitScout. It's not a template generator — it's an AI writing partner that understands recruiting, knows the candidate's background, adapts to channels, generates full sequences, and learns from response data to get better over time.
+An interactive outreach writing tool that lives in the Sequences tab of Scout. It's not a template generator — it's an AI writing partner that understands recruiting, knows the candidate's background, adapts to channels, generates full sequences, and learns from response data to get better over time.
 
-A recruiter opens it and either: selects a candidate from their GitScout search/map results (auto-fills everything), or pastes in candidate details manually (works standalone). Then they interact with the writer to craft perfect outreach.
+A recruiter opens it and either: selects a candidate from their Scout search/map results (auto-fills everything), or pastes in candidate details manually (works standalone). Then they interact with the writer to craft perfect outreach.
 
 ## Core Concept: The Outreach Studio
 
@@ -23,7 +23,7 @@ create table if not exists outreach_sequences (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
   
-  -- Candidate info (auto-filled from GitScout or manual entry)
+  -- Candidate info (auto-filled from Scout or manual entry)
   candidate_name text not null,
   candidate_title text,
   candidate_company text,
@@ -176,7 +176,7 @@ create index idx_outreach_analytics_outcome on outreach_analytics (response_rece
 Full-width page with three panels:
 
 **Left Panel (280px): Candidate Context**
-- If auto-filled from GitScout: candidate card showing name, title, company, GitScout score, fit score, flight risk, top repos, recent activity
+- If auto-filled from Scout: candidate card showing name, title, company, Scout score, fit score, flight risk, top repos, recent activity
 - If manual: form fields for name, title, company, LinkedIn URL, any context
 - "Import from search" button — opens a modal to pick from recent search results
 - "Import from map" button — opens a modal to pick from a market map candidate
@@ -207,7 +207,7 @@ Full-width page with three panels:
 ## Feature 1: Write From Scratch
 
 ### Flow
-1. Recruiter selects a candidate (from GitScout or manual entry)
+1. Recruiter selects a candidate (from Scout or manual entry)
 2. Fills in role info + selling points (or loads a template)
 3. Sets channel, tone, sequence length
 4. Clicks "Generate"
@@ -221,8 +221,8 @@ Name: {candidate_name}
 Title: {candidate_title}
 Company: {candidate_company}
 Location: {candidate_location}
-{if GitScout data exists:}
-GitScout Score: {score}/100
+{if Scout data exists:}
+Scout Score: {score}/100
 Top repositories: {top_repos}
 Recent activity: {recent_activity}
 Bio: {bio}
@@ -273,7 +273,7 @@ MULTI-CHANNEL SEQUENCE:
 PERSONALIZATION RULES:
 - NEVER: "I came across your profile", "Hope this finds you well", "I'm reaching out because"
 - ALWAYS: Reference something SPECIFIC about the candidate — a repo they built, their company's recent news, a technical decision they made
-- If GitScout data exists: reference their actual code contributions, not generic claims
+- If Scout data exists: reference their actual code contributions, not generic claims
 - If connection data exists: lead with the connection in message 1
 - Each message in the sequence must use a DIFFERENT personalization angle
 - If the candidate has flight risk signals, subtly increase urgency without being desperate
@@ -464,7 +464,7 @@ Don't build this yet — just capture the data. Same pattern as the market map o
 ## Integration Points
 
 ### From Search Results
-On each developer card in search results, add a small "Write outreach" icon. Clicking it opens the Outreach Studio with the candidate auto-filled from their GitScout profile (name, title, company, score, top repos, etc.).
+On each developer card in search results, add a small "Write outreach" icon. Clicking it opens the Outreach Studio with the candidate auto-filled from their Scout profile (name, title, company, score, top repos, etc.).
 
 ### From Market Map
 On each candidate in the market map, add "Write outreach" to the action menu. Auto-fills candidate info + fit score + flight risk + company context.

@@ -31,7 +31,7 @@
 | Search button | Yes | Blue "Search" button inside input |
 | Filter sidebar | Yes | Visible by default on desktop |
 | Results area | Empty | No results, no empty state message -- just blank space |
-| Header nav | Yes | GitScout logo, Search, Match, Lists, sound toggle, Sign in |
+| Header nav | Yes | Scout logo, Search, Match, Lists, sound toggle, Sign in |
 
 **Observation:** The empty state shows filters but no call-to-action or illustration in the results area. Consider adding a prompt like "Enter a search to find developers" or a hero illustration.
 

@@ -1,24 +1,24 @@
-# GitScout LinkedIn Agent — Electron Desktop App Spec
+# Scout LinkedIn Agent — Electron Desktop App Spec
 
 ## What Is This
 
-A desktop app that recruiters install on their Mac or Windows machine. It connects to their GitScout account, pulls outreach sequences from the Outreach Studio, and executes LinkedIn actions (profile views, post likes, connection requests, messages) automatically using a stealth browser with biomechanical human simulation.
+A desktop app that recruiters install on their Mac or Windows machine. It connects to their Scout account, pulls outreach sequences from the Outreach Studio, and executes LinkedIn actions (profile views, post likes, connection requests, messages) automatically using a stealth browser with biomechanical human simulation.
 
-The recruiter's own machine is the stealth layer. Their real IP, timezone, location, and browser cookies make LinkedIn see normal activity from a normal user. GitScout provides the intelligence (who to reach, what to say, when to say it). The desktop agent provides the execution.
+The recruiter's own machine is the stealth layer. Their real IP, timezone, location, and browser cookies make LinkedIn see normal activity from a normal user. Scout provides the intelligence (who to reach, what to say, when to say it). The desktop agent provides the execution.
 
 ## User Experience
 
 ### Install
 1. Recruiter goes to gitscout.com/download
-2. Downloads GitScout Agent for Mac (.dmg) or Windows (.exe)
+2. Downloads Scout Agent for Mac (.dmg) or Windows (.exe)
 3. Drags to Applications / runs installer
 4. Opens the app
-5. Signs in with their GitScout account (OAuth or email/password)
+5. Signs in with their Scout account (OAuth or email/password)
 6. App prompts: "Connect your LinkedIn session" → one-click imports cookies from their Chrome browser
 7. Done. Agent starts working.
 
 ### Daily Usage
-1. Recruiter opens GitScout Agent in the morning (or it auto-starts on login)
+1. Recruiter opens Scout Agent in the morning (or it auto-starts on login)
 2. Agent shows: "12 actions queued for today"
 3. Agent runs quietly in background — system tray icon with status
 4. Throughout the day, it executes actions at human speed
@@ -32,9 +32,9 @@ Minimal, clean interface. Think Linear or Raycast — not a bloated dashboard.
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ GitScout Agent                    ─  □  ✕       │
+│ Scout Agent                       ─  □  ✕       │
 │                                                 │
-│  ● Connected to GitScout    LinkedIn: Active    │
+│  ● Connected to Scout       LinkedIn: Active    │
 │                                                 │
 │  ┌─────────────────────────────────────────────┐│
 │  │  Today's Activity                     ▼     ││
@@ -74,7 +74,7 @@ When minimized, the app lives in the system tray (Mac menu bar / Windows taskbar
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ GitScout Cloud (existing)                           │
+│ Scout Cloud (existing)                              │
 │                                                     │
 │ Web App (Vercel)                                    │
 │ ├── Outreach Studio: write messages, build sequences│
@@ -91,7 +91,7 @@ When minimized, the app lives in the system tray (Mac menu bar / Windows taskbar
                     │ HTTPS API
                     │
 ┌───────────────────▼─────────────────────────────────┐
-│ GitScout Agent (Electron app on recruiter's machine)│
+│ Scout Agent (Electron app on recruiter's machine)   │
 │                                                     │
 │ ┌─────────────┐  ┌──────────────┐  ┌─────────────┐ │
 │ │ Queue       │  │ Stealth      │  │ Behavioral  │ │
@@ -117,10 +117,10 @@ When minimized, the app lives in the system tray (Mac menu bar / Windows taskbar
 
 ### Key Principle: Cloud = Intelligence, Desktop = Execution
 
-The GitScout web app handles all the thinking: who to reach, what to say, when to say it, in what order. The desktop agent handles all the doing: actually opening LinkedIn, typing messages, clicking buttons.
+The Scout web app handles all the thinking: who to reach, what to say, when to say it, in what order. The desktop agent handles all the doing: actually opening LinkedIn, typing messages, clicking buttons.
 
 This means:
-- Recruiter can use GitScout web app on their phone/any device to set up sequences
+- Recruiter can use Scout web app on their phone/any device to set up sequences
 - The desktop agent on their computer executes them
 - If the agent isn't running (laptop closed), actions queue up and execute next time it's open
 - No VPS cost per user, no proxy cost per user
@@ -131,8 +131,8 @@ This means:
 
 ### Electron App
 - **Electron** — cross-platform desktop framework (Mac + Windows)
-- **React** — UI framework (same as GitScout web app)
-- **Tailwind** — styling (same as GitScout web app)
+- **React** — UI framework (same as Scout web app)
+- **Tailwind** — styling (same as Scout web app)
 - **electron-builder** — packaging for Mac (.dmg) and Windows (.exe/.msi)
 - **electron-store** — local config persistence
 - **electron-updater** — auto-updates
@@ -164,7 +164,7 @@ gitscout-agent/
 │   ├── pages/
 │   │   ├── Dashboard.tsx          — Main activity view
 │   │   ├── Settings.tsx           — Configuration
-│   │   ├── Login.tsx              — GitScout auth
+│   │   ├── Login.tsx              — Scout auth
 │   │   └── Setup.tsx              — First-run LinkedIn connection
 │   ├── components/
 │   │   ├── ActivityFeed.tsx        — Live action log
@@ -266,7 +266,7 @@ async function importLinkedInCookies(): Promise<Cookie[]> {
 If auto-import fails (different browser, Chrome locked, permissions issue):
 1. User installs a tiny Chrome extension (or goes to chrome://settings/cookies)
 2. Exports LinkedIn cookies as JSON
-3. Pastes or uploads into the GitScout Agent
+3. Pastes or uploads into the Scout Agent
 4. Agent loads the cookies
 
 ### Session Refresh
@@ -391,14 +391,14 @@ This 3-touch warm-up is orchestrated automatically. When a recruiter builds a se
 
 ---
 
-## Integration with GitScout Web App
+## Integration with Scout Web App
 
 ### How Actions Get Queued
 
-In the GitScout web app (Outreach Studio), when a recruiter:
+In the Scout web app (Outreach Studio), when a recruiter:
 1. Writes a sequence for a candidate
 2. Clicks "Send via LinkedIn"
-3. GitScout creates entries in `linkedin_action_queue`:
+3. Scout creates entries in `linkedin_action_queue`:
    - view_profile (scheduled for now)
    - like_post (scheduled for +24h)
    - connect with note (scheduled for +48h)
@@ -444,7 +444,7 @@ if (profileData) {
 }
 ```
 
-The GitScout web app sees results in real-time. The Outreach Studio updates: "Connection request sent ✓", "Response received!"
+The Scout web app sees results in real-time. The Outreach Studio updates: "Connection request sent ✓", "Response received!"
 
 ---
 
@@ -490,8 +490,8 @@ After a kill switch event:
 ### electron-builder.yml
 ```yaml
 appId: com.gitscout.agent
-productName: GitScout Agent
-copyright: Copyright © 2026 GitScout
+productName: Scout Agent
+copyright: Copyright © 2026 Scout
 
 mac:
   category: public.app-category.productivity
@@ -609,7 +609,7 @@ create table if not exists linkedin_sessions (
   updated_at timestamptz default now()
 );
 
--- Scraped profile data (enriches GitScout)
+-- Scraped profile data (enriches Scout)
 create table if not exists linkedin_profile_data (
   id uuid primary key default gen_random_uuid(),
   linkedin_url text not null unique,
@@ -645,7 +645,7 @@ Initialize the Electron + React + TypeScript project. Get a blank window renderi
 Build the main window: activity feed, stats bar, pause/resume, settings page. Use mock data.
 
 ### Step 3: Supabase connection
-Wire up authentication (GitScout login). Subscribe to linkedin_action_queue via Realtime. Display queued actions in the UI.
+Wire up authentication (Scout login). Subscribe to linkedin_action_queue via Realtime. Display queued actions in the UI.
 
 ### Step 4: Browser integration
 Bundle fingerprint-chromium binary (or CloakBrowser as fallback). Build browser.ts launcher. Test that it opens and navigates to linkedin.com.
@@ -704,7 +704,7 @@ fingerprint-chromium provides Linux binaries. For Mac and Windows, you may need 
 - Test detection on each platform before shipping
 
 ### Chrome Cookie Reading Requires Permissions
-On Mac: the app needs permission to read Chrome's data directory. macOS may prompt "GitScout Agent wants to access files in your Google Chrome folder." This is normal but may concern some users. Explain clearly in the setup flow.
+On Mac: the app needs permission to read Chrome's data directory. macOS may prompt "Scout Agent wants to access files in your Google Chrome folder." This is normal but may concern some users. Explain clearly in the setup flow.
 
 On Windows: similar DPAPI decryption needed for cookie values. The electron safeStorage API handles this.
 
@@ -722,7 +722,7 @@ Before releasing to any users, test extensively with your own LinkedIn account:
 - Monitor acceptance rates and any LinkedIn warnings throughout
 
 ### Pricing
-This should be a premium feature — not included in a basic GitScout plan:
+This should be a premium feature — not included in a basic Scout plan:
 - Free tier: Outreach Studio (write messages), manual sending
 - Pro tier ($29/month): Outreach Studio + LinkedIn Agent (automated execution)
 - This is comparable to Expandi ($99/month) and PhantomBuster ($69/month) but with better stealth and integrated intelligence

@@ -687,6 +687,7 @@ function WatchlistPanel({
       <div className="border-t border-neutral-100 px-4 py-3 dark:border-neutral-800/50">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <input
+            id="watchlist-add-input"
             type="text"
             value={newDomain}
             onChange={(e) => setNewDomain(e.target.value)}
@@ -886,19 +887,38 @@ export default function AlertsPage() {
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           if (res.status === 409) {
-            // Already exists — just ignore
+            // Already exists — just refresh
+            await fetchWatchlist();
             return;
           }
           throw new Error(err.error || "Failed to add company");
         }
+        const newCompany = await res.json();
         await fetchWatchlist();
+
+        // Auto-scan immediately so user sees results right away
+        if (newCompany.id) {
+          setScanningId(newCompany.id);
+          try {
+            await fetch("/api/alerts/scan", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ watchedCompanyId: newCompany.id }),
+            });
+            await Promise.all([fetchSignals(), fetchWatchlist()]);
+          } catch {
+            // Scan failed silently — company still added
+          } finally {
+            setScanningId(null);
+          }
+        }
       } catch {
         // Could show a toast here
       } finally {
         setAddingCompany(false);
       }
     },
-    [fetchWatchlist]
+    [fetchWatchlist, fetchSignals]
   );
 
   // Toggle company active/inactive
@@ -986,10 +1006,15 @@ export default function AlertsPage() {
     });
   }, []);
 
-  // Scroll to add form (for empty state CTA)
+  // Focus the add input (for empty state CTA)
   const handleScrollToAdd = useCallback(() => {
     const el = document.getElementById("watchlist-panel");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Focus the input field
+    setTimeout(() => {
+      const input = document.getElementById("watchlist-add-input");
+      input?.focus();
+    }, 400);
   }, []);
 
   // Computed stats

@@ -10,7 +10,7 @@
 
 ### Architecture
 
-GitScout searches GitHub's `/search/users` API **live** per query. Results are merged with locally-stored profiles (scored/enriched developers). The system has three search paths:
+Scout searches GitHub's `/search/users` API **live** per query. Results are merged with locally-stored profiles (scored/enriched developers). The system has three search paths:
 
 | Path | Endpoint | Speed | Quality | Used By |
 |------|----------|-------|---------|---------|
@@ -123,7 +123,7 @@ GitScout searches GitHub's `/search/users` API **live** per query. Results are m
 
 ### Score Accuracy Audit (5 Developers)
 
-| Developer | GitScout Score | Expected | Verdict |
+| Developer | Scout Score | Expected | Verdict |
 |-----------|---------------|----------|---------|
 | trekhleb (255k stars, Uber, 17.8k followers) | 23.7 | 80+ | WILDLY INACCURATE -- `totalCommits: 0` in DB |
 | mahseema (awesome-list curator, 6.3k followers, 10.9k following) | 56 | 30-40 | OVERSCORED -- not a TS dev, follow-for-follow ratio |

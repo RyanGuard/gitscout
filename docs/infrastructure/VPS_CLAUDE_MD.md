@@ -1,12 +1,12 @@
 # Copy this file to /opt/scout-eval/CLAUDE.md on the VPS
 
-# CLAUDE.md — GitScout Eval System
+# CLAUDE.md — Scout Eval System
 
 ## What is this?
 
-The GitScout autonomous eval and self-improving system. It runs 24/7 on a Hetzner VPS and does three things:
+The Scout autonomous eval and self-improving system. It runs 24/7 on a Hetzner VPS and does three things:
 
-1. **Evaluate** — Agents test the live GitScout app (search quality, map quality, API latency, connection quality) and write improvement tickets to Supabase when they find problems.
+1. **Evaluate** — Agents test the live Scout app (search quality, map quality, API latency, connection quality) and write improvement tickets to Supabase when they find problems.
 2. **Plan** — A planner agent reads tickets and feature ideas, prioritizes them, and writes build specs to a development queue.
 3. **Build** — A builder agent picks items off the queue, implements fixes using Claude API, runs the build, and auto-merges small/trivial changes to main (which triggers Vercel auto-deploy).
 4. **Verify** — A post-deploy eval agent checks whether deployed changes improved or hurt scores. If scores drop, it auto-reverts.
@@ -51,7 +51,7 @@ Builder agent uses a separate repo clone at `/home/scout/gitscout-autofix/` for 
 
 ### Eval Agents (detect problems)
 
-**api-latency** — Runs every hour. Hits 5 API endpoints on the live GitScout app, measures response time. Creates tickets if latency exceeds thresholds or errors occur.
+**api-latency** — Runs every hour. Hits 5 API endpoints on the live Scout app, measures response time. Creates tickets if latency exceeds thresholds or errors occur.
 
 **search-quality** — Runs daily at 06:00 UTC. Executes 15 predefined search queries against the live app. Scores results on 4 metrics: result count, relevance, score distribution, response time. Creates tickets for any metric below threshold.
 

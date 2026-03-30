@@ -223,7 +223,7 @@ Tab navigation testing on `/search` showed **25/25 elements had visible focus in
 
 | Element | Focus visible |
 |---------|:------------:|
-| GitScout logo link | Yes |
+| Scout logo link | Yes |
 | Search nav link | Yes |
 | Match nav link | Yes |
 | Lists nav link | Yes |

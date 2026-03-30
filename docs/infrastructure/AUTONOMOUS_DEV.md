@@ -143,7 +143,7 @@ create table if not exists deploy_log (
 
 4. Feed all findings to Claude:
 ```
-You are a product strategist for GitScout, a recruiting intelligence platform with three features: developer search (GitHub-powered), market map (company landscape with Apollo data), and connection mapper (warm path detection).
+You are a product strategist for Scout, a recruiting intelligence platform with three features: developer search (GitHub-powered), market map (company landscape with Apollo data), and connection mapper (warm path detection).
 
 Here are signals from the market this week:
 
@@ -157,9 +157,9 @@ COMPETITOR PAIN POINTS (from reviews):
 {G2/Capterra complaints}
 
 For each signal, assess:
-1. Is this relevant to GitScout? (yes/no)
+1. Is this relevant to Scout? (yes/no)
 2. If yes: what feature or improvement would address this?
-3. Impact score (1-10): how much would this move the needle for GitScout users?
+3. Impact score (1-10): how much would this move the needle for Scout users?
 4. Effort estimate: "trivial" (<1 hour), "small" (1-4 hours), "medium" (1-2 days), "large" (3+ days)
 5. Do any competitors already have this? Which ones?
 
@@ -191,7 +191,7 @@ Respond in JSON:
 4. Feed everything to Claude:
 
 ```
-You are the technical lead for GitScout. You need to decide what to build next.
+You are the technical lead for Scout. You need to decide what to build next.
 
 OPEN TICKETS (bugs and quality issues):
 {tickets with severity and category}
@@ -251,7 +251,7 @@ Respond in JSON:
 5. Execute the build:
 
 ```
-For the GitScout repo at GITSCOUT_REPO_PATH:
+For the Scout repo at GITSCOUT_REPO_PATH:
 
 a. git checkout main && git pull
 b. Create branch: dev/{queue-id-short}

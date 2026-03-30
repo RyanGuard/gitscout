@@ -1,4 +1,4 @@
-# GitScout Developer Scoring Framework
+# Scout Developer Scoring Framework
 ## A Recruiter-Built Scoring Engine for Identifying Top Engineering Talent via GitHub
 
 ---
@@ -7,7 +7,7 @@
 
 Most GitHub sourcing tools make the same mistake: they treat all signals equally and over-index on vanity metrics. A developer with 10,000 stars on a single viral README template is not a better engineer than someone quietly shipping merged PRs to Kubernetes.
 
-GitScout's scoring should answer one question: **"How likely is this person to be a strong hire for a given role?"** That means the score must be contextual — a great ML engineer looks different from a great frontend developer on GitHub.
+Scout's scoring should answer one question: **"How likely is this person to be a strong hire for a given role?"** That means the score must be contextual — a great ML engineer looks different from a great frontend developer on GitHub.
 
 ---
 
@@ -71,7 +71,7 @@ GitScout's scoring should answer one question: **"How likely is this person to b
 | **CI/CD configuration** | Production engineering maturity | Check for `.github/workflows/` in repos | Presence of GitHub Actions = +1pt per repo (capped) |
 
 **Scoring language match:**
-For a "Senior React Developer" search, weight JavaScript/TypeScript repos 3x. For "ML Engineer", weight Python/Jupyter repos. This is where GitScout becomes contextual rather than generic.
+For a "Senior React Developer" search, weight JavaScript/TypeScript repos 3x. For "ML Engineer", weight Python/Jupyter repos. This is where Scout becomes contextual rather than generic.
 
 ---
 
@@ -211,14 +211,14 @@ For batch scoring, implement a queue with rate limiting. Cache results in Supaba
 
 ## Competitive Landscape
 
-| Tool | Approach | Pricing | What GitScout Can Do Better |
+| Tool | Approach | Pricing | What Scout Can Do Better |
 |------|----------|---------|----------------------------|
-| **SeekOut** | "Coder Score" 1-5 stars, aggregates GH + SO | ~$500/mo | Black box scoring. GitScout = transparent, customizable weights |
-| **GitRoll** | AI-powered "CURISM" scoring | Free tier + paid | Heavy AI, slow. GitScout = fast, recruiter-first UX |
-| **GitHunt** | AI ranks by contributions + stack match | $39-299/mo | Good but generic. GitScout = contextual scoring per role |
-| **AmazingHiring** | Aggregates 50+ platforms | ~$300/mo | Broad but unfocused. GitScout = GitHub-deep |
+| **SeekOut** | "Coder Score" 1-5 stars, aggregates GH + SO | ~$500/mo | Black box scoring. Scout = transparent, customizable weights |
+| **GitRoll** | AI-powered "CURISM" scoring | Free tier + paid | Heavy AI, slow. Scout = fast, recruiter-first UX |
+| **GitHunt** | AI ranks by contributions + stack match | $39-299/mo | Good but generic. Scout = contextual scoring per role |
+| **AmazingHiring** | Aggregates 50+ platforms | ~$300/mo | Broad but unfocused. Scout = GitHub-deep |
 
-### GitScout's Edge
+### Scout's Edge
 1. **Contextual scoring** — weights shift based on the role you're hiring for
 2. **Transparency** — show WHY someone scored high, not just a number
 3. **Recruiter-built** — designed for sourcing workflow, not developer vanity metrics
