@@ -193,6 +193,94 @@ Remember: each message needs a DIFFERENT personalization angle. ${effectiveChann
       include: { messages: { orderBy: { stepNumber: "asc" } } },
     });
 
+    // Queue LinkedIn actions for the agent if channel is linkedin
+    if (
+      (effectiveChannel === "linkedin" || effectiveChannel === "multi_channel") &&
+      candidateLinkedinUrl?.trim()
+    ) {
+      try {
+        const linkedinUrl = candidateLinkedinUrl.trim();
+        const supabaseUserId = process.env.SUPABASE_AGENT_USER_ID;
+
+        if (supabaseUserId) {
+          const now = new Date();
+          const actions: Array<{
+            type: string;
+            note?: string;
+            body?: string;
+            delayMinutes: number;
+            priority: number;
+          }> = [];
+
+          // Step 1: Always view profile first
+          actions.push({ type: "view_profile", delayMinutes: 0, priority: 1 });
+
+          // Map generated messages to LinkedIn actions
+          for (const msg of generated.messages) {
+            if (msg.channel === "linkedin" || effectiveChannel === "linkedin") {
+              const msgBody = msg.body as string;
+              if (msg.step_number === 1) {
+                // First LinkedIn touch: send as connection request
+                actions.push({
+                  type: "connect",
+                  note: msgBody.slice(0, 200),
+                  delayMinutes: 5 + (msg.delay_days || 0) * 1440,
+                  priority: 3,
+                });
+              } else {
+                // Follow-up: send as message (only works if already connected)
+                actions.push({
+                  type: "message",
+                  body: msgBody,
+                  delayMinutes: (msg.delay_days || 1) * 1440,
+                  priority: 5,
+                });
+              }
+            }
+          }
+
+          // If no like_post action and sequence >= 2, add one before the connect
+          if (length >= 2 && !actions.find((a) => a.type === "like_post")) {
+            const connectIdx = actions.findIndex((a) => a.type === "connect");
+            if (connectIdx > 0) {
+              actions.splice(connectIdx, 0, {
+                type: "like_post",
+                delayMinutes: 3,
+                priority: 2,
+              });
+            }
+          }
+
+          // Insert into linkedin_action_queue
+          for (const action of actions) {
+            const scheduledFor = new Date(now.getTime() + action.delayMinutes * 60 * 1000);
+            await prisma.$executeRaw`
+              INSERT INTO linkedin_action_queue (id, user_id, sequence_id, action_type, target_linkedin_url, target_name, connection_note, message_body, scheduled_for, priority, status, created_at)
+              VALUES (
+                gen_random_uuid(),
+                ${supabaseUserId}::uuid,
+                ${sequence.id},
+                ${action.type},
+                ${linkedinUrl},
+                ${candidateName.trim()},
+                ${action.note || null},
+                ${action.body || null},
+                ${scheduledFor},
+                ${action.priority},
+                'queued',
+                now()
+              )
+            `;
+          }
+
+          console.log(`[outreach] Queued ${actions.length} LinkedIn actions for ${candidateName} → agent`);
+        }
+      } catch (queueErr) {
+        // Don't fail the whole request if queue insertion fails
+        console.error("[outreach] Failed to queue LinkedIn actions:", queueErr);
+      }
+    }
+
     return Response.json({
       id: sequence.id,
       strategy: generated.strategy,
