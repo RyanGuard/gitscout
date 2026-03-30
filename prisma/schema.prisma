@@ -104,6 +104,7 @@ model User {
   watchedCompanies    WatchedCompany[]
   outreachSequences   OutreachSequence[]
   outreachStudioTemplates OutreachStudioTemplate[]
+  sellingPointKits        SellingPointKit[]
 }
 
 model Account {
@@ -813,6 +814,10 @@ model OutreachSequence {
   channel              String             @default("email") // email | linkedin | text | multi_channel
   tone                 String             @default("professional") // professional | casual | technical_peer | executive | warm_intro
   sequenceLength       Int                @default(3)
+  roleContext          Json?
+  flowSteps            Json?
+  linkedinQueuedAt     DateTime?
+  ashbyPushedAt        DateTime?
   status               String             @default("draft") // draft | ready | sending | completed
   responseReceived     Boolean            @default(false)
   responseSentiment    String?            // positive | neutral | negative
@@ -883,4 +888,23 @@ model OutreachAnalytic {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SELLING POINT KITS
+// ═══════════════════════════════════════════════════════════
+
+model SellingPointKit {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  roleTitle   String?
+  points      String[] @default([])
+  roleContext Json?
+  useCount    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

@@ -5,12 +5,28 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   Send, Mail, MessageSquare, Smartphone, Layers, Copy, Download,
-  Bookmark, Loader2, RefreshCw, ArrowUp, ArrowDown, Plus, X,
-  Building2, MapPin, Sparkles, ChevronDown,
-  Minus, FileText, Zap, TrendingUp, AlertCircle, CheckCircle2,
+  Bookmark, Loader2, ArrowUp, ArrowDown, Plus, X,
+  Building2, MapPin, ChevronDown,
+  Minus, FileText, AlertCircle, CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CandidateBrowser } from "@/components/outreach/CandidateBrowser";
+import {
+  ChannelSelector,
+  ToneSelector,
+  SequenceLengthSlider,
+  ChannelSettingsLinkedin,
+  ChannelSettingsEmail,
+  ChannelSettingsText,
+  RoleContextPanel,
+  ActionsSection,
+  TemplatesSection,
+  IntelligenceSection,
+  SuggestionsSection,
+  LinkedInQueueButton,
+  AshbyLogSection,
+} from "@/components/outreach/settings";
+import type { RoleContext } from "@/components/outreach/settings";
 import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
 
 // ─── Custom Icons ───
@@ -155,9 +171,17 @@ function OutreachStudio() {
   const [channel, setChannel] = useState<Channel>("email");
   const [tone, setTone] = useState<Tone>("professional");
   const [seqLength, setSeqLength] = useState(3);
-  const [roleTitle, setRoleTitle] = useState("");
-  const [roleCompany, setRoleCompany] = useState("");
+  // Structured role context
+  const [roleContext, setRoleContext] = useState<RoleContext>({
+    roleTitle: '', company: '', payRange: null, workModel: null,
+    techStack: [], teamSize: '', companyStage: '', recentNews: ''
+  });
   const [sellingPoints, setSellingPoints] = useState<string[]>([""]);
+
+  // LinkedIn-specific settings
+  const [viewFirst, setViewFirst] = useState(true);
+  const [likePost, setLikePost] = useState(false);
+  const [firstTouch, setFirstTouch] = useState<'connect' | 'inmail'>('connect');
 
   // UI State
   const [generating, setGenerating] = useState(false);
@@ -272,8 +296,9 @@ function OutreachStudio() {
           sourceType: candidate.sourceType,
           sourceDeveloperId: candidate.sourceDeveloperId,
           sourceMapId: candidate.sourceMapId,
-          roleTitle,
-          roleCompany,
+          roleTitle: roleContext.roleTitle,
+          roleCompany: roleContext.company,
+          roleContext,
           sellingPoints: sellingPoints.filter(Boolean),
           channel,
           tone,
@@ -530,7 +555,7 @@ function OutreachStudio() {
           channel,
           tone,
           sequenceLength: seqLength,
-          roleContext: roleTitle,
+          roleContext: roleContext.roleTitle,
           sellingPoints: sellingPoints.filter(Boolean),
           templateMessages,
         }),
@@ -592,8 +617,17 @@ function OutreachStudio() {
       setTone(data.tone);
       setSeqLength(data.sequenceLength);
       setSellingPoints(data.sellingPoints?.length ? data.sellingPoints : [""]);
-      setRoleTitle(data.roleTitle || "");
-      setRoleCompany(data.roleCompany || "");
+      // Load structured roleContext if available, otherwise populate from flat fields
+      if (data.roleContext && typeof data.roleContext === 'object') {
+        setRoleContext(data.roleContext as RoleContext);
+      } else {
+        setRoleContext({
+          roleTitle: data.roleTitle || '',
+          company: data.roleCompany || '',
+          payRange: null, workModel: null,
+          techStack: [], teamSize: '', companyStage: '', recentNews: ''
+        });
+      }
       setSequenceStatus(data.status);
       setMessages(
         (data.messages || []).map((m: OutreachMessage) => ({
@@ -1013,100 +1047,27 @@ function OutreachStudio() {
 
       {/* ═══ RIGHT PANEL — AI Controls + Intelligence ═══ */}
       <div className="w-[300px] shrink-0 border-l border-border overflow-y-auto bg-surface-secondary p-4">
-        {/* Section 1: Settings */}
         <div className="mb-5">
           <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3">Settings</h3>
+          <ChannelSelector channel={channel} onChange={setChannel} />
+          <ToneSelector tone={tone} onChange={setTone} />
 
-          {/* Channel */}
-          <div className="mb-3">
-            <label className="mb-1.5 block text-xs font-medium text-text-secondary">Channel</label>
-            <div className="grid grid-cols-4 gap-1 rounded-lg border border-border bg-surface p-0.5">
-              {CHANNELS.map((ch) => {
-                const Icon = ch.icon;
-                return (
-                  <button
-                    key={ch.value}
-                    onClick={() => setChannel(ch.value)}
-                    className={cn(
-                      "flex flex-col items-center gap-0.5 rounded-md py-2 text-[10px] font-medium transition-colors",
-                      channel === ch.value ? "bg-gold text-white" : "text-text-muted hover:text-text"
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    {ch.label}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-1 text-[10px] text-text-dim">
-              Try multi-channel — email first, then LinkedIn follow-up. Recruiters who mix channels get 2x more responses.
-            </p>
-          </div>
-
-          {/* Tone */}
-          <div className="mb-3">
-            <label className="mb-1.5 block text-xs font-medium text-text-secondary">Tone</label>
-            <div className="grid grid-cols-2 gap-1">
-              {TONES.map((t) => (
-                <button
-                  key={t.value}
-                  onClick={() => setTone(t.value)}
-                  className={cn(
-                    "rounded-md border px-2 py-1.5 text-[11px] font-medium transition-colors",
-                    tone === t.value
-                      ? "border-gold bg-gold-bg text-gold"
-                      : "border-border text-text-muted hover:border-gold/30"
-                  )}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-[10px] text-text-dim">
-              &quot;Technical peer&quot; works best for senior engineers. &quot;Casual&quot; works best for startup engineers.
-            </p>
-          </div>
-
-          {/* Sequence length */}
-          <div className="mb-3">
-            <label className="mb-1.5 flex items-center justify-between text-xs font-medium text-text-secondary">
-              <span>Sequence length</span>
-              <span className="font-bold text-gold">{seqLength}</span>
-            </label>
-            <input
-              type="range"
-              min={1}
-              max={5}
-              value={seqLength}
-              onChange={(e) => setSeqLength(parseInt(e.target.value))}
-              className="w-full accent-gold"
+          {/* Channel-specific settings */}
+          {channel === 'linkedin' && (
+            <ChannelSettingsLinkedin
+              seqLength={seqLength} onSeqLengthChange={setSeqLength}
+              viewFirst={viewFirst} onViewFirstChange={setViewFirst}
+              likePost={likePost} onLikePostChange={setLikePost}
+              firstTouch={firstTouch} onFirstTouchChange={setFirstTouch}
             />
-            <div className="flex justify-between text-[9px] text-text-dim">
-              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-            </div>
-          </div>
+          )}
+          {channel === 'email' && <ChannelSettingsEmail seqLength={seqLength} onSeqLengthChange={setSeqLength} />}
+          {channel === 'text' && <ChannelSettingsText seqLength={seqLength} onSeqLengthChange={setSeqLength} />}
+          {channel === 'multi_channel' && <SequenceLengthSlider value={seqLength} onChange={setSeqLength} />}
 
-          {/* Role info */}
-          <div className="mb-3">
-            <label className="mb-1 block text-xs font-medium text-text-secondary">Role title</label>
-            <input
-              value={roleTitle}
-              onChange={(e) => setRoleTitle(e.target.value)}
-              placeholder="e.g. Sr. Frontend Engineer"
-              className="w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-xs outline-none focus:border-gold"
-            />
-          </div>
-          <div className="mb-3">
-            <label className="mb-1 block text-xs font-medium text-text-secondary">Company</label>
-            <input
-              value={roleCompany}
-              onChange={(e) => setRoleCompany(e.target.value)}
-              placeholder="Your company name"
-              className="w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-xs outline-none focus:border-gold"
-            />
-          </div>
+          <RoleContextPanel value={roleContext} onChange={setRoleContext} />
 
-          {/* Selling points */}
+          {/* Selling points - kept inline */}
           <div className="mb-3">
             <label className="mb-1 block text-xs font-medium text-text-secondary">Selling points</label>
             {sellingPoints.map((sp, i) => (
@@ -1143,171 +1104,45 @@ function OutreachStudio() {
           </div>
         </div>
 
-        {/* Section 2: Actions */}
-        <div className="mb-5">
-          <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3">Actions</h3>
+        <ActionsSection
+          onGenerate={handleGenerate}
+          onRewrite={handleRewrite}
+          onImprove={handleImprove}
+          onRegenerateStep={handleRegenerateStep}
+          generating={generating}
+          rewriting={rewriting}
+          improving={improving}
+          hasMessages={messages.length > 0}
+          canGenerate={!!candidate.name.trim()}
+          activeStep={activeStep}
+        />
 
-          <button
-            onClick={handleGenerate}
-            disabled={generating || !candidate.name.trim()}
-            className="w-full rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {generating ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                Generate sequence
-              </>
-            )}
-          </button>
-
-          {messages.length > 0 && (
-            <div className="mt-2 space-y-1.5">
-              <button
-                onClick={handleRewrite}
-                disabled={rewriting}
-                className="w-full rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-1.5"
-              >
-                {rewriting ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                Rewrite this message
-              </button>
-              <button
-                onClick={handleImprove}
-                disabled={improving}
-                className="w-full rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-1.5"
-              >
-                {improving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
-                Improve this message
-              </button>
-              <p className="text-[10px] text-text-dim">
-                Paste your own draft and click Improve — Scout keeps your voice but makes it sharper
-              </p>
-              <button
-                onClick={() => handleRegenerateStep(activeStep)}
-                className="w-full rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface flex items-center justify-center gap-1.5"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Regenerate this step
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Section 3: Templates */}
-        <div className="mb-5">
-          <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3">Templates</h3>
-          {templates.length > 0 && (
-            <div className="relative mb-2">
-              <button
-                onClick={() => setShowTemplates(!showTemplates)}
-                className="w-full flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-gold/30"
-              >
-                <span>Load template</span>
-                <ChevronDown className={cn("h-3 w-3 transition-transform", showTemplates && "rotate-180")} />
-              </button>
-              {showTemplates && (
-                <div className="absolute z-10 top-full mt-1 w-full rounded-lg border border-border bg-surface shadow-lg max-h-48 overflow-y-auto">
-                  {templates.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => loadTemplate(t)}
-                      className="w-full px-3 py-2 text-left text-xs hover:bg-surface-secondary border-b border-border last:border-0"
-                    >
-                      <span className="font-medium text-text">{t.name}</span>
-                      {t.responseRate !== null && (
-                        <span className="ml-2 text-success">{Math.round(t.responseRate * 100)}% response</span>
-                      )}
-                      <p className="text-text-muted truncate">{t.description}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          <p className="text-[10px] text-text-dim">
-            Save your best sequences as templates. Scout tracks which templates get the highest response rates.
-          </p>
-        </div>
-
-        {/* Section 4: Intelligence */}
-        {analytics?.hasEnoughData && (
-          <div className="mb-5">
-            <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3">
-              What&apos;s working for you
-            </h3>
-            <div className="rounded-xl border border-border bg-surface p-3 space-y-2">
-              {analytics.bestChannel && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-muted">Best channel</span>
-                  <span className="font-semibold text-text capitalize">{analytics.bestChannel.channel} ({analytics.bestChannel.rate}%)</span>
-                </div>
-              )}
-              {analytics.bestTone && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-muted">Best tone</span>
-                  <span className="font-semibold text-text capitalize">{analytics.bestTone.tone.replace("_", " ")} ({analytics.bestTone.rate}%)</span>
-                </div>
-              )}
-              {analytics.optimalLength && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-muted">Optimal length</span>
-                  <span className="font-semibold text-text">{analytics.optimalLength.min}-{analytics.optimalLength.max} words</span>
-                </div>
-              )}
-              {analytics.topSignal && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-muted">Top signal</span>
-                  <span className="font-semibold text-gold">{analytics.topSignal.signal} (+{analytics.topSignal.rate}%)</span>
-                </div>
-              )}
-            </div>
-            <p className="mt-1.5 text-[10px] text-text-dim">
-              These stats are from YOUR outreach. Scout learns what works for you specifically.
-            </p>
-          </div>
+        {/* LinkedIn Queue Button */}
+        {(channel === 'linkedin' || channel === 'multi_channel') && sequenceId && candidate.linkedinUrl && (
+          <LinkedInQueueButton sequenceId={sequenceId} candidateName={candidate.name} />
         )}
 
-        {/* Suggestions */}
-        {candidate.name && (
-          <div className="mb-5">
-            <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3">Suggested approach</h3>
-            {suggestions ? (
-              <div className="rounded-xl border border-border bg-surface p-3">
-                <ul className="space-y-1.5">
-                  {suggestions.suggestions?.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-text-secondary">
-                      <TrendingUp className="h-3 w-3 text-gold shrink-0 mt-0.5" />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={applySuggestions}
-                  className="mt-3 w-full rounded-lg bg-gold-bg border border-gold-border px-3 py-1.5 text-xs font-medium text-gold hover:bg-gold-bg-strong transition-colors"
-                >
-                  Apply suggestions
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleGetSuggestions}
-                disabled={loadingSuggestions}
-                className="w-full rounded-lg border border-dashed border-border px-3 py-2.5 text-xs font-medium text-text-muted hover:border-gold hover:text-gold transition-colors flex items-center justify-center gap-1.5"
-              >
-                {loadingSuggestions ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Sparkles className="h-3 w-3" />
-                )}
-                Get AI suggestions
-              </button>
-            )}
-          </div>
+        {/* Ashby Log */}
+        {sequenceId && (
+          <AshbyLogSection sequenceId={sequenceId} candidateName={candidate.name} />
         )}
+
+        <TemplatesSection
+          templates={templates}
+          showTemplates={showTemplates}
+          onToggleTemplates={() => setShowTemplates(!showTemplates)}
+          onLoadTemplate={loadTemplate}
+        />
+
+        <IntelligenceSection analytics={analytics} />
+
+        <SuggestionsSection
+          suggestions={suggestions}
+          loadingSuggestions={loadingSuggestions}
+          onGetSuggestions={handleGetSuggestions}
+          onApplySuggestions={applySuggestions}
+          showForCandidate={!!candidate.name}
+        />
       </div>
 
       {/* ═══ MODALS ═══ */}

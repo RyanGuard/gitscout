@@ -183,3 +183,31 @@ export async function createApplication(
 
   return { applicationId: data.results.id };
 }
+
+// --- Create note on a candidate ---
+
+interface NoteCreateResponse {
+  success: boolean;
+  results: {
+    id: string;
+  };
+}
+
+export async function createNote(
+  apiKey: string,
+  params: {
+    candidateId: string;
+    note: string;
+  }
+): Promise<{ noteId: string }> {
+  const data = await ashbyRequest<NoteCreateResponse>(
+    "candidate.createNote",
+    apiKey,
+    {
+      candidateId: params.candidateId,
+      note: params.note,
+    }
+  );
+
+  return { noteId: data.results.id };
+}
