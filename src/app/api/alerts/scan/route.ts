@@ -152,37 +152,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (articles.length === 0) {
-      // No news — update lastScannedAt and return
-      await prisma.watchedCompany.update({
-        where: { id: watchedCompanyId },
-        data: { lastScannedAt: new Date() },
-      });
-
-      return NextResponse.json({
-        signalsCreated: 0,
-        candidatesSurfaced: 0,
-        message: "No recent news articles found.",
-      });
-    }
-
     // -------------------------------------------------------
-    // Step 2: Classify news with Claude
+    // Step 2: Classify news with Claude (skip if no articles)
     // -------------------------------------------------------
-    const anthropic = new Anthropic();
+    let events: NewsEvent[] = [];
 
-    const articleText = articles
-      .slice(0, 8)
-      .map(
-        (a, i) =>
-          `${i + 1}. "${a.title}" (${a.published_date})\n   ${a.snippet.slice(0, 200)}`
-      )
-      .join("\n\n");
+    if (articles.length > 0) {
+      const anthropic = new Anthropic();
+      const articleText = articles
+        .slice(0, 8)
+        .map(
+          (a, i) =>
+            `${i + 1}. "${a.title}" (${a.published_date})\n   ${a.snippet.slice(0, 200)}`
+        )
+        .join("\n\n");
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      system: `You are analyzing news articles about ${watchedCompany.companyName} for recruiting intelligence.
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: `You are analyzing news articles about ${watchedCompany.companyName} for recruiting intelligence.
 
 From these articles, identify any of the following events. Respond ONLY with the events you find clear evidence for:
 - LAYOFFS: any reduction in force, layoffs, or significant headcount cuts
@@ -206,26 +194,26 @@ Respond ONLY in JSON:
     {"event_type": "LAYOFFS", "severity": "high", "summary": "Company laid off 15% of workforce in January", "date": "2026-01", "source_url": "https://..."}
   ]
 }`,
-      messages: [
-        {
-          role: "user",
-          content: `Articles about ${watchedCompany.companyName}:\n\n${articleText}`,
-        },
-      ],
-    });
+        messages: [
+          {
+            role: "user",
+            content: `Articles about ${watchedCompany.companyName}:\n\n${articleText}`,
+          },
+        ],
+      });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
-    let events: NewsEvent[] = [];
+      const text =
+        response.content[0].type === "text" ? response.content[0].text : "";
 
-    try {
-      const parsed = JSON.parse(text);
-      events = parsed.events || [];
-    } catch {
-      const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
+      try {
+        const parsed = JSON.parse(text);
         events = parsed.events || [];
+      } catch {
+        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[1]);
+          events = parsed.events || [];
+        }
       }
     }
 
@@ -242,17 +230,15 @@ Respond ONLY in JSON:
       (e) => e.severity === "medium" || e.severity === "high"
     );
 
+    // If no significant news events, create a baseline signal
+    // so candidates still get surfaced on first scan
     if (significantEvents.length === 0) {
-      await prisma.watchedCompany.update({
-        where: { id: watchedCompanyId },
-        data: { lastScannedAt: new Date() },
-      });
-
-      return NextResponse.json({
-        signalsCreated: 0,
-        candidatesSurfaced: 0,
-        eventsFound: filteredEvents.length,
-        message: "No medium/high severity events detected.",
+      significantEvents.push({
+        event_type: "FUNDING" as const,
+        severity: "medium" as const,
+        summary: `Now watching ${watchedCompany.companyName} — ${articles.length > 0 ? articles.length + " recent articles reviewed, no major events detected" : "no recent news found"}. Here are current engineering candidates.`,
+        date: new Date().toISOString().slice(0, 7),
+        source_url: undefined,
       });
     }
 
