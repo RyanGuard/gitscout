@@ -28,6 +28,7 @@ import {
 } from "@/components/outreach/settings";
 import type { RoleContext } from "@/components/outreach/settings";
 import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
+import { CandidateProfileCard } from "@/components/outreach/CandidateProfileCard";
 
 // ─── Custom Icons ───
 
@@ -886,6 +887,10 @@ function OutreachStudio() {
                   <div className="h-4 rounded bg-surface-secondary animate-pulse" />
                   <div className="h-32 rounded-lg bg-surface-secondary animate-pulse" />
                   <div className="h-4 w-2/3 rounded bg-surface-secondary animate-pulse" />
+                </div>
+              ) : candidate.name ? (
+                <div className="w-full h-full overflow-y-auto text-left">
+                  <CandidateProfileCard candidate={candidate} />
                 </div>
               ) : (
                 <>
