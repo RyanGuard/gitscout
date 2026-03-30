@@ -76,6 +76,58 @@ export async function listJobs(apiKey: string) {
   return data.results.filter((j) => j.status === "Open" || j.status === "Published");
 }
 
+// --- Job details ---
+
+interface AshbyJobDetails {
+  id: string;
+  title: string;
+  status: string;
+  employmentType: string | null;
+  department: { id: string; name: string } | null;
+  location: { id: string; name: string } | null;
+  compensationTier: {
+    id: string;
+    title: string;
+    min: { value: number; currencyCode: string } | null;
+    max: { value: number; currencyCode: string } | null;
+  } | null;
+  customFields: Array<{
+    id: string;
+    title: string;
+    value: string | string[] | null;
+  }>;
+  hiringTeam: Array<{
+    userId: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  }>;
+}
+
+interface JobInfoResponse {
+  success: boolean;
+  results: AshbyJobDetails;
+}
+
+export async function getJobDetails(apiKey: string, jobId: string) {
+  const data = await ashbyRequest<JobInfoResponse>("job.info", apiKey, { jobId });
+  const job = data.results;
+
+  // Extract useful fields for the outreach role context
+  return {
+    id: job.id,
+    title: job.title,
+    department: job.department?.name || null,
+    location: job.location?.name || null,
+    employmentType: job.employmentType,
+    compensationMin: job.compensationTier?.min?.value || null,
+    compensationMax: job.compensationTier?.max?.value || null,
+    currency: job.compensationTier?.min?.currencyCode || 'USD',
+    customFields: job.customFields,
+    hiringTeam: job.hiringTeam,
+  };
+}
+
 // --- Sources ---
 
 interface AshbySource {

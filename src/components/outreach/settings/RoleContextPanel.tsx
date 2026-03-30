@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, ChevronDown, Loader2, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ───
@@ -46,6 +46,77 @@ interface RoleContextPanelProps {
 
 export function RoleContextPanel({ value, onChange }: RoleContextPanelProps) {
   const [techInput, setTechInput] = useState("");
+  const [atsJobs, setAtsJobs] = useState<Array<{ id: string; title: string }>>([]);
+  const [atsConnected, setAtsConnected] = useState(false);
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [showJobPicker, setShowJobPicker] = useState(false);
+  const [loadingJobDetails, setLoadingJobDetails] = useState(false);
+
+  // Check if ATS is connected and load jobs
+  useEffect(() => {
+    fetch("/api/ashby/connect")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.connected) {
+          setAtsConnected(true);
+          setLoadingJobs(true);
+          fetch("/api/ashby/jobs")
+            .then((r) => r.json())
+            .then((d) => setAtsJobs(d.jobs || []))
+            .catch(() => {})
+            .finally(() => setLoadingJobs(false));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  async function handleSelectJob(jobId: string) {
+    setShowJobPicker(false);
+    setLoadingJobDetails(true);
+    try {
+      const res = await fetch(`/api/ashby/jobs/${jobId}`);
+      const { job } = await res.json();
+      if (job) {
+        onChange({
+          ...value,
+          roleTitle: job.title || value.roleTitle,
+          company: value.company, // Keep existing company
+          payRange: job.compensationMin ? {
+            min: String(job.compensationMin),
+            max: String(job.compensationMax || job.compensationMin),
+            showToCandidate: false,
+          } : value.payRange,
+          workModel: inferWorkModel(job.location, job.customFields) || value.workModel,
+          teamSize: value.teamSize,
+          companyStage: value.companyStage,
+          recentNews: value.recentNews,
+          techStack: value.techStack,
+        });
+      }
+    } catch {}
+    setLoadingJobDetails(false);
+  }
+
+  function inferWorkModel(
+    location: string | null,
+    customFields: Array<{ title: string; value: string | string[] | null }> | undefined
+  ): "remote" | "hybrid" | "onsite" | null {
+    // Check custom fields for work model
+    const workField = customFields?.find((f) =>
+      f.title.toLowerCase().includes("remote") ||
+      f.title.toLowerCase().includes("work model") ||
+      f.title.toLowerCase().includes("workplace")
+    );
+    if (workField?.value) {
+      const v = String(workField.value).toLowerCase();
+      if (v.includes("remote")) return "remote";
+      if (v.includes("hybrid")) return "hybrid";
+      if (v.includes("onsite") || v.includes("office")) return "onsite";
+    }
+    // Infer from location name
+    if (location?.toLowerCase().includes("remote")) return "remote";
+    return null;
+  }
 
   function update(patch: Partial<RoleContext>) {
     onChange({ ...value, ...patch });
@@ -81,6 +152,48 @@ export function RoleContextPanel({ value, onChange }: RoleContextPanelProps) {
 
   return (
     <div>
+      {/* ATS Role Picker */}
+      {atsConnected && (
+        <div className="mb-3">
+          <label className="mb-1 block text-xs font-medium text-text-secondary">Import from ATS</label>
+          <div className="relative">
+            <button
+              onClick={() => setShowJobPicker(!showJobPicker)}
+              disabled={loadingJobs || loadingJobDetails}
+              className="w-full flex items-center justify-between rounded-lg border border-dashed border-gold/40 bg-gold-bg px-3 py-1.5 text-xs font-medium text-gold transition-colors hover:border-gold/60 disabled:opacity-50"
+            >
+              <span className="flex items-center gap-1.5">
+                {loadingJobDetails ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Building2 className="h-3 w-3" />
+                )}
+                {loadingJobDetails ? "Loading job details..." : "Select role from Ashby"}
+              </span>
+              <ChevronDown className={cn("h-3 w-3 transition-transform", showJobPicker && "rotate-180")} />
+            </button>
+            {showJobPicker && atsJobs.length > 0 && (
+              <div className="absolute z-20 top-full mt-1 w-full rounded-lg border border-border bg-surface shadow-lg max-h-48 overflow-y-auto">
+                {atsJobs.map((job) => (
+                  <button
+                    key={job.id}
+                    onClick={() => handleSelectJob(job.id)}
+                    className="w-full px-3 py-2 text-left text-xs hover:bg-surface-secondary border-b border-border last:border-0 text-text"
+                  >
+                    {job.title}
+                  </button>
+                ))}
+              </div>
+            )}
+            {showJobPicker && atsJobs.length === 0 && !loadingJobs && (
+              <div className="absolute z-20 top-full mt-1 w-full rounded-lg border border-border bg-surface p-3 text-xs text-text-muted">
+                No open jobs found in Ashby
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Role title */}
       <div className="mb-3">
         <label className="mb-1 block text-xs font-medium text-text-secondary">Role title</label>
