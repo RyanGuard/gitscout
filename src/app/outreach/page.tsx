@@ -29,6 +29,8 @@ import {
 import type { RoleContext } from "@/components/outreach/settings";
 import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
 import { CandidateProfileCard } from "@/components/outreach/CandidateProfileCard";
+import { CompactCandidateHeader } from "@/components/outreach/CompactCandidateHeader";
+import { SequenceStatusCard } from "@/components/outreach/SequenceStatusCard";
 
 // ─── Custom Icons ───
 
@@ -823,34 +825,25 @@ function OutreachStudio() {
 
       {/* ═══ CENTER PANEL — Message Editor ═══ */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar: channel + tone badges */}
-        <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-          {activeMsg && (
-            <>
-              <span className="inline-flex items-center gap-1 rounded-md bg-gold-bg px-2 py-1 text-[10px] font-semibold text-gold capitalize">
-                {activeMsg.channel === "multi_channel" ? "Multi-channel" : activeMsg.channel}
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md bg-surface-secondary px-2 py-1 text-[10px] font-semibold text-text-secondary capitalize">
-                {tone.replace("_", " ")}
-              </span>
-            </>
-          )}
-          {strategy && (
-            <span className="ml-auto text-xs text-text-muted italic truncate max-w-xs">{strategy}</span>
-          )}
+        {/* Compact candidate header (visible after generation) */}
+        {messages.length > 0 && candidate.name && (
+          <CompactCandidateHeader candidate={candidate} />
+        )}
 
-          {/* Response tracking buttons */}
-          {sequenceId && sequenceStatus === "draft" && messages.length > 0 && (
+        {/* Top bar: response tracking only */}
+        {messages.length > 0 && (
+        <div className="flex items-center gap-2 border-b border-border px-5 py-2">
+          {sequenceId && sequenceStatus === "draft" && (
             <button
               onClick={markAsSent}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-secondary"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-secondary"
             >
               <Send className="h-3 w-3" />
               Mark as sent
             </button>
           )}
           {sequenceId && sequenceStatus === "sending" && (
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowResponseModal(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-white"
@@ -867,6 +860,7 @@ function OutreachStudio() {
             </div>
           )}
         </div>
+        )}
 
         {/* Error banner */}
         {error && (
@@ -903,6 +897,19 @@ function OutreachStudio() {
             </div>
           ) : (
             <>
+              {/* Sequence status dashboard */}
+              <div className="mb-4">
+                <SequenceStatusCard
+                  channel={channel}
+                  tone={tone}
+                  strategy={strategy}
+                  roleContext={roleContext}
+                  sequenceId={sequenceId}
+                  sequenceStatus={sequenceStatus}
+                  messages={messages}
+                />
+              </div>
+
               {/* Subject line (email only) */}
               {showSubject && (
                 <div className="mb-3">
