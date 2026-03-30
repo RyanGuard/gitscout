@@ -96,9 +96,9 @@ type Tier = "A" | "B" | "C";
 // ═══════════════════════════════════════════════════════════
 
 const TIER_CONFIG: Record<Tier, { label: string; sub: string; dot: string; badge: string }> = {
-  A: { label: "Tier A", sub: "Direct competitors", dot: "bg-emerald-500", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-  B: { label: "Tier B", sub: "Adjacent space", dot: "bg-indigo-500", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
-  C: { label: "Tier C", sub: "Upmarket talent", dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  A: { label: "Tier A", sub: "Direct competitors", dot: "bg-emerald-500", badge: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
+  B: { label: "Tier B", sub: "Adjacent space", dot: "bg-indigo-500", badge: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20" },
+  C: { label: "Tier C", sub: "Upmarket talent", dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20" },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -121,10 +121,10 @@ const FLIGHT_RISK_LABELS: Record<string, string> = {
 };
 
 function scoreColor(s: number) {
-  if (s >= 90) return "text-emerald-400 bg-emerald-500/10";
-  if (s >= 80) return "text-blue-400 bg-blue-500/10";
-  if (s >= 70) return "text-amber-400 bg-amber-500/10";
-  return "text-neutral-400 bg-neutral-500/10";
+  if (s >= 90) return "text-emerald-700 dark:text-emerald-400 bg-emerald-500/10";
+  if (s >= 80) return "text-blue-700 dark:text-blue-400 bg-blue-500/10";
+  if (s >= 70) return "text-amber-700 dark:text-amber-400 bg-amber-500/10";
+  return "text-neutral-600 dark:text-neutral-400 bg-neutral-500/10";
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -146,13 +146,13 @@ function StatusDropdown({ status, onUpdate }: { status: string; onUpdate: (s: st
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-6 z-50 w-36 rounded-lg border border-neutral-700/50 bg-neutral-900 p-1 shadow-xl">
+          <div className="absolute right-0 top-6 z-50 w-36 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-900 p-1 shadow-xl">
             {Object.entries(STATUS_CONFIG).map(([key, val]) => (
               <button
                 key={key}
                 onClick={(e) => { e.stopPropagation(); onUpdate(key); setOpen(false); }}
                 className={`w-full rounded-md px-2.5 py-1.5 text-left text-[11px] font-medium transition-colors ${
-                  key === status ? "bg-neutral-800 text-white" : "text-neutral-400 hover:bg-neutral-800/50 hover:text-white"
+                  key === status ? "bg-neutral-800 text-neutral-900 dark:text-white" : "text-neutral-400 hover:bg-neutral-100/50 dark:bg-neutral-800/50 hover:text-neutral-900 dark:text-white"
                 }`}
               >
                 {val.label}
@@ -191,9 +191,9 @@ function FlightRiskBadge({ risk, signals, reasoning }: { risk: string | null; si
       </button>
       {risk === "high" && <FeatureHint id="map-flight-risk" message="High flight risk = signals this person may be open to moving. Great time to reach out." position="top" />}
       {showTooltip && (signals.length > 0 || reasoning) && (
-        <div className="absolute left-0 top-7 z-50 w-64 rounded-lg border border-neutral-700/50 bg-neutral-900 p-3 shadow-xl text-xs">
+        <div className="absolute left-0 top-7 z-50 w-64 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-900 p-3 shadow-xl text-xs">
           {signals.map((s) => (
-            <div key={s} className="flex items-start gap-2 mb-1.5 text-neutral-300">
+            <div key={s} className="flex items-start gap-2 mb-1.5 text-neutral-700 dark:text-neutral-300">
               <Shield className="h-3 w-3 mt-0.5 shrink-0 text-amber-400" />
               {FLIGHT_RISK_LABELS[s] || s}
             </div>
@@ -235,11 +235,11 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
     <div
       onClick={() => onSelectPerson(candidate)}
       className={`grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto_auto] items-center gap-2 px-3 sm:px-4 py-2.5 cursor-pointer transition-all text-sm
-        ${isActive ? "bg-gold/5 border-l-2 border-l-gold" : "border-l-2 border-l-transparent hover:bg-neutral-800/30"}`}
+        ${isActive ? "bg-gold/5 border-l-2 border-l-gold" : "border-l-2 border-l-transparent hover:bg-neutral-50/50 dark:bg-neutral-800/30"}`}
     >
       <button
         onClick={(e) => { e.stopPropagation(); onSelect(candidate.id); }}
-        className="text-neutral-600 hover:text-white transition-colors"
+        className="text-neutral-600 hover:text-neutral-900 dark:text-white transition-colors"
       >
         {selected ? <CheckSquare className="h-3.5 w-3.5 text-gold" /> : <Square className="h-3.5 w-3.5" />}
       </button>
@@ -301,7 +301,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
   const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
 
   return (
-    <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-800/80 bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-700/80 ${expanded ? "ring-1 ring-gold/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-gold/30 scale-[1.02]" : ""}`}>
+    <div ref={setNodeRef} style={style} className={`rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 overflow-hidden transition-all hover:border-neutral-300/50 dark:border-neutral-700/80 ${expanded ? "ring-1 ring-gold/20" : ""} ${isDragging ? "shadow-2xl ring-2 ring-gold/30 scale-[1.02]" : ""}`}>
       <div onClick={onToggle} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer group">
         <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 transition-colors shrink-0 touch-none"
           onClick={(e) => e.stopPropagation()}>
@@ -312,7 +312,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-white truncate">{company.companyName}</p>
+            <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{company.companyName}</p>
             {connectionCount && connectionCount > 0 ? (
               <span className="flex items-center gap-0.5">
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 font-medium shrink-0 border border-teal-500/20" title={`${connectionCount} warm connection${connectionCount !== 1 ? "s" : ""}`}>
@@ -341,7 +341,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
                 {company.growthRate && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growthRate}</span>
                 )}
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
                 {openCount > 0 && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">{openCount} high risk</span>
                 )}
@@ -359,9 +359,9 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
       </div>
 
       {expanded && (
-        <div className="border-t border-neutral-800/50">
+        <div className="border-t border-neutral-200/30 dark:border-neutral-800/50">
           {company.newsSummary && company.flightRiskCompany !== "low" && (
-            <div className="px-4 py-2 text-[11px] text-amber-400/80 bg-amber-500/5 border-b border-neutral-800/30">
+            <div className="px-4 py-2 text-[11px] text-amber-400/80 bg-amber-500/5 border-b border-neutral-200/20 dark:border-neutral-800/30">
               <AlertTriangle className="inline h-3 w-3 mr-1" />
               {company.newsSummary}
             </div>
@@ -392,8 +392,8 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
 
 function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClose: () => void; mapId: string }) {
   return (
-    <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 relative">
-      <button onClick={onClose} className="absolute top-3 right-3 text-neutral-600 hover:text-white transition-colors">
+    <div className="rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 p-5 relative">
+      <button onClick={onClose} className="absolute top-3 right-3 text-neutral-600 hover:text-neutral-900 dark:text-white transition-colors">
         <X className="h-4 w-4" />
       </button>
 
@@ -402,7 +402,7 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
           {person.name.split(" ").map(n => n[0]).join("")}
         </div>
         <div>
-          <p className="text-base font-semibold text-white">{person.name}</p>
+          <p className="text-base font-semibold text-neutral-900 dark:text-white">{person.name}</p>
           <p className="text-xs text-neutral-500 mt-0.5">{person.title}</p>
         </div>
       </div>
@@ -414,17 +414,17 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
           { label: "Location", val: [person.city, person.state].filter(Boolean).join(", ") || "—" },
           { label: "Status", val: STATUS_CONFIG[person.status]?.label || person.status },
         ].map((m) => (
-          <div key={m.label} className="rounded-lg bg-neutral-800/40 p-3">
+          <div key={m.label} className="rounded-lg bg-neutral-100/60 dark:bg-neutral-800/40 p-3">
             <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">{m.label}</p>
-            <p className="text-sm font-semibold text-white">{m.val}</p>
+            <p className="text-sm font-semibold text-neutral-900 dark:text-white">{m.val}</p>
           </div>
         ))}
       </div>
 
       {person.fitReasoning && (
-        <div className="mb-4 rounded-lg bg-neutral-800/30 p-3">
+        <div className="mb-4 rounded-lg bg-neutral-50/50 dark:bg-neutral-800/30 p-3">
           <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">Fit analysis</p>
-          <p className="text-xs text-neutral-300">{person.fitReasoning}</p>
+          <p className="text-xs text-neutral-700 dark:text-neutral-300">{person.fitReasoning}</p>
         </div>
       )}
 
@@ -432,7 +432,7 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
         <div className={`mb-4 rounded-lg p-3 ${person.flightRisk === "high" ? "bg-red-500/5 border border-red-500/10" : "bg-amber-500/5 border border-amber-500/10"}`}>
           <p className="text-xs uppercase tracking-wider text-neutral-500 mb-2">Flight risk: {person.flightRisk}</p>
           {person.flightRiskSignals.map((s) => (
-            <div key={s} className="flex items-start gap-2 mb-1 text-xs text-neutral-300">
+            <div key={s} className="flex items-start gap-2 mb-1 text-xs text-neutral-700 dark:text-neutral-300">
               <Shield className="h-3 w-3 mt-0.5 shrink-0 text-amber-400" />
               {FLIGHT_RISK_LABELS[s] || s}
             </div>
@@ -500,7 +500,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
     <div ref={setNodeRef} className={`transition-all rounded-xl p-2 -m-2 ${isOver ? "bg-gold/5 ring-1 ring-gold/20" : ""}`}>
       <div className="flex items-center gap-2.5 mb-3">
         <div className={`w-2.5 h-2.5 rounded ${cfg.dot}`} />
-        <span className="text-sm font-semibold text-white">{cfg.label}</span>
+        <span className="text-sm font-semibold text-neutral-900 dark:text-white">{cfg.label}</span>
         <span className="text-xs text-neutral-500">{cfg.sub}</span>
         {tier === "A" && <FeatureHint id="map-tier-a" message="Tier A = closest competitors for this talent. Start your outreach here." position="right" />}
       </div>
@@ -811,7 +811,7 @@ function MarketMapInner() {
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
           <Map className="h-5 w-5 text-gold" />
-          <h1 className="text-xl font-bold text-white tracking-tight">Market Map</h1>
+          <h1 className="text-xl font-bold text-neutral-900 dark:text-white tracking-tight">Market Map</h1>
           <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-gold-bg text-gold border border-gold-border">
             Scout
           </span>
@@ -821,17 +821,17 @@ function MarketMapInner() {
 
       {/* Generate form */}
       {!mapData && (
-        <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5 mb-6">
+        <div className="rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 p-5 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
               <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
+                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
             </div>
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
               <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value)}
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none">
+                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none">
                 <option value="mid">Mid</option>
                 <option value="senior">Senior</option>
                 <option value="staff">Staff</option>
@@ -841,16 +841,16 @@ function MarketMapInner() {
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
               <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
+                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
             </div>
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
               <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
-                className="w-full rounded-lg border border-neutral-700/50 bg-neutral-900/40 px-3 py-2 text-sm text-white outline-none focus:border-gold/50" />
+                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
             </div>
           </div>
           <button onClick={generateMap} disabled={generating || !roleTitle}
-            className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
+            className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
             {generating ? "Generating map..." : "Generate market map"}
           </button>
@@ -871,10 +871,10 @@ function MarketMapInner() {
               <Link
                 key={m.id}
                 href={`/map?id=${m.id}`}
-                className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-4 transition-all hover:border-neutral-700/80 hover:bg-neutral-900/80"
+                className="rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 p-4 transition-all hover:border-neutral-300/50 dark:border-neutral-700/80 hover:bg-surface-secondary dark:bg-neutral-900/80"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{m.name}</p>
                   {m.status === "stale" && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium shrink-0 ml-2">Stale</span>
                   )}
@@ -909,11 +909,11 @@ function MarketMapInner() {
           {/* Map header */}
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-white">{mapData.name}</h2>
+              <h2 className="text-lg font-bold text-neutral-900 dark:text-white">{mapData.name}</h2>
               <p className="text-xs text-neutral-500">{mapData.roleTitle} · {mapData.roleLevel} · {mapData.geography.join(", ")}</p>
             </div>
             <button onClick={() => { setMapData(null); router.push("/map"); }}
-              className="text-xs text-neutral-500 hover:text-white transition-colors">
+              className="text-xs text-neutral-500 hover:text-neutral-900 dark:text-white transition-colors">
               ← New map
             </button>
           </div>
@@ -926,12 +926,12 @@ function MarketMapInner() {
               { label: "Avg Fit", val: mapData.stats.avgFitScore || "—", icon: TrendingUp },
               { label: "High risk", val: allCompanies.reduce((s, c) => s + c.candidates.filter((p) => p.flightRisk === "high").length, 0), icon: AlertTriangle },
             ].map((m) => (
-              <div key={m.label} className="rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4">
+              <div key={m.label} className="rounded-xl bg-neutral-50/50 dark:bg-neutral-800/30 border border-neutral-200/30 dark:border-neutral-800/50 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <m.icon className="h-3.5 w-3.5 text-neutral-500" />
                   <p className="text-xs uppercase tracking-wider text-neutral-500">{m.label}</p>
                 </div>
-                <p className="text-2xl font-bold text-white tabular-nums">{m.val}</p>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-white tabular-nums">{m.val}</p>
               </div>
             ))}
           </div>
@@ -943,7 +943,7 @@ function MarketMapInner() {
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 flightRiskFilter
                   ? "bg-red-500/15 text-red-400 border border-red-500/20"
-                  : "border border-neutral-700/50 text-neutral-500 hover:text-neutral-300"
+                  : "border border-neutral-200/50 dark:border-neutral-700/50 text-neutral-500 hover:text-neutral-700 dark:text-neutral-300"
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -996,7 +996,7 @@ function MarketMapInner() {
 
               {/* Hidden companies */}
               {mapData.hiddenCompanies.length > 0 && (
-                <div className="mt-6 rounded-lg border border-neutral-800/50 bg-neutral-900/30 p-4">
+                <div className="mt-6 rounded-lg border border-neutral-200/30 dark:border-neutral-800/50 bg-neutral-900/30 p-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-2">
                     Removed companies ({mapData.hiddenCompanies.length})
                   </p>
@@ -1012,7 +1012,7 @@ function MarketMapInner() {
                           });
                           loadMap(mapData.id);
                         }}
-                        className="flex items-center gap-1.5 rounded-md border border-neutral-700/30 px-2.5 py-1 text-xs text-neutral-500 hover:text-white hover:border-neutral-600 transition-colors"
+                        className="flex items-center gap-1.5 rounded-md border border-neutral-700/30 px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900 dark:text-white hover:border-neutral-600 transition-colors"
                       >
                         <Plus className="h-3 w-3" /> {co.companyName}
                       </button>
@@ -1034,11 +1034,11 @@ function MarketMapInner() {
           {addCompanyTier && (
             <>
               <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => { setAddCompanyTier(null); setAddCompanyQuery(""); }} />
-              <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border border-neutral-700/50 bg-neutral-900 p-5 shadow-2xl">
+              <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-900 p-5 shadow-2xl">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white">Add company to {TIER_CONFIG[addCompanyTier].label}</h3>
+                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Add company to {TIER_CONFIG[addCompanyTier].label}</h3>
                   <button onClick={() => { setAddCompanyTier(null); setAddCompanyQuery(""); }}
-                    className="text-neutral-500 hover:text-white"><X className="h-4 w-4" /></button>
+                    className="text-neutral-500 hover:text-neutral-900 dark:text-white"><X className="h-4 w-4" /></button>
                 </div>
                 <div className="relative mb-3">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
@@ -1048,7 +1048,7 @@ function MarketMapInner() {
                     onChange={(e) => setAddCompanyQuery(e.target.value)}
                     placeholder="Search companies..."
                     autoFocus
-                    className="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 py-2.5 pl-10 pr-4 text-sm text-white outline-none focus:border-gold/50"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-100/50 dark:bg-neutral-800/50 py-2.5 pl-10 pr-4 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50"
                   />
                   {addCompanyLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-neutral-500" />}
                 </div>
@@ -1058,9 +1058,9 @@ function MarketMapInner() {
                       <button
                         key={co.company_domain}
                         onClick={() => addCompany(co)}
-                        className="w-full text-left rounded-lg px-3 py-2.5 hover:bg-neutral-800/50 transition-colors"
+                        className="w-full text-left rounded-lg px-3 py-2.5 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors"
                       >
-                        <p className="text-sm font-medium text-white">{co.company_name}</p>
+                        <p className="text-sm font-medium text-neutral-900 dark:text-white">{co.company_name}</p>
                         <p className="text-[11px] text-neutral-500">{co.company_domain}{co.headcount ? ` · ${co.headcount} employees` : ""}{co.hq_city ? ` · ${co.hq_city}` : ""}</p>
                       </button>
                     ))}
@@ -1075,30 +1075,30 @@ function MarketMapInner() {
 
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border border-neutral-700/50 bg-neutral-900/95 px-6 py-3 shadow-2xl backdrop-blur-sm">
-              <span className="text-sm font-semibold text-white">{selectedIds.size} selected</span>
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-900/95 px-6 py-3 shadow-2xl backdrop-blur-sm">
+              <span className="text-sm font-semibold text-neutral-900 dark:text-white">{selectedIds.size} selected</span>
               <div className="h-5 w-px bg-neutral-700" />
               <button onClick={() => bulkUpdateStatus("shortlisted")}
-                className="rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-gold-hover transition-colors">
+                className="rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors">
                 Shortlist
               </button>
               <button onClick={() => bulkUpdateStatus("contacted")}
-                className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-500 transition-colors">
+                className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-neutral-900 dark:text-white hover:bg-amber-500 transition-colors">
                 Mark contacted
               </button>
               <button onClick={() => bulkUpdateStatus("rejected")}
-                className="rounded-lg border border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors">
+                className="rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors">
                 Remove
               </button>
               <button onClick={() => setSelectedIds(new Set())}
-                className="text-xs text-neutral-500 hover:text-white transition-colors">
+                className="text-xs text-neutral-500 hover:text-neutral-900 dark:text-white transition-colors">
                 Clear
               </button>
             </div>
           )}
 
           {/* Footer actions */}
-          <div className="mt-6 rounded-xl bg-neutral-800/30 border border-neutral-800/50 p-4 flex gap-2 justify-between flex-wrap">
+          <div className="mt-6 rounded-xl bg-neutral-50/50 dark:bg-neutral-800/30 border border-neutral-200/30 dark:border-neutral-800/50 p-4 flex gap-2 justify-between flex-wrap">
             <div className="flex gap-2">
               <button
                 onClick={async () => {
@@ -1111,25 +1111,25 @@ function MarketMapInner() {
                   });
                   if (res.ok) alert("Template saved!");
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors"
               >
                 <Save className="h-3.5 w-3.5" /> Save as template
               </button>
               <Link
                 href="/map/templates"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors"
               >
                 <Copy className="h-3.5 w-3.5" /> Templates
               </Link>
             </div>
             <div className="flex gap-2">
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors">
                 <Download className="h-3.5 w-3.5" /> Export PDF
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-700/50 text-sm text-neutral-300 hover:bg-neutral-800/50 transition-colors">
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors">
                 <Share2 className="h-3.5 w-3.5" /> Share with HM
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-sm font-semibold text-white hover:bg-gold-hover transition-colors">
+              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors">
                 <Send className="h-3.5 w-3.5" /> Push to Ashby
               </button>
             </div>
