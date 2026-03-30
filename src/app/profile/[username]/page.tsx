@@ -21,7 +21,7 @@ import { FindSimilar } from "@/components/features/FindSimilar";
 import { ShareCard } from "@/components/features/ShareCard";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
-import { formatNumber, getLanguageColor } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -42,78 +42,85 @@ function githubHeaders(): HeadersInit {
 
 // Fetch a developer: local DB first, then GitHub live
 async function getDeveloper(username: string) {
-  // Check local DB first
-  let local;
+  // Check local DB first — wrapped in try/catch so a DB failure
+  // (connection refused, schema drift, etc.) falls through to the
+  // live GitHub path instead of crashing the server component.
   try {
-    local = await prisma.developer.findUnique({
-      where: { username },
-      include: {
-        languages: { orderBy: { percentage: "desc" } },
-        repositories: { orderBy: { stars: "desc" } },
-        contactInfo: true,
-      },
-    });
-  } catch {
-    // Fallback without contactInfo if the relation query fails
-    local = await prisma.developer.findUnique({
-      where: { username },
-      include: {
-        languages: { orderBy: { percentage: "desc" } },
-        repositories: { orderBy: { stars: "desc" } },
-      },
-    });
-  }
+    let local;
+    try {
+      local = await prisma.developer.findUnique({
+        where: { username },
+        include: {
+          languages: { orderBy: { percentage: "desc" } },
+          repositories: { orderBy: { stars: "desc" } },
+          contactInfo: true,
+        },
+      });
+    } catch {
+      // Fallback without contactInfo if the relation query fails
+      local = await prisma.developer.findUnique({
+        where: { username },
+        include: {
+          languages: { orderBy: { percentage: "desc" } },
+          repositories: { orderBy: { stars: "desc" } },
+        },
+      });
+    }
 
-  if (local) {
-    return {
-      source: "local" as const,
-      id: local.id,
-      githubId: local.githubId,
-      username: local.username,
-      name: local.name,
-      email: local.email,
-      avatarUrl: local.avatarUrl,
-      bio: local.bio,
-      company: local.company,
-      location: local.location,
-      blog: local.blog,
-      twitterUsername: local.twitterUsername,
-      publicRepos: local.publicRepos,
-      followers: local.followers,
-      following: local.following,
-      hireable: local.hireable,
-      primaryLanguage: local.primaryLanguage,
-      totalCommits: local.totalCommits,
-      totalStars: local.totalStars,
-      score: local.score,
-      languages: local.languages,
-      repositories: local.repositories.map((r) => ({
-        id: r.id,
-        name: r.name,
-        fullName: r.fullName,
-        description: r.description,
-        language: r.language,
-        stars: r.stars,
-        forks: r.forks,
-        topics: r.topics,
-        pushedAt: r.pushedAt?.toISOString() ?? null,
-      })),
-      contactInfo: (local as any).contactInfo ? {
-        primaryEmail: (local as any).contactInfo.primaryEmail,
-        emails: (local as any).contactInfo.emails,
-        phone: (local as any).contactInfo.phone,
-        linkedinUrl: (local as any).contactInfo.linkedinUrl,
-        twitterUrl: (local as any).contactInfo.twitterUrl,
-        currentTitle: (local as any).contactInfo.currentTitle,
-        headline: (local as any).contactInfo.headline,
-        normalizedCompany: (local as any).contactInfo.normalizedCompany,
-        seniorityLevel: (local as any).contactInfo.seniorityLevel,
-        employmentHistory: (local as any).contactInfo.employmentHistory,
-        photoUrl: (local as any).contactInfo.photoUrl,
-        enrichedAt: (local as any).contactInfo.enrichedAt?.toISOString() ?? null,
-        enrichmentSource: (local as any).contactInfo.enrichmentSource,
-      } : null,
-    };
+    if (local) {
+      return {
+        source: "local" as const,
+        id: local.id,
+        githubId: local.githubId,
+        username: local.username,
+        name: local.name,
+        email: local.email,
+        avatarUrl: local.avatarUrl,
+        bio: local.bio,
+        company: local.company,
+        location: local.location,
+        blog: local.blog,
+        twitterUsername: local.twitterUsername,
+        publicRepos: local.publicRepos,
+        followers: local.followers,
+        following: local.following,
+        hireable: local.hireable,
+        primaryLanguage: local.primaryLanguage,
+        totalCommits: local.totalCommits,
+        totalStars: local.totalStars,
+        score: local.score,
+        languages: local.languages,
+        repositories: local.repositories.map((r) => ({
+          id: r.id,
+          name: r.name,
+          fullName: r.fullName,
+          description: r.description,
+          language: r.language,
+          stars: r.stars,
+          forks: r.forks,
+          topics: r.topics,
+          pushedAt: r.pushedAt?.toISOString() ?? null,
+        })),
+        contactInfo: (local as any).contactInfo ? {
+          primaryEmail: (local as any).contactInfo.primaryEmail,
+          emails: (local as any).contactInfo.emails,
+          phone: (local as any).contactInfo.phone,
+          linkedinUrl: (local as any).contactInfo.linkedinUrl,
+          twitterUrl: (local as any).contactInfo.twitterUrl,
+          currentTitle: (local as any).contactInfo.currentTitle,
+          headline: (local as any).contactInfo.headline,
+          normalizedCompany: (local as any).contactInfo.normalizedCompany,
+          seniorityLevel: (local as any).contactInfo.seniorityLevel,
+          employmentHistory: (local as any).contactInfo.employmentHistory,
+          photoUrl: (local as any).contactInfo.photoUrl,
+          enrichedAt: (local as any).contactInfo.enrichedAt?.toISOString() ?? null,
+          enrichmentSource: (local as any).contactInfo.enrichmentSource,
+        } : null,
+      };
+    }
+  } catch (err) {
+    // DB entirely unreachable — fall through to GitHub API
+    console.error("[profile] DB query failed, falling back to GitHub:", err);
   }
 
   // Not in DB — fetch live from GitHub
