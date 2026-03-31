@@ -105,6 +105,13 @@ function SearchPageInner() {
   const [viewedCount, setViewedCount] = useState(0);
   const [linkedinResult, setLinkedinResult] = useState<LinkedinLookupResult | null>(null);
   const [linkedinLoading, setLinkedinLoading] = useState(false);
+  const [aiInterpretation, setAiInterpretation] = useState<{
+    keywords?: string[];
+    languages?: string[];
+    location?: string;
+    seniority?: string;
+    suggestedQuery?: string;
+  } | null>(null);
 
   useEffect(() => {
     setViewedCount(getViewedCount());
@@ -198,7 +205,13 @@ function SearchPageInner() {
     }
   }
 
-  function handleSearch(e: React.FormEvent) {
+  function isComplexQuery(q: string): boolean {
+    const words = q.trim().split(/\s+/).length;
+    const complexPhrases = ["who", "that", "with experience", "at a", "worked at", "contributed to", "find me", "looking for", "series"];
+    return words > 5 || complexPhrases.some((p) => q.toLowerCase().includes(p));
+  }
+
+  async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
@@ -209,6 +222,38 @@ function SearchPageInner() {
     }
 
     setLinkedinResult(null);
+    setAiInterpretation(null);
+
+    // For complex queries, use AI interpretation
+    if (isComplexQuery(inputValue)) {
+      try {
+        const aiRes = await fetch("/api/search/interpret", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: inputValue.trim() }),
+        });
+        if (aiRes.ok) {
+          const { interpreted } = await aiRes.json();
+          setAiInterpretation(interpreted);
+
+          // Build optimized search from AI interpretation
+          const aiQuery = interpreted.suggestedQuery || inputValue.trim();
+          const aiFilters = { ...filters };
+          if (interpreted.languages?.length > 0 && !aiFilters.languages?.length) {
+            aiFilters.languages = interpreted.languages;
+          }
+          if (interpreted.location && !aiFilters.location) {
+            aiFilters.location = interpreted.location;
+          }
+          const params = buildSearchParams(aiQuery, aiFilters);
+          router.push(`/search?${params}`);
+          return;
+        }
+      } catch {
+        // Fall through to normal search
+      }
+    }
+
     const params = buildSearchParams(inputValue.trim(), filters);
     router.push(`/search?${params}`);
   }
@@ -417,6 +462,30 @@ function SearchPageInner() {
               >
                 Retry
               </button>
+            </div>
+          )}
+
+          {/* AI interpretation banner */}
+          {aiInterpretation && results && (
+            <div className="mb-4 rounded-lg border border-gold-border bg-gold-bg px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-gold-muted dark:text-gold">
+                <Spinner className="h-3.5 w-3.5" />
+                Scout AI interpreted your search
+              </div>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {aiInterpretation.languages?.map((l) => (
+                  <span key={l} className="rounded-full bg-gold/10 px-2 py-0.5 text-[11px] font-medium text-gold">{l}</span>
+                ))}
+                {aiInterpretation.location && (
+                  <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">{aiInterpretation.location}</span>
+                )}
+                {aiInterpretation.seniority && (
+                  <span className="rounded-full bg-purple-500/10 px-2 py-0.5 text-[11px] font-medium text-purple-600 dark:text-purple-400">{aiInterpretation.seniority}</span>
+                )}
+                {aiInterpretation.keywords?.map((k) => (
+                  <span key={k} className="rounded-full bg-neutral-200/50 px-2 py-0.5 text-[11px] font-medium text-neutral-600 dark:bg-neutral-700/50 dark:text-neutral-400">{k}</span>
+                ))}
+              </div>
             </div>
           )}
 
