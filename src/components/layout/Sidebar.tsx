@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
-  Search, Target, List, Map, Link2, BarChart3, Bell,
+  Search, Target, List, Map, Link2, BarChart3, Bell, Building2,
   Settings, ChevronLeft, ChevronRight, Sparkles, Send,
 } from "lucide-react";
 
@@ -16,6 +16,7 @@ const SECTIONS = [
       { id: "search", label: "Search", href: "/search", icon: Search },
       { id: "market-map", label: "Market map", href: "/map", icon: Map },
       { id: "connections", label: "Network map", href: "/connections", icon: Link2 },
+      { id: "company", label: "Company sourcing", href: "/company", icon: Building2 },
     ],
   },
   {
