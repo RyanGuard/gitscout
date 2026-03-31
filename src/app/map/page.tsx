@@ -286,7 +286,7 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
 //  COMPANY CARD
 // ═══════════════════════════════════════════════════════════
 
-function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove, connectionCount, onVerifyStack, mapRoleStack }: {
+function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove, connectionCount, onVerifyStack, mapRoleStack, sourcingMode }: {
   company: Company; mapId: string; tier: Tier; expanded: boolean; onToggle: () => void;
   selectedIds: Set<string>; onSelectCandidate: (id: string) => void;
   onSelectPerson: (c: Candidate) => void; activePerson: Candidate | null;
@@ -294,6 +294,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
   connectionCount?: number;
   onVerifyStack?: () => void;
   mapRoleStack?: string[];
+  sourcingMode?: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: company.id,
@@ -376,30 +377,61 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
                 {company.engHeadcount ? `${company.engHeadcount} eng` : ""}{company.hqCity ? ` · ${company.hqCity}` : ""}
               </p>
               <div className="flex gap-1.5 justify-end mt-1 flex-wrap">
-                {company.growthRate && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growthRate}</span>
+                {/* Stack mode: show stack badges prominently */}
+                {sourcingMode === "stack" && company.stackScanStatus === "complete" && company.techStackVerified.length > 0 && (
+                  <>
+                    {company.techStackVerified.slice(0, 4).map((tech) => {
+                      const confidence = company.stackConfidence?.[tech] || "reported";
+                      const matchesRole = mapRoleStack?.some((s) => s.toLowerCase() === tech.toLowerCase());
+                      const colorClass =
+                        confidence === "confirmed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : confidence === "likely" ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                          : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20";
+                      return (
+                        <span key={tech} className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${colorClass} ${matchesRole ? "ring-1 ring-gold/40" : ""}`}>
+                          {tech}
+                        </span>
+                      );
+                    })}
+                    {company.techStackVerified.length > 4 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-500/10 text-neutral-400 font-medium">+{company.techStackVerified.length - 4}</span>
+                    )}
+                  </>
                 )}
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
-                {openCount > 0 && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">{openCount} high risk</span>
-                )}
-                {company.stackScanStatus === "complete" && company.techStackVerified.length > 0 && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
-                    {company.stackConfidence ? Object.values(company.stackConfidence).filter((c) => c === "confirmed").length : 0} verified
-                  </span>
-                )}
-                {company.enrichmentStatus === "complete" && !company.stackScanStatus && onVerifyStack && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onVerifyStack(); }}
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-gold/10 text-gold font-medium hover:bg-gold/20 border border-gold/20 transition-colors"
-                  >
-                    Verify Stack
-                  </button>
-                )}
-                {company.stackScanStatus === "scanning" && (
+                {sourcingMode === "stack" && company.stackScanStatus === "scanning" && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-gold/10 text-gold font-medium flex items-center gap-1">
-                    <Loader2 className="h-2.5 w-2.5 animate-spin" /> Scanning...
+                    <Loader2 className="h-2.5 w-2.5 animate-spin" /> Verifying...
                   </span>
+                )}
+
+                {/* Company mode: show company attributes prominently */}
+                {sourcingMode === "company" && (
+                  <>
+                    {company.fundingStage && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">{company.fundingStage}</span>
+                    )}
+                    {company.headcount && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-400 font-medium">{company.headcount} people</span>
+                    )}
+                  </>
+                )}
+
+                {/* Role mode (default): show existing badges */}
+                {sourcingMode !== "stack" && sourcingMode !== "company" && (
+                  <>
+                    {company.growthRate && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growthRate}</span>
+                    )}
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
+                    {openCount > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">{openCount} high risk</span>
+                    )}
+                    {company.stackScanStatus === "complete" && company.techStackVerified.length > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
+                        {company.stackConfidence ? Object.values(company.stackConfidence).filter((c) => c === "confirmed").length : 0} verified
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
             </>
@@ -568,7 +600,7 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
 //  TIER SECTION
 // ═══════════════════════════════════════════════════════════
 
-function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany, connectionCounts, onVerifyStack, mapRoleStack }: {
+function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany, connectionCounts, onVerifyStack, mapRoleStack, sourcingMode }: {
   tier: Tier; companies: Company[]; mapId: string; expandedCo: string | null;
   onToggleCo: (name: string) => void; selectedIds: Set<string>;
   onSelectCandidate: (id: string) => void; onSelectPerson: (c: Candidate) => void;
@@ -577,6 +609,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
   connectionCounts?: Record<string, number>;
   onVerifyStack?: (companyId: string, companyName: string, companyDomain: string) => void;
   mapRoleStack?: string[];
+  sourcingMode?: string;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `tier-${tier}`, data: { tier } });
   const cfg = TIER_CONFIG[tier];
@@ -622,6 +655,7 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
             connectionCount={connectionCounts?.[co.id]}
             onVerifyStack={onVerifyStack ? () => onVerifyStack(co.id, co.companyName, co.companyDomain) : undefined}
             mapRoleStack={mapRoleStack}
+            sourcingMode={sourcingMode}
           />
         ))}
         {companies.length === 0 && (
@@ -1317,6 +1351,33 @@ function MarketMapInner() {
             </button>
           </div>
 
+          {/* Sourcing lens selector (when viewing a map) */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">View as:</span>
+            <div className="flex rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-50/50 dark:bg-neutral-800/30 p-0.5">
+              {([
+                { id: "role" as const, label: "Role" },
+                { id: "stack" as const, label: "Stack" },
+                { id: "company" as const, label: "Company" },
+              ]).map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => {
+                    setSourcingMode(mode.id);
+                    if (mode.id === "stack") verifyAllStacks();
+                  }}
+                  className={`rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                    sourcingMode === mode.id
+                      ? "bg-gold text-white shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
             {[
@@ -1392,6 +1453,7 @@ function MarketMapInner() {
                   connectionCounts={connectionCounts}
                   onVerifyStack={verifyStack}
                   mapRoleStack={mapData.roleStack}
+                  sourcingMode={sourcingMode}
                 />
               ))}
 
