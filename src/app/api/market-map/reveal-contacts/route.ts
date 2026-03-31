@@ -1,12 +1,11 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

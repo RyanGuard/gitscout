@@ -1,11 +1,10 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -170,7 +169,7 @@ Remember: each message needs a DIFFERENT personalization angle. ${effectiveChann
     // Save to database
     const sequence = await prisma.outreachSequence.create({
       data: {
-        userId: session.user.id,
+        userId,
         candidateName: candidateName.trim(),
         candidateTitle: candidateTitle?.trim() || null,
         candidateCompany: candidateCompany?.trim() || null,

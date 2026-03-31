@@ -92,6 +92,27 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development",
 };
 
+/**
+ * Authenticate a request via session OR eval API key.
+ * Returns the user ID if authenticated, null otherwise.
+ * The eval API key (EVAL_API_KEY env var) lets the VPS eval agents
+ * call authenticated endpoints without a browser session.
+ */
+export async function getAuthUserId(request?: Request): Promise<string | null> {
+  // Check eval API key first (header-based auth for eval agents)
+  if (request) {
+    const evalKey = request.headers.get("x-eval-api-key");
+    if (evalKey && process.env.EVAL_API_KEY && evalKey === process.env.EVAL_API_KEY) {
+      // Return the configured eval user ID (the account the eval agents act as)
+      return process.env.EVAL_USER_ID || "eval-service";
+    }
+  }
+
+  // Fall back to session auth
+  const session = await getServerSession(authOptions);
+  return session?.user?.id || null;
+}
+
 // Extend the session type to include user.id
 declare module "next-auth" {
   interface Session {

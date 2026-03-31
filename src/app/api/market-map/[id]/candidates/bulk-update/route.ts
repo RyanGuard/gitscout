@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logStatusChange } from "@/lib/map/statusHistory";
 
@@ -9,8 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -61,7 +60,7 @@ export async function POST(
               mapId,
               oldStatus,
               update.status,
-              session.user.id
+              userId
             )
           );
         }
