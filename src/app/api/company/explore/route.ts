@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     for (const person of allPeople) {
       const depts = person.departments.length > 0 ? person.departments : ["Other"];
       for (const dept of depts) {
-        const normalized = normalizeDepartment(dept);
+        const normalized = normalizeDepartment(dept, person.title);
         if (!departmentMap[normalized]) departmentMap[normalized] = [];
         departmentMap[normalized].push(person);
       }
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
       .map(([name, people]) => {
         const seniorityCountMap: Record<string, number> = {};
         for (const p of people) {
-          const s = normalizeSeniority(p.seniority);
+          const s = normalizeSeniority(p.seniority, p.title);
           seniorityCountMap[s] = (seniorityCountMap[s] || 0) + 1;
         }
 
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
             id: p.id,
             name: p.name,
             title: p.title,
-            seniority: normalizeSeniority(p.seniority),
+            seniority: normalizeSeniority(p.seniority, p.title),
             city: p.city,
             state: p.state,
             country: p.country,
@@ -221,22 +221,56 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function normalizeDepartment(dept: string): string {
+function inferDepartmentFromTitle(title: string): string {
+  const lower = title.toLowerCase();
+  if (/engineer|developer|sre|devops|architect|software|platform|infrastructure|cto|vp of engineering/i.test(lower)) return "Engineering";
+  if (/product manager|product lead|head of product|vp product|cpo/i.test(lower)) return "Product";
+  if (/design|ux|ui|creative director/i.test(lower)) return "Design";
+  if (/data scien|data engineer|data analy|machine learning|ml |ai /i.test(lower)) return "Data & AI";
+  if (/market|growth|brand|content|seo|demand gen/i.test(lower)) return "Marketing";
+  if (/sales|account exec|business develop|revenue|sdr|bdr/i.test(lower)) return "Sales";
+  if (/operations|support|customer success|cs manager/i.test(lower)) return "Operations";
+  if (/recruit|people|hr |human resource|talent/i.test(lower)) return "People";
+  if (/financ|legal|counsel|comptroll|cfo/i.test(lower)) return "Finance & Legal";
+  if (/ceo|coo|founder|co-founder|partner|chief|president|chairman|board/i.test(lower)) return "Leadership";
+  if (/security|infosec|cyber/i.test(lower)) return "Security";
+  if (/qa|quality|test/i.test(lower)) return "QA";
+  return "Other";
+}
+
+function normalizeDepartment(dept: string, title?: string): string {
   const lower = dept.toLowerCase();
-  if (lower.includes("engineer") || lower.includes("development") || lower.includes("technology") || lower.includes("it")) return "Engineering";
+  if (lower.includes("engineer") || lower.includes("development") || lower.includes("technology") || lower.includes("information_technology")) return "Engineering";
   if (lower.includes("product")) return "Product";
   if (lower.includes("design") || lower.includes("ux")) return "Design";
-  if (lower.includes("data") || lower.includes("analytics")) return "Data";
+  if (lower.includes("data") || lower.includes("analytics")) return "Data & AI";
   if (lower.includes("marketing")) return "Marketing";
   if (lower.includes("sales") || lower.includes("business_development")) return "Sales";
-  if (lower.includes("operations") || lower.includes("support")) return "Operations";
+  if (lower.includes("operations") || lower.includes("support") || lower.includes("customer_success")) return "Operations";
   if (lower.includes("hr") || lower.includes("human") || lower.includes("people")) return "People";
   if (lower.includes("finance") || lower.includes("legal")) return "Finance & Legal";
   if (lower.includes("executive") || lower.includes("c_suite") || lower.includes("founder")) return "Leadership";
+
+  // If department is generic/unknown, infer from title
+  if (title && (lower === "other" || lower === "unknown" || lower === "")) {
+    return inferDepartmentFromTitle(title);
+  }
+
   return dept.charAt(0).toUpperCase() + dept.slice(1).replace(/_/g, " ");
 }
 
-function normalizeSeniority(seniority: string): string {
+function inferSeniorityFromTitle(title: string): string {
+  const lower = title.toLowerCase();
+  if (/\b(ceo|cto|cfo|coo|cpo|ciso|chairman|president|co-founder|founder|partner)\b/i.test(lower)) return "Executive";
+  if (/\b(vp|vice president|svp|evp|director|head of)\b/i.test(lower)) return "VP/Director";
+  if (/\b(manager|managing|lead|team lead|eng manager|engineering manager)\b/i.test(lower)) return "Manager";
+  if (/\b(staff|principal|distinguished|fellow)\b/i.test(lower)) return "Senior";
+  if (/\b(senior|sr\.?|sr )\b/i.test(lower)) return "Senior";
+  if (/\b(junior|jr\.?|jr |intern|associate|entry)\b/i.test(lower)) return "Junior/Mid";
+  return "Junior/Mid";
+}
+
+function normalizeSeniority(seniority: string, title?: string): string {
   const lower = seniority.toLowerCase();
   if (lower === "vp" || lower === "director") return "VP/Director";
   if (lower === "manager") return "Manager";
@@ -244,5 +278,12 @@ function normalizeSeniority(seniority: string): string {
   if (lower === "entry" || lower === "junior") return "Junior/Mid";
   if (lower === "intern" || lower === "training") return "Intern";
   if (lower === "owner" || lower === "founder" || lower === "partner") return "Executive";
+
+  // If seniority is unknown/empty, infer from title
+  if (title && (lower === "unknown" || lower === "" || lower === "other")) {
+    return inferSeniorityFromTitle(title);
+  }
+
+  if (lower === "unknown" || lower === "") return "Junior/Mid";
   return seniority.charAt(0).toUpperCase() + seniority.slice(1);
 }
