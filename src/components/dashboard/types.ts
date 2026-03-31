@@ -54,3 +54,29 @@ export interface FunnelData {
   messaged: number;
   responded: number;
 }
+
+export interface FavoriteDeveloper {
+  id: string;
+  username: string;
+  name: string | null;
+  avatarUrl: string | null;
+  score: number;
+  primaryLanguage: string | null;
+  location: string | null;
+  company: string | null;
+}
+
+export interface FavoriteItem {
+  id: string;
+  developer: FavoriteDeveloper;
+}
+
+export interface AlertItem {
+  id: string;
+  eventType: string;
+  severity: string;
+  summary: string;
+  companyName: string;
+  createdAt: string;
+  isRead: boolean;
+}

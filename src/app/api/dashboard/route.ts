@@ -18,7 +18,7 @@ export async function GET() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [sequences, analytics, linkedinActions] = await Promise.all([
+  const [sequences, analytics, linkedinActions, favorites, alerts] = await Promise.all([
     // 1. Recent sequences
     prisma.outreachSequence.findMany({
       where: { userId: session.user.id },
@@ -43,6 +43,32 @@ export async function GET() {
       LIMIT 100
     ` as Promise<LinkedinAction[]>
     ).catch(() => [] as LinkedinAction[]),
+
+    // 4. Favorites (watchlist)
+    prisma.favorite.findMany({
+      where: { userId: session.user.id },
+      include: {
+        developer: {
+          select: {
+            id: true, username: true, name: true, avatarUrl: true,
+            score: true, primaryLanguage: true, location: true, company: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+    }),
+
+    // 5. Alerts (market signals)
+    prisma.marketSignal.findMany({
+      where: {
+        watchedCompany: { userId: session.user.id },
+        isDismissed: false,
+      },
+      include: { watchedCompany: { select: { companyName: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    }).catch(() => []),
   ]);
 
   const now = new Date();
@@ -193,5 +219,31 @@ export async function GET() {
     },
 
     recentActivity,
+
+    favorites: favorites.map(f => ({
+      id: f.id,
+      developer: {
+        id: f.developer.id,
+        username: f.developer.username,
+        name: f.developer.name,
+        avatarUrl: f.developer.avatarUrl,
+        score: f.developer.score,
+        primaryLanguage: f.developer.primaryLanguage,
+        location: f.developer.location,
+        company: f.developer.company,
+      },
+    })),
+
+    alerts: (alerts as any[]).map(a => ({
+      id: a.id,
+      eventType: a.eventType,
+      severity: a.severity,
+      summary: a.summary,
+      companyName: a.watchedCompany?.companyName || a.companyName,
+      createdAt: a.createdAt.toISOString(),
+      isRead: a.isRead,
+    })),
+
+    userName: session.user.name || 'there',
   });
 }
