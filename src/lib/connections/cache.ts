@@ -8,6 +8,7 @@ const CACHE_TTL: Record<string, number> = {
   news_articles: 3,
   connection_lookup: 7,
   github_repos: 7,
+  stack_scan: 7,
 };
 
 export async function getCached<T = unknown>(key: string): Promise<T | null> {

@@ -68,6 +68,12 @@ interface Company {
   flightRiskCompany: string | null;
   enrichmentStatus: string;
   candidates: Candidate[];
+  techStackVerified: string[];
+  techStackSources: Record<string, string[]> | null;
+  stackConfidence: Record<string, string> | null;
+  jdCount: number | null;
+  stackScanStatus: string | null;
+  lastStackScanAt: string | null;
 }
 
 interface MapData {
@@ -278,12 +284,14 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
 //  COMPANY CARD
 // ═══════════════════════════════════════════════════════════
 
-function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove, connectionCount }: {
+function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemove, connectionCount, onVerifyStack, mapRoleStack }: {
   company: Company; mapId: string; tier: Tier; expanded: boolean; onToggle: () => void;
   selectedIds: Set<string>; onSelectCandidate: (id: string) => void;
   onSelectPerson: (c: Candidate) => void; activePerson: Candidate | null;
   onRemove: (id: string) => void;
   connectionCount?: number;
+  onVerifyStack?: () => void;
+  mapRoleStack?: string[];
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: company.id,
@@ -360,13 +368,31 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
               <p className="text-[11px] text-neutral-500">
                 {company.engHeadcount ? `${company.engHeadcount} eng` : ""}{company.hqCity ? ` · ${company.hqCity}` : ""}
               </p>
-              <div className="flex gap-1.5 justify-end mt-1">
+              <div className="flex gap-1.5 justify-end mt-1 flex-wrap">
                 {company.growthRate && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">{company.growthRate}</span>
                 )}
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50 text-neutral-400 font-medium">{company.candidates.length} people</span>
                 {openCount > 0 && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">{openCount} high risk</span>
+                )}
+                {company.stackScanStatus === "complete" && company.techStackVerified.length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
+                    {company.stackConfidence ? Object.values(company.stackConfidence).filter((c) => c === "confirmed").length : 0} verified
+                  </span>
+                )}
+                {company.enrichmentStatus === "complete" && !company.stackScanStatus && onVerifyStack && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onVerifyStack(); }}
+                    className="text-[10px] px-1.5 py-0.5 rounded bg-gold/10 text-gold font-medium hover:bg-gold/20 border border-gold/20 transition-colors"
+                  >
+                    Verify Stack
+                  </button>
+                )}
+                {company.stackScanStatus === "scanning" && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-gold/10 text-gold font-medium flex items-center gap-1">
+                    <Loader2 className="h-2.5 w-2.5 animate-spin" /> Scanning...
+                  </span>
                 )}
               </div>
             </>
@@ -387,6 +413,37 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
             <div className="px-4 py-2 text-[11px] text-amber-400/80 bg-amber-500/5 border-b border-neutral-200/20 dark:border-neutral-800/30">
               <AlertTriangle className="inline h-3 w-3 mr-1" />
               {company.newsSummary}
+            </div>
+          )}
+          {company.stackScanStatus === "complete" && company.techStackVerified.length > 0 && (
+            <div className="px-4 py-2.5 border-b border-neutral-200/20 dark:border-neutral-800/30">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
+                Verified Stack{company.jdCount ? ` (${company.jdCount} JDs analyzed)` : ""}
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {company.techStackVerified.map((tech) => {
+                  const confidence = company.stackConfidence?.[tech] || "reported";
+                  const sources = company.techStackSources?.[tech] || [];
+                  const matchesRole = mapRoleStack?.some(
+                    (s) => s.toLowerCase() === tech.toLowerCase()
+                  );
+                  const colorClass =
+                    confidence === "confirmed"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : confidence === "likely"
+                      ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                      : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20";
+                  return (
+                    <span
+                      key={tech}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${colorClass} ${matchesRole ? "ring-1 ring-gold/40" : ""}`}
+                      title={sources.join(", ")}
+                    >
+                      {tech}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
           <p className="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-neutral-600">
@@ -504,13 +561,15 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
 //  TIER SECTION
 // ═══════════════════════════════════════════════════════════
 
-function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany, connectionCounts }: {
+function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedIds, onSelectCandidate, onSelectPerson, activePerson, onRemoveCompany, onAddCompany, connectionCounts, onVerifyStack, mapRoleStack }: {
   tier: Tier; companies: Company[]; mapId: string; expandedCo: string | null;
   onToggleCo: (name: string) => void; selectedIds: Set<string>;
   onSelectCandidate: (id: string) => void; onSelectPerson: (c: Candidate) => void;
   activePerson: Candidate | null; onRemoveCompany: (id: string) => void;
   onAddCompany: (tier: Tier) => void;
   connectionCounts?: Record<string, number>;
+  onVerifyStack?: (companyId: string, companyName: string, companyDomain: string) => void;
+  mapRoleStack?: string[];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `tier-${tier}`, data: { tier } });
   const cfg = TIER_CONFIG[tier];
@@ -554,6 +613,8 @@ function TierSection({ tier, companies, mapId, expandedCo, onToggleCo, selectedI
             activePerson={activePerson}
             onRemove={onRemoveCompany}
             connectionCount={connectionCounts?.[co.id]}
+            onVerifyStack={onVerifyStack ? () => onVerifyStack(co.id, co.companyName, co.companyDomain) : undefined}
+            mapRoleStack={mapRoleStack}
           />
         ))}
         {companies.length === 0 && (
@@ -716,6 +777,15 @@ function MarketMapInner() {
       setLoading(false);
     }
   }, []);
+
+  async function verifyStack(companyId: string, companyName: string, companyDomain: string) {
+    await fetch("/api/market-map/enrich-stack", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ company_id: companyId, company_name: companyName, company_domain: companyDomain }),
+    });
+    if (mapData) loadMap(mapData.id);
+  }
 
   // Fetch connection counts for all companies on the map
   const loadConnectionCounts = useCallback(async (mapId: string) => {
@@ -1082,6 +1152,8 @@ function MarketMapInner() {
                   onRemoveCompany={removeCompany}
                   onAddCompany={(t) => setAddCompanyTier(t)}
                   connectionCounts={connectionCounts}
+                  onVerifyStack={verifyStack}
+                  mapRoleStack={mapData.roleStack}
                 />
               ))}
 

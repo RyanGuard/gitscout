@@ -66,7 +66,7 @@ const LANGUAGE_FRAMEWORK_OVERRIDES: Record<string, string> = {
   nodejs: "Node.js",
 };
 
-const FRAMEWORK_MAP: Record<string, string> = {
+export const FRAMEWORK_MAP: Record<string, string> = {
   react: "React",
   "react.js": "React",
   reactjs: "React",
@@ -123,7 +123,7 @@ const FRAMEWORK_MAP: Record<string, string> = {
   bun: "Bun",
 };
 
-const TOOL_MAP: Record<string, string> = {
+export const TOOL_MAP: Record<string, string> = {
   docker: "Docker",
   kubernetes: "Kubernetes",
   k8s: "Kubernetes",

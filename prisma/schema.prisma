@@ -311,10 +311,16 @@ model MapCompany {
   flightRiskCompany String?        // low | medium | high
   enrichmentStatus  String         @default("pending") // pending | enriching | complete | failed
   hidden            Boolean        @default(false)
-  apolloOrgId       String?
-  createdAt         DateTime       @default(now())
-  map               MarketMap      @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  candidates        MapCandidate[]
+  apolloOrgId        String?
+  techStackVerified  String[]       @default([])
+  techStackSources   Json?
+  stackConfidence    Json?
+  jdCount            Int?
+  stackScanStatus    String?        // null | scanning | complete | failed
+  lastStackScanAt    DateTime?
+  createdAt          DateTime       @default(now())
+  map                MarketMap      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  candidates         MapCandidate[]
 
   @@index([mapId])
   @@index([tier])
