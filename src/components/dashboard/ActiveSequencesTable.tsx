@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { Mail, Smartphone, ExternalLink } from "lucide-react";
 import type { DashboardSequence } from "./types";
 
@@ -185,16 +186,21 @@ export function ActiveSequencesTable({
                     className="border-b border-border hover:bg-surface-secondary"
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium text-text">
-                        {seq.candidateName}
-                      </p>
-                      {(seq.candidateTitle || seq.candidateCompany) && (
-                        <p className="text-xs text-text-muted">
-                          {[seq.candidateTitle, seq.candidateCompany]
-                            .filter(Boolean)
-                            .join(" at ")}
+                      <Link
+                        href={`/outreach/${seq.id}`}
+                        className="block group"
+                      >
+                        <p className="font-medium text-text group-hover:text-gold transition-colors">
+                          {seq.candidateName}
                         </p>
-                      )}
+                        {(seq.candidateTitle || seq.candidateCompany) && (
+                          <p className="text-xs text-text-muted">
+                            {[seq.candidateTitle, seq.candidateCompany]
+                              .filter(Boolean)
+                              .join(" at ")}
+                          </p>
+                        )}
+                      </Link>
                     </td>
                     <td className="px-4 py-3">
                       <ChannelIcon className="h-4 w-4 text-text-muted" />
@@ -214,13 +220,26 @@ export function ActiveSequencesTable({
                       {timeAgo(seq.updatedAt)}
                     </td>
                     <td className="px-4 py-3">
-                      <a
-                        href={`/outreach?id=${seq.id}`}
-                        className="inline-flex items-center gap-1 text-xs text-gold hover:text-gold-hover transition-colors"
-                      >
-                        Open
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/outreach/${seq.id}`}
+                          className="inline-flex items-center gap-1 text-xs text-gold hover:text-gold-hover transition-colors"
+                        >
+                          Open
+                          <ExternalLink className="h-3 w-3" />
+                        </Link>
+                        {seq.candidateLinkedinUrl && (
+                          <a
+                            href={seq.candidateLinkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-neutral-400 hover:text-blue-500 transition-colors"
+                            title="LinkedIn profile"
+                          >
+                            <LinkedinIcon className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

@@ -3,6 +3,9 @@ export interface DashboardSequence {
   candidateName: string;
   candidateTitle: string | null;
   candidateCompany: string | null;
+  candidateLinkedinUrl: string | null;
+  candidateGithubUrl: string | null;
+  sourceDeveloperId: string | null;
   channel: string;
   tone: string;
   status: string;
