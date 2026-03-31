@@ -31,6 +31,8 @@ interface HomeBase {
   investors: string[];
   fundingStage: string | null;
   lastEnrichedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface LookupResult {
@@ -79,13 +81,24 @@ export default function ConnectionsPage() {
     fetchHomeBase();
   }, [fetchHomeBase]);
 
-  // Poll while enriching
+  // Poll while enriching — auto-reset if stuck for >5 minutes
   useEffect(() => {
     if (
       !homeBase ||
       homeBase.setupStatus === "ready" ||
       homeBase.setupStatus === "failed"
     ) {
+      return;
+    }
+
+    // Check if stuck (updatedAt > 5 minutes ago)
+    const updatedAt = new Date(homeBase.updatedAt || homeBase.createdAt).getTime();
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    if (updatedAt < fiveMinutesAgo) {
+      // Reset the stuck record
+      fetch(`/api/connections/home-base/${homeBase.id}/reset`, { method: "POST" })
+        .then(() => fetchHomeBase())
+        .catch(() => {});
       return;
     }
 
@@ -115,6 +128,8 @@ export default function ConnectionsPage() {
           investors: [],
           fundingStage: null,
           lastEnrichedAt: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
         setSetupDomain("");
       }
@@ -205,7 +220,10 @@ export default function ConnectionsPage() {
           loading={settingUp}
         />
       ) : isEnriching ? (
-        <EnrichingCard homeBase={homeBase} />
+        <EnrichingCard homeBase={homeBase} onReset={async () => {
+          await fetch(`/api/connections/home-base/${homeBase.id}/reset`, { method: "POST" });
+          fetchHomeBase();
+        }} />
       ) : homeBase.setupStatus === "failed" ? (
         <FailedCard onRetry={handleRefresh} loading={settingUp} />
       ) : (
@@ -390,7 +408,7 @@ function SetupCard({
   );
 }
 
-function EnrichingCard({ homeBase }: { homeBase: HomeBase }) {
+function EnrichingCard({ homeBase, onReset }: { homeBase: HomeBase; onReset: () => void }) {
   const statusMessages: Record<string, { label: string; sub: string }> = {
     pending: {
       label: "Starting enrichment...",
@@ -437,6 +455,12 @@ function EnrichingCard({ homeBase }: { homeBase: HomeBase }) {
           )}
         </div>
       )}
+      <button
+        onClick={onReset}
+        className="mt-3 text-xs text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-200 transition-colors"
+      >
+        Stuck? Click to restart setup
+      </button>
     </div>
   );
 }

@@ -30,6 +30,7 @@ export async function GET() {
       fundingStage: homeBase.fundingStage,
       lastEnrichedAt: homeBase.lastEnrichedAt,
       createdAt: homeBase.createdAt,
+      updatedAt: homeBase.updatedAt,
     },
   });
 }
