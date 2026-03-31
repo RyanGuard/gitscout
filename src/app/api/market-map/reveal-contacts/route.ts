@@ -37,10 +37,10 @@ export async function POST(request: Request) {
     const needsEnrichment = candidates.filter((c) => !c.email && c.apolloPersonId);
 
     // Check cache first
-    const results: Array<{ id: string; email: string | null; phone: string | null }> = [];
+    const results: Array<{ id: string; email: string | null; phone: string | null; linkedinUrl: string | null }> = [];
 
     for (const c of alreadyEnriched) {
-      results.push({ id: c.id, email: c.email, phone: c.phone });
+      results.push({ id: c.id, email: c.email, phone: c.phone, linkedinUrl: c.linkedinUrl });
     }
 
     if (needsEnrichment.length > 0) {
@@ -54,16 +54,18 @@ export async function POST(request: Request) {
         });
 
         if (cached && cached.expiresAt > new Date()) {
-          const data = cached.data as { email?: string; phone?: string };
+          const data = cached.data as { email?: string; phone?: string; linkedinUrl?: string };
+          const updateData: Record<string, unknown> = {
+            email: data.email || null,
+            phone: data.phone || null,
+            emailEnrichedAt: new Date(),
+          };
+          if (data.linkedinUrl && !c.linkedinUrl) updateData.linkedinUrl = data.linkedinUrl;
           await prisma.mapCandidate.update({
             where: { id: c.id },
-            data: {
-              email: data.email || null,
-              phone: data.phone || null,
-              emailEnrichedAt: new Date(),
-            },
+            data: updateData,
           });
-          results.push({ id: c.id, email: data.email || null, phone: data.phone || null });
+          results.push({ id: c.id, email: data.email || null, phone: data.phone || null, linkedinUrl: data.linkedinUrl || c.linkedinUrl });
         } else {
           uncached.push(c);
         }
@@ -91,15 +93,18 @@ export async function POST(request: Request) {
 
             const email = match?.email || match?.personal_emails?.[0] || null;
             const phone = match?.phone_numbers?.[0]?.sanitized_number || null;
+            const linkedinUrl = match?.linkedin_url || null;
 
             // Update candidate
+            const updateData: Record<string, unknown> = {
+              email,
+              phone,
+              emailEnrichedAt: new Date(),
+            };
+            if (linkedinUrl && !candidate.linkedinUrl) updateData.linkedinUrl = linkedinUrl;
             await prisma.mapCandidate.update({
               where: { id: candidate.id },
-              data: {
-                email,
-                phone,
-                emailEnrichedAt: new Date(),
-              },
+              data: updateData,
             });
 
             // Cache the result (30 day TTL)
@@ -109,16 +114,16 @@ export async function POST(request: Request) {
               create: {
                 cacheKey,
                 cacheType: "person_enrichment",
-                data: { email, phone } as object,
+                data: { email, phone, linkedinUrl } as object,
                 expiresAt: new Date(Date.now() + 30 * 86400000),
               },
               update: {
-                data: { email, phone } as object,
+                data: { email, phone, linkedinUrl } as object,
                 expiresAt: new Date(Date.now() + 30 * 86400000),
               },
             }).catch(() => {});
 
-            results.push({ id: candidate.id, email, phone });
+            results.push({ id: candidate.id, email, phone, linkedinUrl: linkedinUrl || candidate.linkedinUrl });
           }
         } else {
           console.error("[reveal] Apollo enrichment failed:", enrichRes.status);
