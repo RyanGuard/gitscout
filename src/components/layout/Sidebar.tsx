@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
   Search, Target, List, Map, Link2, BarChart3, Bell, Building2,
-  Settings, ChevronLeft, ChevronRight, Sparkles, Send,
+  Settings, ChevronLeft, ChevronRight, Sparkles, Send, LayoutDashboard,
 } from "lucide-react";
 
 const SECTIONS = [
@@ -98,6 +98,23 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 space-y-4">
+        {/* Dashboard link */}
+        <div className="space-y-0.5">
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            className={`group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-colors duration-150 ${
+              pathname === "/"
+                ? "bg-sidebar-active text-sidebar-text font-medium border-l-2 border-l-gold -ml-[2px] pl-[calc(0.625rem+2px)]"
+                : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-text"
+            }`}
+            title={collapsed ? "Dashboard" : undefined}
+          >
+            <LayoutDashboard className="h-4 w-4 shrink-0" />
+            {!collapsed && <span className="truncate">Dashboard</span>}
+          </Link>
+        </div>
+
         {SECTIONS.map((section) => (
           <div key={section.label}>
             {!collapsed && (
