@@ -2,7 +2,18 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Search, Map, Link2, ArrowRight, X, Sparkles } from "lucide-react";
+import {
+  Search,
+  Send,
+  BarChart3,
+  Building2,
+  Sparkles,
+  Map,
+  Settings,
+  Link2,
+  ArrowRight,
+  X,
+} from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════
 //  STORAGE
@@ -187,6 +198,12 @@ function SpotlightOverlay({
 }
 
 // ═══════════════════════════════════════════════════════════
+//  TOTAL STEPS
+// ═══════════════════════════════════════════════════════════
+
+const TOTAL_STEPS = 7;
+
+// ═══════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 
@@ -195,7 +212,7 @@ export function OnboardingFlow() {
   const pathname = usePathname();
   const [currentStep, setCurrentStep] = useState(0);
   const [active, setActive] = useState(false);
-  const [substep, setSubstep] = useState(0); // For multi-part steps
+  const [substep, setSubstep] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -211,11 +228,17 @@ export function OnboardingFlow() {
     setActive(false);
   }, []);
 
+  const complete = useCallback(() => {
+    markOnboardingCompleted();
+    setActive(false);
+    router.push("/");
+  }, [router]);
+
   const nextStep = useCallback(() => {
     setSubstep(0);
     setCurrentStep((prev) => {
       const next = prev + 1;
-      if (next >= 4) {
+      if (next >= TOTAL_STEPS) {
         markOnboardingCompleted();
         setActive(false);
         return prev;
@@ -228,7 +251,15 @@ export function OnboardingFlow() {
   useEffect(() => {
     if (!active || !mounted) return;
 
-    const targetPages = [null, "/search", "/map", "/connections"];
+    const targetPages: (string | null)[] = [
+      "/",          // Step 0: Welcome
+      "/",          // Step 1: Dashboard
+      "/search",    // Step 2: Search + Discovery
+      "/company",   // Step 3: Company Sourcing
+      "/outreach",  // Step 4: Outreach Studio
+      "/map",       // Step 5: Market Map
+      "/settings",  // Step 6: Connect Your Tools
+    ];
     const target = targetPages[currentStep];
     if (target && pathname !== target) {
       router.push(target);
@@ -237,31 +268,28 @@ export function OnboardingFlow() {
 
   if (!mounted || !active) return null;
 
-  // ── STEP 1: Welcome ──
+  // ── STEP 0: Welcome ──
   if (currentStep === 0) {
     return (
-      <SpotlightOverlay onSkip={skip} step={0} totalSteps={4} position="center">
+      <SpotlightOverlay onSkip={skip} step={0} totalSteps={TOTAL_STEPS} position="center">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold">
             <Sparkles className="h-6 w-6 text-neutral-900" />
           </div>
           <h2 className="text-xl font-bold text-white">Welcome to Scout</h2>
           <p className="mt-3 text-sm leading-relaxed text-neutral-300">
-            You just got a superpower. Scout finds engineers other recruiters
-            can&apos;t — using their actual code, not just their LinkedIn profile.
+            Your recruiting command center. Source engineers from GitHub, automate
+            LinkedIn outreach, and track your pipeline &mdash; all in one place.
           </p>
           <div className="mt-5 space-y-3 text-left">
             {[
-              { icon: Search, label: "Search", desc: "Find developers by what they've actually built" },
-              { icon: Map, label: "Market Map", desc: "See the entire talent landscape for any role, instantly" },
-              { icon: Link2, label: "Connections", desc: "Warm intros into any company through your network" },
-            ].map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="flex items-start gap-3 rounded-lg bg-white/5 px-3 py-2.5">
+              { icon: Search, desc: "Find engineers by what they build, not what they claim" },
+              { icon: Send, desc: "AI-powered outreach with LinkedIn automation" },
+              { icon: BarChart3, desc: "Track responses, pipeline, and performance" },
+            ].map(({ icon: Icon, desc }) => (
+              <div key={desc} className="flex items-start gap-3 rounded-lg bg-white/5 px-3 py-2.5">
                 <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                <div>
-                  <p className="text-sm font-medium text-white">{label}</p>
-                  <p className="text-xs text-neutral-400">{desc}</p>
-                </div>
+                <p className="text-sm text-neutral-300">{desc}</p>
               </div>
             ))}
           </div>
@@ -269,7 +297,7 @@ export function OnboardingFlow() {
             onClick={nextStep}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
           >
-            Get started
+            Let&apos;s go
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
@@ -277,94 +305,59 @@ export function OnboardingFlow() {
     );
   }
 
-  // ── STEP 2: Guided Search ──
+  // ── STEP 1: Dashboard ──
   if (currentStep === 1) {
-    if (pathname !== "/search") return null;
+    if (pathname !== "/") return null;
 
-    // Substep 0: Point at search bar
-    if (substep === 0) {
-      return (
-        <SpotlightOverlay
-          targetSelector="form.relative input[type='text']"
-          onSkip={skip}
-          step={1}
-          totalSteps={4}
-          position="below"
-        >
-          <h3 className="text-lg font-bold text-white">Try a search</h3>
-          <p className="mt-2 text-sm text-neutral-300">
-            Type a role or technology into the search bar above. Try
-            something like <span className="font-medium text-gold">&quot;react frontend&quot;</span> or <span className="font-medium text-gold">&quot;kubernetes engineer SF&quot;</span>.
-          </p>
-          <p className="mt-3 text-xs text-neutral-500">
-            Scout searches GitHub profiles, not LinkedIn — so you find people based on what they&apos;ve actually built.
-          </p>
-          <button
-            onClick={() => setSubstep(1)}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
-          >
-            I&apos;ve searched — what&apos;s next?
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </SpotlightOverlay>
-      );
-    }
-
-    // Substep 1: Explain results / score
     return (
       <SpotlightOverlay
+        targetSelector='[data-onboarding="dashboard"]'
         onSkip={skip}
         step={1}
-        totalSteps={4}
-        position="center"
+        totalSteps={TOTAL_STEPS}
+        position="below"
       >
-        <h3 className="text-lg font-bold text-white">Scout Score</h3>
+        <h3 className="text-lg font-bold text-white">Your Dashboard</h3>
         <p className="mt-2 text-sm text-neutral-300">
-          Every developer gets a quality score based on their actual code —
-          contributions, consistency, impact, and community reputation.
-        </p>
-        <p className="mt-2 text-sm text-neutral-300">
-          This is what makes Scout different from LinkedIn. You see real
-          engineering signal, not self-reported titles.
+          This is your command center. See active outreach sequences, response
+          rates, your pipeline funnel, and LinkedIn agent status &mdash; all at a
+          glance.
         </p>
         <button
           onClick={nextStep}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
         >
-          Next: Try a Market Map
+          Next: Find candidates
           <ArrowRight className="h-4 w-4" />
         </button>
       </SpotlightOverlay>
     );
   }
 
-  // ── STEP 3: Guided Market Map ──
+  // ── STEP 2: Search + Discovery ──
   if (currentStep === 2) {
-    if (pathname !== "/map") return null;
+    if (pathname !== "/search") return null;
 
     if (substep === 0) {
       return (
         <SpotlightOverlay
-          targetSelector="input[type='text']"
+          targetSelector={`form input[type='text'], input[placeholder*='search' i], [data-onboarding="search"]`}
           onSkip={skip}
           step={2}
-          totalSteps={4}
+          totalSteps={TOTAL_STEPS}
           position="below"
         >
-          <h3 className="text-lg font-bold text-white">Create a Market Map</h3>
+          <h3 className="text-lg font-bold text-white">Search by what they build</h3>
           <p className="mt-2 text-sm text-neutral-300">
-            A Market Map shows the entire talent landscape for a role. Enter a
-            role you&apos;re hiring for — or try <span className="font-medium text-gold">&quot;Sr. Platform Engineer&quot;</span>.
-          </p>
-          <p className="mt-2 text-xs text-neutral-500">
-            Scout will identify top companies, find matching engineers, score
-            candidates, and flag who&apos;s likely to move.
+            Try searching <span className="font-medium text-gold">&quot;React frontend SF&quot;</span> or{" "}
+            <span className="font-medium text-gold">&quot;Kubernetes engineer&quot;</span>. Scout indexes
+            48M+ developers by their actual code contributions.
           </p>
           <button
             onClick={() => setSubstep(1)}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
           >
-            I see the map — what now?
+            Next
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </SpotlightOverlay>
@@ -375,49 +368,186 @@ export function OnboardingFlow() {
       <SpotlightOverlay
         onSkip={skip}
         step={2}
-        totalSteps={4}
+        totalSteps={TOTAL_STEPS}
         position="center"
       >
-        <h3 className="text-lg font-bold text-white">Your talent landscape</h3>
+        <h3 className="text-lg font-bold text-white">Scout Score</h3>
         <p className="mt-2 text-sm text-neutral-300">
-          Scout just identified top companies, found matching engineers, scored
-          every candidate, and flagged who might be open to moving.
-        </p>
-        <p className="mt-2 text-sm text-neutral-400 italic">
-          This would take 2-3 days manually. Scout does it in 30 seconds.
+          Every developer gets a quality score based on real code &mdash;
+          contributions, stars, consistency, and impact. Not self-reported resumes.
         </p>
         <button
           onClick={nextStep}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
         >
-          Next: Connection Mapper
+          Next: Company sourcing
           <ArrowRight className="h-4 w-4" />
         </button>
       </SpotlightOverlay>
     );
   }
 
-  // ── STEP 4: Connection Mapper ──
+  // ── STEP 3: Company Sourcing ──
   if (currentStep === 3) {
-    if (pathname !== "/connections") return null;
+    if (pathname !== "/company") return null;
 
     return (
       <SpotlightOverlay
-        targetSelector="input[placeholder='yourcompany.com']"
+        targetSelector={`input[placeholder*='company' i], input[placeholder*='domain' i], [data-onboarding="company"]`}
         onSkip={skip}
         step={3}
-        totalSteps={4}
+        totalSteps={TOTAL_STEPS}
         position="below"
       >
-        <h3 className="text-lg font-bold text-white">Map your warm paths</h3>
+        <h3 className="text-lg font-bold text-white">Explore any company</h3>
         <p className="mt-2 text-sm text-neutral-300">
-          Enter your company domain and Scout finds warm paths into any company —
-          former colleagues, shared investors, same open source projects.
+          Enter a company domain to see their entire engineering org &mdash;
+          departments, seniority breakdown, and individual engineers. Find exactly
+          who you need.
         </p>
-        <p className="mt-2 text-xs text-neutral-500">
-          Skip this for now if you want — you can set it up anytime from the
-          sidebar.
+        <button
+          onClick={nextStep}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+        >
+          Next: Outreach Studio
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </SpotlightOverlay>
+    );
+  }
+
+  // ── STEP 4: Outreach Studio ──
+  if (currentStep === 4) {
+    if (pathname !== "/outreach") return null;
+
+    if (substep === 0) {
+      return (
+        <SpotlightOverlay
+          targetSelector='[data-onboarding="outreach"]'
+          onSkip={skip}
+          step={4}
+          totalSteps={TOTAL_STEPS}
+          position="below"
+        >
+          <h3 className="text-lg font-bold text-white">AI-Powered Outreach</h3>
+          <p className="mt-2 text-sm text-neutral-300">
+            Select a candidate, choose LinkedIn or Email, set the tone, and click
+            Generate. Claude AI writes personalized sequences that reference their
+            actual work.
+          </p>
+          <button
+            onClick={() => setSubstep(1)}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+          >
+            Next
+            <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        </SpotlightOverlay>
+      );
+    }
+
+    return (
+      <SpotlightOverlay
+        onSkip={skip}
+        step={4}
+        totalSteps={TOTAL_STEPS}
+        position="center"
+      >
+        <h3 className="text-lg font-bold text-white">LinkedIn Automation</h3>
+        <p className="mt-2 text-sm text-neutral-300">
+          Click &quot;Start LinkedIn Sequence&quot; to queue actions. The GitScout
+          Agent desktop app views their profile, likes a post, then sends your
+          connection request &mdash; all with human-like behavior.
         </p>
+        <button
+          onClick={nextStep}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+        >
+          Next: Market map
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </SpotlightOverlay>
+    );
+  }
+
+  // ── STEP 5: Market Map ──
+  if (currentStep === 5) {
+    if (pathname !== "/map") return null;
+
+    return (
+      <SpotlightOverlay
+        targetSelector={`input[type='text'], [data-onboarding="market-map"]`}
+        onSkip={skip}
+        step={5}
+        totalSteps={TOTAL_STEPS}
+        position="below"
+      >
+        <h3 className="text-lg font-bold text-white">Map your talent landscape</h3>
+        <p className="mt-2 text-sm text-neutral-300">
+          Enter a role and Scout finds matching companies, scores candidate fit,
+          detects flight risks, and maps warm connections. Your competitive
+          intelligence in one view.
+        </p>
+        <button
+          onClick={nextStep}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+        >
+          Next: Connect your tools
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </SpotlightOverlay>
+    );
+  }
+
+  // ── STEP 6: Connect Your Tools ──
+  if (currentStep === 6) {
+    if (pathname !== "/settings") return null;
+
+    return (
+      <SpotlightOverlay
+        onSkip={skip}
+        step={6}
+        totalSteps={TOTAL_STEPS}
+        position="center"
+      >
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold">
+            <Settings className="h-6 w-6 text-neutral-900" />
+          </div>
+          <h3 className="text-lg font-bold text-white">Supercharge with integrations</h3>
+          <p className="mt-2 text-sm text-neutral-300">
+            Connect your tools to unlock the full workflow.
+          </p>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {[
+            {
+              icon: Building2,
+              name: "Ashby ATS",
+              desc: "Push candidates to your ATS, import job details for outreach",
+            },
+            {
+              icon: Search,
+              name: "Apollo Enrichment",
+              desc: "Find emails, phone numbers, LinkedIn profiles, and employment history",
+            },
+            {
+              icon: Link2,
+              name: "GitScout Agent",
+              desc: "Desktop app for automated LinkedIn outreach with human-like behavior",
+            },
+          ].map(({ icon: Icon, name, desc }) => (
+            <div key={name} className="flex items-start gap-3 rounded-lg bg-white/5 px-3 py-2.5">
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+              <div>
+                <p className="text-sm font-medium text-white">{name}</p>
+                <p className="text-xs text-neutral-400">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="mt-5 flex gap-2">
           <button
             onClick={skip}
@@ -426,10 +556,10 @@ export function OnboardingFlow() {
             Skip for now
           </button>
           <button
-            onClick={skip}
+            onClick={complete}
             className="flex-1 rounded-lg bg-gold py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
           >
-            Finish tour
+            Done &mdash; go to dashboard
           </button>
         </div>
       </SpotlightOverlay>
