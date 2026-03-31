@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { scoreTier, assignTier } from "@/lib/map/tierScoring";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -208,6 +209,31 @@ export async function POST(request: Request) {
       where: { id: company_id },
       data: updateData,
     });
+
+    // Post-enrichment tier refinement — re-score with structured data
+    const currentCompany = await prisma.mapCompany.findUnique({
+      where: { id: company_id },
+      select: { tier: true, tierOverride: true, tierReasoning: true, techStack: true, headcount: true, fundingStage: true, growthRate: true, hqCity: true, hqCountry: true },
+    });
+    if (currentCompany && !currentCompany.tierOverride) {
+      const { score, breakdown } = scoreTier(
+        {
+          techStack: currentCompany.techStack,
+          headcount: currentCompany.headcount,
+          fundingStage: currentCompany.fundingStage,
+          growthRate: currentCompany.growthRate,
+          hqCity: currentCompany.hqCity,
+          hqCountry: currentCompany.hqCountry,
+          tierReasoning: currentCompany.tierReasoning,
+        },
+        { roleStack: role_stack || [], roleLevel: role_level || null, geography: geography || [] }
+      );
+      const newTier = assignTier(score);
+      await prisma.mapCompany.update({
+        where: { id: company_id },
+        data: { tier: newTier, tierScore: score, tierBreakdown: breakdown as object },
+      });
+    }
 
     // Insert candidates
     const candidates = await Promise.all(

@@ -296,6 +296,8 @@ model MapCompany {
   tier              String         // A | B | C
   tierOverride      Boolean        @default(false)
   tierReasoning     String?
+  tierScore         Int?
+  tierBreakdown     Json?
   headcount         Int?
   engHeadcount      Int?
   hqCity            String?

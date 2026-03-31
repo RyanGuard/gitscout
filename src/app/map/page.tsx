@@ -57,6 +57,8 @@ interface Company {
   tier: string;
   tierOverride: boolean;
   tierReasoning: string | null;
+  tierScore: number | null;
+  tierBreakdown: { stack: number; headcount: number; funding: number; domain: number; growth: number; geo: number } | null;
   headcount: number | null;
   engHeadcount: number | null;
   hqCity: string | null;
@@ -338,7 +340,12 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
             <Square className="h-4 w-4" />
           )}
         </button>
-        <div className={`w-9 h-9 rounded-lg ${cfg.badge} border flex items-center justify-center text-sm font-bold shrink-0`}>
+        <div
+          className={`w-9 h-9 rounded-lg ${cfg.badge} border flex items-center justify-center text-sm font-bold shrink-0`}
+          title={company.tierScore != null && company.tierBreakdown
+            ? `${cfg.label} (score: ${company.tierScore})\nStack: ${company.tierBreakdown.stack}  Headcount: ${company.tierBreakdown.headcount}  Funding: ${company.tierBreakdown.funding}\nDomain: ${company.tierBreakdown.domain}  Growth: ${company.tierBreakdown.growth}  Geo: ${company.tierBreakdown.geo}`
+            : `${cfg.label}${company.tierOverride ? " (manual)" : ""}`}
+        >
           {company.companyName.charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
@@ -641,11 +648,27 @@ function MarketMapInner() {
   const searchParams = useSearchParams();
   const mapIdParam = searchParams.get("id");
 
-  // Form state
+  // Sourcing mode
+  type SourcingMode = "role" | "stack" | "company";
+  const [sourcingMode, setSourcingMode] = useState<SourcingMode>("role");
+
+  // Form state — role mode
   const [roleTitle, setRoleTitle] = useState("Sr. Platform Engineer");
   const [roleLevel, setRoleLevel] = useState("senior");
   const [roleStack, setRoleStack] = useState("Go, Kubernetes");
   const [geography, setGeography] = useState("San Francisco");
+
+  // Form state — stack mode
+  const [targetStack, setTargetStack] = useState<string[]>([]);
+  const [stackInput, setStackInput] = useState("");
+
+  // Form state — company mode
+  const [companyLocation, setCompanyLocation] = useState("");
+  const [companyMinSize, setCompanyMinSize] = useState("");
+  const [companyMaxSize, setCompanyMaxSize] = useState("");
+  const [companyFunding, setCompanyFunding] = useState<string[]>([]);
+  const [companySearchResults, setCompanySearchResults] = useState<Array<{ name: string; domain: string; headcount: number | null; city: string | null; funding: string | null; techStack: string[] }>>([]);
+  const [companySearching, setCompanySearching] = useState(false);
 
   // Map state
   const [mapData, setMapData] = useState<MapData | null>(null);
@@ -785,6 +808,51 @@ function MarketMapInner() {
       body: JSON.stringify({ company_id: companyId, company_name: companyName, company_domain: companyDomain }),
     });
     if (mapData) loadMap(mapData.id);
+  }
+
+  // Auto-verify all companies in stack mode
+  async function verifyAllStacks() {
+    if (!mapData) return;
+    const companies = Object.values(mapData.tiers).flat() as Company[];
+    const unverified = companies.filter(
+      (c) => c.enrichmentStatus === "complete" && !c.stackScanStatus
+    );
+    // Run up to 3 at a time
+    for (let i = 0; i < unverified.length; i += 3) {
+      const batch = unverified.slice(i, i + 3);
+      await Promise.allSettled(
+        batch.map((c) =>
+          fetch("/api/market-map/enrich-stack", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_id: c.id, company_name: c.companyName, company_domain: c.companyDomain }),
+          })
+        )
+      );
+    }
+    if (mapData) loadMap(mapData.id);
+  }
+
+  // Search companies by filters (company mode)
+  async function searchCompanies() {
+    setCompanySearching(true);
+    try {
+      const res = await fetch("/api/market-map/search-companies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          location: companyLocation || undefined,
+          min_headcount: companyMinSize ? parseInt(companyMinSize) : undefined,
+          max_headcount: companyMaxSize ? parseInt(companyMaxSize) : undefined,
+          funding_stages: companyFunding.length > 0 ? companyFunding : undefined,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanySearchResults(data.companies || []);
+      }
+    } catch { /* ignore */ }
+    setCompanySearching(false);
   }
 
   // Fetch connection counts for all companies on the map
@@ -980,41 +1048,211 @@ function MarketMapInner() {
         <p className="text-sm text-neutral-500">AI-powered talent landscape for targeted recruiting</p>
       </div>
 
-      {/* Generate form */}
+      {/* Sourcing mode selector + Generate form */}
       {!mapData && (
         <div className="rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 bg-surface dark:bg-neutral-900/60 p-5 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
-              <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
-              <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none">
-                <option value="mid">Mid</option>
-                <option value="senior">Senior</option>
-                <option value="staff">Staff</option>
-                <option value="principal">Principal</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
-              <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
-                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
-              <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
-                className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
-            </div>
+          {/* Mode selector */}
+          <div className="flex rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-neutral-50/50 dark:bg-neutral-800/30 p-0.5 mb-5">
+            {([
+              { id: "role" as const, label: "By Role", desc: "AI picks target companies for a role" },
+              { id: "stack" as const, label: "By Stack", desc: "Find companies using specific tech" },
+              { id: "company" as const, label: "By Company", desc: "Search by size, location, funding" },
+            ]).map((mode) => (
+              <button
+                key={mode.id}
+                onClick={() => setSourcingMode(mode.id)}
+                className={`flex-1 rounded-md px-3 py-2 text-center transition-colors ${
+                  sourcingMode === mode.id
+                    ? "bg-gold text-white shadow-sm"
+                    : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                }`}
+              >
+                <p className="text-xs font-semibold">{mode.label}</p>
+                <p className={`text-[10px] mt-0.5 ${sourcingMode === mode.id ? "text-white/70" : "text-neutral-400"}`}>{mode.desc}</p>
+              </button>
+            ))}
           </div>
-          <button onClick={generateMap} disabled={generating || !roleTitle}
-            className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
-            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
-            {generating ? "Generating map..." : "Generate market map"}
-          </button>
+
+          {/* Role mode form */}
+          {sourcingMode === "role" && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>
+                  <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Level</label>
+                  <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none">
+                    <option value="mid">Mid</option>
+                    <option value="senior">Senior</option>
+                    <option value="staff">Staff</option>
+                    <option value="principal">Principal</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Tech stack</label>
+                  <input type="text" value={roleStack} onChange={(e) => setRoleStack(e.target.value)} placeholder="Go, Kubernetes, AWS"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography</label>
+                  <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+              </div>
+              <button onClick={generateMap} disabled={generating || !roleTitle}
+                className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
+                {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
+                {generating ? "Generating map..." : "Generate market map"}
+              </button>
+            </>
+          )}
+
+          {/* Stack mode form */}
+          {sourcingMode === "stack" && (
+            <>
+              <div className="mb-4">
+                <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Target technologies</label>
+                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                  {targetStack.map((tech) => (
+                    <span key={tech} className="flex items-center gap-1 rounded-md bg-gold/10 border border-gold/20 px-2 py-1 text-xs font-medium text-gold">
+                      {tech}
+                      <button onClick={() => setTargetStack(targetStack.filter((t) => t !== tech))} className="hover:text-gold-hover">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={stackInput}
+                    onChange={(e) => setStackInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && stackInput.trim()) {
+                        e.preventDefault();
+                        if (!targetStack.includes(stackInput.trim())) {
+                          setTargetStack([...targetStack, stackInput.trim()]);
+                        }
+                        setStackInput("");
+                      }
+                    }}
+                    placeholder="Type a technology and press Enter"
+                    className="flex-1 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50"
+                  />
+                  <button
+                    onClick={() => {
+                      if (stackInput.trim() && !targetStack.includes(stackInput.trim())) {
+                        setTargetStack([...targetStack, stackInput.trim()]);
+                        setStackInput("");
+                      }
+                    }}
+                    className="rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 px-3 py-2 text-xs font-medium text-neutral-500 hover:text-gold hover:border-gold/30 transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-1.5">Scout will verify each company&apos;s stack via job boards + GitHub repos</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role context (optional)</label>
+                  <input type="text" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} placeholder="e.g. Frontend Engineer"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Geography (optional)</label>
+                  <input type="text" value={geography} onChange={(e) => setGeography(e.target.value)} placeholder="San Francisco"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+              </div>
+              <button onClick={generateMap} disabled={generating || targetStack.length === 0}
+                className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
+                {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                {generating ? "Finding companies..." : "Find companies using this stack"}
+              </button>
+            </>
+          )}
+
+          {/* Company mode form */}
+          {sourcingMode === "company" && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Location</label>
+                  <input type="text" value={companyLocation} onChange={(e) => setCompanyLocation(e.target.value)} placeholder="San Francisco, NYC"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Min headcount</label>
+                  <input type="number" value={companyMinSize} onChange={(e) => setCompanyMinSize(e.target.value)} placeholder="50"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Max headcount</label>
+                  <input type="number" value={companyMaxSize} onChange={(e) => setCompanyMaxSize(e.target.value)} placeholder="500"
+                    className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Funding stage</label>
+                  <div className="flex flex-wrap gap-1">
+                    {["Seed", "Series A", "Series B", "Series C", "Series D+", "IPO"].map((stage) => (
+                      <button
+                        key={stage}
+                        onClick={() => setCompanyFunding(
+                          companyFunding.includes(stage) ? companyFunding.filter((s) => s !== stage) : [...companyFunding, stage]
+                        )}
+                        className={`rounded px-2 py-1 text-[10px] font-medium transition-colors ${
+                          companyFunding.includes(stage)
+                            ? "bg-gold/10 text-gold border border-gold/20"
+                            : "bg-neutral-100/50 dark:bg-neutral-800/50 text-neutral-500 border border-neutral-200/50 dark:border-neutral-700/50 hover:border-gold/30"
+                        }`}
+                      >
+                        {stage}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button onClick={searchCompanies} disabled={companySearching}
+                className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
+                {companySearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                {companySearching ? "Searching..." : "Search companies"}
+              </button>
+
+              {/* Company search results */}
+              {companySearchResults.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">{companySearchResults.length} companies found</p>
+                  <div className="max-h-64 overflow-y-auto space-y-1.5">
+                    {companySearchResults.map((co) => (
+                      <div key={co.domain} className="flex items-center justify-between rounded-lg border border-neutral-200/50 dark:border-neutral-800/50 px-3 py-2.5">
+                        <div>
+                          <p className="text-sm font-medium text-neutral-900 dark:text-white">{co.name}</p>
+                          <p className="text-[11px] text-neutral-500">
+                            {[co.city, co.headcount ? `${co.headcount} people` : null, co.funding].filter(Boolean).join(" · ")}
+                          </p>
+                          {co.techStack.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {co.techStack.slice(0, 5).map((t) => (
+                                <span key={t} className="text-[9px] px-1 py-0.5 rounded bg-neutral-100/50 dark:bg-neutral-800/50 text-neutral-500">{t}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <button className="text-[10px] px-2.5 py-1 rounded bg-gold/10 text-gold font-medium hover:bg-gold/20 border border-gold/20 transition-colors shrink-0">
+                          + Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
