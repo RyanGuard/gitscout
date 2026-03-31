@@ -1,13 +1,15 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
-import { SearchX, Lightbulb, ArrowRight, Sparkles } from "lucide-react";
+import { SearchX, Lightbulb, ArrowRight, Sparkles, CheckSquare, Square } from "lucide-react";
 import { DeveloperCard } from "@/components/profile/DeveloperCard";
+import { BulkOutreachBar } from "@/components/search/BulkOutreachBar";
 import { AnimatedResultsList } from "@/components/ui/AnimatedResultsList";
 import { SearchRadar } from "@/components/ui/SearchRadar";
 import { SearchLoadingMessages } from "@/components/ui/SearchLoadingMessages";
-import type { SearchResult } from "@/types";
+import type { SearchResult, DeveloperProfile } from "@/types";
 
 // Generate alternative search suggestions based on the failed query
 function getAlternatives(query: string): string[] {
@@ -74,6 +76,30 @@ interface SearchResultsProps {
 
 export function SearchResults({ results, loading, onPageChange }: SearchResultsProps) {
   const router = useRouter();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectAll = useCallback(() => {
+    if (!results) return;
+    const allIds = results.developers.map((d) => d.id);
+    const allSelected = allIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allIds));
+    }
+  }, [results, selectedIds]);
+
+  const selectedDevelopers: DeveloperProfile[] = results
+    ? results.developers.filter((d) => selectedIds.has(d.id))
+    : [];
 
   if (loading) {
     return (
@@ -130,13 +156,46 @@ export function SearchResults({ results, loading, onPageChange }: SearchResultsP
     );
   }
 
+  const allSelected = results.developers.length > 0 && results.developers.every((d) => selectedIds.has(d.id));
+
   return (
     <div>
+      {/* Select all toggle */}
+      {results.developers.length > 0 && (
+        <div className="mb-3 flex items-center gap-2">
+          <button
+            onClick={selectAll}
+            className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-gold transition-colors"
+          >
+            {allSelected
+              ? <CheckSquare className="h-3.5 w-3.5 text-gold" />
+              : <Square className="h-3.5 w-3.5" />}
+            {allSelected ? "Deselect all" : "Select all"}
+          </button>
+          {selectedIds.size > 0 && (
+            <span className="text-[11px] text-neutral-400">
+              {selectedIds.size} selected
+            </span>
+          )}
+        </div>
+      )}
+
       <AnimatedResultsList searchKey={results.query + results.page}>
         {results.developers.map((dev) => (
-          <DeveloperCard key={dev.id} developer={dev} />
+          <DeveloperCard
+            key={dev.id}
+            developer={dev}
+            selected={selectedIds.has(dev.id)}
+            onSelect={toggleSelect}
+          />
         ))}
       </AnimatedResultsList>
+
+      {/* Bulk outreach floating bar */}
+      <BulkOutreachBar
+        selectedDevelopers={selectedDevelopers}
+        onClear={() => setSelectedIds(new Set())}
+      />
 
       <SignInCTA />
 

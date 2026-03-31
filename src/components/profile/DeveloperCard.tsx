@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye } from "lucide-react";
+import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye, CheckSquare, Square } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
@@ -21,9 +21,11 @@ const SCORE_ACCENTS: Record<string, string> = {
 
 interface DeveloperCardProps {
   developer: DeveloperProfile & { tier?: string; source?: string };
+  selected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-export function DeveloperCard({ developer }: DeveloperCardProps) {
+export function DeveloperCard({ developer, selected, onSelect }: DeveloperCardProps) {
   const topLanguages = developer.languages.slice(0, 4);
   const tierInfo = developer.score > 0 ? getTierInfo(developer.score) : null;
   const tierAccent = tierInfo ? SCORE_ACCENTS[tierInfo.label] : undefined;
@@ -63,6 +65,15 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
         </div>
 
         <div className="flex items-start gap-4">
+          {/* Selection checkbox */}
+          {onSelect && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(developer.id); }}
+              className="mt-1 shrink-0 text-neutral-400 hover:text-gold transition-colors"
+            >
+              {selected ? <CheckSquare className="h-4 w-4 text-gold" /> : <Square className="h-4 w-4" />}
+            </button>
+          )}
           {/* Avatar + Score */}
           <div className="flex flex-col items-center gap-1.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
