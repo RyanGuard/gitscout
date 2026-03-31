@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { Search, SlidersHorizontal, X, EyeOff, ExternalLink, ArrowRight, Loader2 as Spinner } from "lucide-react";
 import Link from "next/link";
 import { SearchResults } from "@/components/search/SearchResults";
+import { SearchDiscovery } from "@/components/search/SearchDiscovery";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
@@ -536,29 +537,7 @@ function SearchPageInner() {
           )}
 
           {!query && !results && !loading && !linkedinResult && !linkedinLoading && (
-            <div className="py-12 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-bg border border-gold-border">
-                <Search className="h-6 w-6 text-gold" />
-              </div>
-              <h3 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">Find your next hire</h3>
-              <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">
-                Search by what developers have actually built — not just their job title. Scout scores engineers on real code contributions across GitHub.
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
-                {["React developers in SF", "Python ML engineers", "Rust systems", "Go in Seattle", "TypeScript fullstack"].map((term) => (
-                  <button
-                    key={term}
-                    onClick={() => { setInputValue(term); router.push(`/search?q=${encodeURIComponent(term)}`); }}
-                    className="rounded-full border border-neutral-200/50 bg-surface px-3.5 py-1.5 text-sm text-neutral-600 shadow-sm transition-all hover:border-gold/40 hover:text-gold hover:-translate-y-px dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:text-gold"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-              <p className="mx-auto mt-5 max-w-md text-xs text-neutral-400 italic">
-                Pro tip: Be specific. &quot;kubernetes terraform&quot; finds DevOps engineers better than just &quot;infrastructure&quot;
-              </p>
-            </div>
+            <SearchDiscovery />
           )}
 
           <SearchResults
