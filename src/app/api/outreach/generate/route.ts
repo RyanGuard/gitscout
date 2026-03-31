@@ -100,11 +100,18 @@ export async function POST(request: Request) {
 
   const toneInstructions: Record<string, string> = {
     professional: "Professional and polished. Respectful, clear, and direct. For LinkedIn connections: 2-3 sentences max.",
-    casual: "Ultra-casual and SHORT. Think quick LinkedIn DM energy. 1-2 sentences MAXIMUM. Example: 'Hey [name], love what you're building at [company]. I work with top engineers in [city] — would love to connect in case you're ever exploring.' NO long paragraphs. NO multiple talking points. Just one quick, friendly line.",
+    casual: "Ultra-casual and SHORT. Think quick LinkedIn DM energy. 1-2 sentences MAXIMUM. You MUST reference ONE specific detail about this candidate (their repo, fit reasoning, company news, or flight risk signal). Example structure: 'Hey [name], [specific detail you noticed about their work]. [soft ask]' — make it feel like you actually looked at their profile. NO generic openers.",
     technical_peer: "Engineer-to-engineer. Reference ONE specific repo or technical detail. Keep it concise — 2-3 sentences max. Speak as a peer, not a recruiter.",
     executive: "Executive tone. Strategic, concise, 1-2 sentences. Focused on business impact.",
     warm_intro: "Warm introduction style. Lead with the mutual connection. 1-2 sentences. Conversational and personal.",
   };
+
+  // Channel-specific personalization guidance
+  const personalizationHint = effectiveChannel === "linkedin"
+    ? `\nLINKEDIN PERSONALIZATION: With only 200 characters, pick the SINGLE most compelling detail about this candidate. Choose ONE: ${candidateContext?.fitReasoning ? "their fit reasoning" : ""}${candidateContext?.topRepos?.length ? ", a specific repo they built" : ""}${candidateContext?.flightRiskSignals?.length ? ", a flight risk signal (company layoffs, reorg)" : ""}${candidateContext?.connections?.length ? ", your mutual connection" : ""}. Work it in naturally — no generic messages.`
+    : effectiveChannel === "email"
+    ? "\nEMAIL PERSONALIZATION: Lead with what's compelling about THEM. Reference a specific repo, company news, or why their background is a strong match. The subject line should hook with something candidate-specific."
+    : "";
 
   const systemPrompt = `You are an expert recruiting outreach writer for Scout, a recruiting intelligence platform. You write personalized outreach sequences that get responses.
 
@@ -122,6 +129,8 @@ Tone: ${toneInstructions[effectiveTone] || toneInstructions.professional}
 
 ${candidateContext?.connections?.length ? "IMPORTANT: This candidate has warm connections. Lead with the mutual connection in the first message." : ""}
 ${candidateContext?.topRepos?.length ? "IMPORTANT: Reference their actual code/repos — be specific about what they built." : ""}
+${candidateContext?.fitReasoning ? `PERSONALIZATION KEY: The reason this candidate is a strong fit: "${candidateContext.fitReasoning}". Reference this naturally without mentioning "fit score".` : ""}
+${candidateContext?.flightRisk === "high" ? "TIMING: This candidate shows high flight risk signals — they may be open to moving. Create urgency without being pushy." : ""}${personalizationHint}
 
 Return ONLY valid JSON with this exact structure:
 {

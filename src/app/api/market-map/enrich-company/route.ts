@@ -233,6 +233,37 @@ export async function POST(request: Request) {
       )
     );
 
+    // Backfill missing LinkedIn URLs via Apollo person match (best effort, non-blocking)
+    const missingLinkedin = candidates.filter(c => !c.linkedinUrl && c.apolloPersonId);
+    if (missingLinkedin.length > 0 && apiKey) {
+      try {
+        const matchRes = await fetch(`${APOLLO_API}/people/bulk_match`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
+          body: JSON.stringify({
+            reveal_personal_emails: false,
+            reveal_phone_number: false,
+            details: missingLinkedin.map(c => ({ id: c.apolloPersonId })),
+          }),
+        });
+        if (matchRes.ok) {
+          const matchData = await matchRes.json();
+          const matches = matchData.matches || [];
+          for (let i = 0; i < missingLinkedin.length; i++) {
+            const linkedinUrl = matches[i]?.linkedin_url;
+            if (linkedinUrl) {
+              await prisma.mapCandidate.update({
+                where: { id: missingLinkedin[i].id },
+                data: { linkedinUrl },
+              }).catch(() => {});
+            }
+          }
+        }
+      } catch {
+        // Non-fatal — LinkedIn URLs are nice-to-have during enrichment
+      }
+    }
+
     // Chain: fetch news for this company (non-blocking — best effort)
     let newsResult: { events?: object[]; flightRisk?: string; summary?: string } = {};
     try {

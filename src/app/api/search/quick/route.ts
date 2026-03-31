@@ -19,8 +19,16 @@ export async function POST(request: Request) {
   const client = getGitHubClient();
 
   // Build GitHub search query
+  // Split multi-word queries and keep only the top 2 most specific terms
+  // to avoid overly restrictive AND matching on GitHub
   const parts: string[] = [];
-  if (freeText) parts.push(freeText);
+  if (freeText) {
+    const fillerWords = new Set(["the", "a", "an", "and", "or", "for", "in", "of", "with", "at", "to", "engineer", "engineering", "developer", "infrastructure", "senior", "staff", "principal", "junior", "lead"]);
+    const words = freeText.trim().split(/\s+/).filter((w: string) => !fillerWords.has(w.toLowerCase()));
+    // Use at most 2 technical keywords to avoid zero-result AND queries
+    const keywords = words.length > 2 ? words.slice(0, 2) : words;
+    if (keywords.length > 0) parts.push(keywords.join(" "));
+  }
   if (language) parts.push(`language:${language}`);
   if (location) parts.push(`location:"${location}"`);
   parts.push(`followers:>${minFollowers}`);
