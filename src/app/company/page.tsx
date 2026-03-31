@@ -171,10 +171,22 @@ function companyLocation(company: Company): string {
 // ═══════════════════════════════════════════════════════════
 function SeniorityBar({ breakdown, total }: { breakdown: SeniorityBreakdown[]; total: number }) {
   if (total === 0) return null;
+
+  // Defensive: handle case where breakdown is an object (legacy cache) or nullish
+  const items: SeniorityBreakdown[] = Array.isArray(breakdown)
+    ? breakdown
+    : breakdown && typeof breakdown === "object"
+      ? Object.entries(breakdown as unknown as Record<string, number>).map(([label, count]) => ({
+          label,
+          count: typeof count === "number" ? count : 0,
+          color: SENIORITY_COLORS[label] || "#8B8B8B",
+        }))
+      : [];
+
   return (
     <div className="mb-4">
       <div className="flex h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-        {breakdown
+        {items
           .filter((s) => s.count > 0)
           .map((s) => (
             <div
@@ -190,7 +202,7 @@ function SeniorityBar({ breakdown, total }: { breakdown: SeniorityBreakdown[]; t
           ))}
       </div>
       <div className="mt-2 flex flex-wrap gap-3">
-        {breakdown
+        {items
           .filter((s) => s.count > 0)
           .map((s) => (
             <div key={s.label} className="flex items-center gap-1.5 text-[11px] text-neutral-500">
@@ -381,7 +393,7 @@ function CompanyHeader({ company }: { company: Company }) {
       </div>
 
       {/* Technologies */}
-      {company.technologies.length > 0 && (
+      {Array.isArray(company.technologies) && company.technologies.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-1.5">
           {company.technologies.map((tech) => (
             <span
@@ -630,6 +642,14 @@ export default function CompanyPage() {
         }
 
         const exploreResult = data as ExploreResult;
+        // Ensure departments is always an array (API may return null/undefined from cache)
+        if (!Array.isArray(exploreResult.departments)) {
+          exploreResult.departments = [];
+        }
+        // Ensure company.technologies is always an array
+        if (exploreResult.company && !Array.isArray(exploreResult.company.technologies)) {
+          exploreResult.company.technologies = [];
+        }
         setResult(exploreResult);
 
         // Auto-expand Engineering (or the largest department)
@@ -692,8 +712,9 @@ export default function CompanyPage() {
   // ── Filter logic ──
   const filteredDepartments = useMemo(() => {
     if (!result) return [];
+    const departments = Array.isArray(result.departments) ? result.departments : [];
 
-    return result.departments
+    return departments
       .filter((dept) => {
         if (filterDepartments.size === 0) return true;
         return filterDepartments.has(dept.name);
@@ -703,6 +724,7 @@ export default function CompanyPage() {
 
   const filterPeople = useCallback(
     (people: Person[]): Person[] => {
+      if (!Array.isArray(people)) return [];
       return people.filter((p) => {
         // Seniority filter
         if (filterSeniorities.size > 0) {
@@ -729,7 +751,8 @@ export default function CompanyPage() {
 
   const allDepartmentNames = useMemo(() => {
     if (!result) return [];
-    return result.departments
+    const departments = Array.isArray(result.departments) ? result.departments : [];
+    return departments
       .sort((a, b) => b.count - a.count)
       .map((d) => d.name);
   }, [result]);
@@ -845,7 +868,7 @@ export default function CompanyPage() {
               </strong>{" "}
               people across{" "}
               <strong className="font-semibold text-neutral-900 dark:text-white">
-                {result.departments.length}
+                {(Array.isArray(result.departments) ? result.departments : []).length}
               </strong>{" "}
               departments
             </span>

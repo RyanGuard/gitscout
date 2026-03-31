@@ -117,13 +117,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 4: Build department summaries with seniority breakdown
+    const SENIORITY_COLORS: Record<string, string> = {
+      Executive: "#C2413C",
+      "VP/Director": "#C8A55A",
+      Manager: "#2D6A4F",
+      Senior: "#4A90D9",
+      "Junior/Mid": "#8B8B8B",
+    };
+
     const departments = Object.entries(departmentMap)
       .map(([name, people]) => {
-        const seniorityBreakdown: Record<string, number> = {};
+        const seniorityCountMap: Record<string, number> = {};
         for (const p of people) {
           const s = normalizeSeniority(p.seniority);
-          seniorityBreakdown[s] = (seniorityBreakdown[s] || 0) + 1;
+          seniorityCountMap[s] = (seniorityCountMap[s] || 0) + 1;
         }
+
+        const seniorityBreakdown = Object.entries(seniorityCountMap).map(
+          ([label, count]) => ({
+            label,
+            count,
+            color: SENIORITY_COLORS[label] || "#8B8B8B",
+          })
+        );
 
         return {
           name,
