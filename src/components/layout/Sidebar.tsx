@@ -9,7 +9,20 @@ import {
   Settings, ChevronLeft, ChevronRight, Sparkles, Send, LayoutDashboard,
 } from "lucide-react";
 
-const SECTIONS = [
+interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  soon?: boolean;
+}
+
+interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+const SECTIONS: NavSection[] = [
   {
     label: "Find",
     items: [
@@ -24,7 +37,7 @@ const SECTIONS = [
     items: [
       { id: "outreach", label: "Outreach Studio", href: "/outreach", icon: Send },
       { id: "match", label: "Match", href: "/match", icon: Target },
-      { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles, soon: true },
+      { id: "pipeline", label: "Pipeline", href: "/pipeline", icon: Sparkles },
     ],
   },
   {
@@ -32,7 +45,7 @@ const SECTIONS = [
     items: [
       { id: "lists", label: "Saved lists", href: "/lists", icon: List },
       { id: "alerts", label: "Market research", href: "/alerts", icon: Bell },
-      { id: "analytics", label: "Analytics", href: "/analytics", icon: BarChart3, soon: true },
+      { id: "analytics", label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],
   },
 ];
@@ -126,28 +139,8 @@ export function Sidebar() {
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const active = !item.soon && isActive(pathname, item.href);
+                const active = isActive(pathname, item.href);
                 const Icon = item.icon;
-
-                if (item.soon) {
-                  return (
-                    <div
-                      key={item.id}
-                      className="group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] text-sidebar-muted/40 cursor-default"
-                      title={collapsed ? `${item.label} (coming soon)` : undefined}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && (
-                        <>
-                          <span className="truncate">{item.label}</span>
-                          <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-sidebar-muted/30 bg-sidebar-hover">
-                            Soon
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  );
-                }
 
                 return (
                   <Link
