@@ -20,6 +20,8 @@ import { OutreachDraft } from "@/components/features/OutreachDraft";
 import { FindSimilar } from "@/components/features/FindSimilar";
 import { ShareCard } from "@/components/features/ShareCard";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { OpenToMoveWidget } from "@/components/profile/OpenToMoveWidget";
+import { StackOverflowWidget } from "@/components/profile/StackOverflowWidget";
 import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
 import { formatNumber } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
@@ -445,6 +447,12 @@ export default async function ProfilePage({
       {/* Score Breakdown — loads async, shows 5-pillar analysis */}
       <div className="mt-6">
         <ScoreBreakdown username={developer.username} />
+      </div>
+
+      {/* Open to Move + Stack Overflow */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <OpenToMoveWidget developerId={developer.id} companyDomain={developer.company?.replace(/^@/, "").split(" ")[0].toLowerCase().includes(".") ? developer.company.replace(/^@/, "").split(" ")[0].toLowerCase() : undefined} />
+        <StackOverflowWidget name={developer.name || developer.username} />
       </div>
 
       {/* Languages */}

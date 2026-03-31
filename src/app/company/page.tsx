@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { SpeakerDiscovery } from "@/components/intelligence/SpeakerDiscovery";
+import { OpenToMoveWidget } from "@/components/profile/OpenToMoveWidget";
 import {
   Building2,
   Search,
@@ -858,6 +860,12 @@ export default function CompanyPage() {
         <div className="space-y-4">
           {/* Company header card */}
           <CompanyHeader company={result.company} />
+
+          {/* Open to Move + Speaker Discovery */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <OpenToMoveWidget companyDomain={result.company.domain} />
+            <SpeakerDiscovery technology={result.company.technologies?.[0] || result.company.industry || result.company.name} />
+          </div>
 
           {/* Summary line */}
           <div className="flex items-center gap-2 text-sm text-neutral-500">
