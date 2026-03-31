@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { SearchX, Lightbulb, ArrowRight } from "lucide-react";
+import { useSession, signIn } from "next-auth/react";
+import { SearchX, Lightbulb, ArrowRight, Sparkles } from "lucide-react";
 import { DeveloperCard } from "@/components/profile/DeveloperCard";
 import { AnimatedResultsList } from "@/components/ui/AnimatedResultsList";
 import { SearchRadar } from "@/components/ui/SearchRadar";
@@ -137,6 +138,8 @@ export function SearchResults({ results, loading, onPageChange }: SearchResultsP
         ))}
       </AnimatedResultsList>
 
+      <SignInCTA />
+
       {results.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
           <button
@@ -158,6 +161,29 @@ export function SearchResults({ results, loading, onPageChange }: SearchResultsP
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function SignInCTA() {
+  const { data: session } = useSession();
+  if (session) return null;
+
+  return (
+    <div className="mt-8 rounded-xl border border-gold-border bg-gold-bg p-6 text-center">
+      <Sparkles className="mx-auto h-6 w-6 text-gold" />
+      <h3 className="mt-3 text-base font-semibold text-neutral-900 dark:text-white">
+        Sign in to unlock Scout
+      </h3>
+      <p className="mx-auto mt-1.5 max-w-md text-sm text-neutral-500">
+        Save candidates to lists, create outreach sequences, build market maps, and track your pipeline — all powered by real code intelligence.
+      </p>
+      <button
+        onClick={() => signIn()}
+        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
+      >
+        Sign in with Google or GitHub
+      </button>
     </div>
   );
 }

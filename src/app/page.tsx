@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import {
   Search, Users, Zap, Globe, Code,
-  Code2, Server, Cpu, Smartphone,
+  Code2, Server, Cpu, Smartphone, LogIn,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -69,6 +69,28 @@ function Landing() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden" style={{ background: "#0a0a0f", minHeight: "100vh" }}>
+      {/* Top bar with sign-in */}
+      <div className="relative z-20 flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md" style={{ background: "#C8A55A" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="3.5" stroke="#19191A" strokeWidth="2" />
+              <path d="M12 12.5c-4 0-7 2.5-7 5.5h14c0-3-3-5.5-7-5.5z" stroke="#19191A" strokeWidth="2" strokeLinejoin="round" />
+              <path d="M18 4l2.5 2.5M18 9l2.5-2.5" stroke="#19191A" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </div>
+          <span className="text-sm font-bold" style={{ color: "#E8E6DF", letterSpacing: "-0.03em" }}>Scout</span>
+        </div>
+        <button
+          onClick={() => signIn()}
+          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all hover:brightness-110"
+          style={{ border: "1px solid rgba(200,165,90,0.4)", color: "#C8A55A", background: "rgba(200,165,90,0.08)" }}
+        >
+          <LogIn className="h-4 w-4" />
+          Sign in
+        </button>
+      </div>
+
       {/* Atmospheric gradient background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "rgba(200,165,90,0.04)" }} />
