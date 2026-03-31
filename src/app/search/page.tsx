@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { Search, SlidersHorizontal, X, EyeOff, ExternalLink, ArrowRight, Loader2 as Spinner } from "lucide-react";
 import Link from "next/link";
 import { SearchResults } from "@/components/search/SearchResults";
+import { RecommendedProfiles } from "@/components/search/RecommendedProfiles";
 import { SearchDiscovery } from "@/components/search/SearchDiscovery";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
@@ -620,6 +621,13 @@ function SearchPageInner() {
             onPageChange={(page) => doSearch(query, page, filters)}
           />
         </div>
+
+        {/* Recommended profiles sidebar — only show when there are results */}
+        {query && results && results.developers.length > 0 && (
+          <div className="hidden xl:block">
+            <RecommendedProfiles query={query} />
+          </div>
+        )}
       </div>
       </div>
     </div>
