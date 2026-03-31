@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -21,6 +21,7 @@ import { FeatureHint } from "@/components/ui/FeatureHint";
 import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromMapCandidate } from "@/lib/outreach/candidateNormalizer";
+import CompanyTimeline from "@/components/map/CompanyTimeline";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -48,6 +49,7 @@ interface Candidate {
   phone: string | null;
   tenureMonths: number | null;
   yearsOfExperience: number | null;
+  shortlistNote: string | null;
 }
 
 interface Company {
@@ -76,6 +78,8 @@ interface Company {
   jdCount: number | null;
   stackScanStatus: string | null;
   lastStackScanAt: string | null;
+  newsEvents: Array<{ event_type: string; severity: string; summary: string; date: string }> | null;
+  departmentalHeadcount: Record<string, number> | null;
 }
 
 interface MapData {
@@ -485,6 +489,14 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
               </div>
             </div>
           )}
+          {expanded && company.enrichmentStatus === "complete" && (
+            <CompanyTimeline
+              candidates={company.candidates}
+              newsEvents={company.newsEvents as any}
+              headcount={company.headcount}
+              engHeadcount={company.engHeadcount}
+            />
+          )}
           <p className="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-neutral-600">
             {company.candidates.length} candidates
           </p>
@@ -547,6 +559,13 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
         </div>
       )}
 
+      {person.shortlistNote && (
+        <div className="mb-4 rounded-lg bg-gold/5 border border-gold/10 p-3">
+          <p className="text-xs uppercase tracking-wider text-gold mb-1 font-semibold">Shortlist Note</p>
+          <p className="text-xs text-neutral-700 dark:text-neutral-300">{person.shortlistNote}</p>
+        </div>
+      )}
+
       {person.flightRisk && person.flightRisk !== "low" && (
         <div className={`mb-4 rounded-lg p-3 ${person.flightRisk === "high" ? "bg-red-500/5 border border-red-500/10" : "bg-amber-500/5 border border-amber-500/10"}`}>
           <p className="text-xs uppercase tracking-wider text-neutral-500 mb-2">Flight risk: {person.flightRisk}</p>
@@ -591,6 +610,13 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
           candidate={fromMapCandidate(person, mapId, "")}
           className="flex-1 py-2 text-xs"
         />
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-neutral-200/20 dark:border-neutral-800/30 flex items-center justify-center gap-3 text-[10px] text-neutral-500">
+        <span><kbd className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">←</kbd> <kbd className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">→</kbd> navigate</span>
+        <span><kbd className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">S</kbd> shortlist</span>
+        <span><kbd className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">X</kbd> reject</span>
+        <span><kbd className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">Esc</kbd> close</span>
       </div>
     </div>
   );
@@ -723,6 +749,21 @@ function MarketMapInner() {
   const [flightRiskFilter, setFlightRiskFilter] = useState(false);
   const [connectionCounts, setConnectionCounts] = useState<Record<string, number>>({});
   const [revealLoading, setRevealLoading] = useState(false);
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+
+  const allCandidates = useMemo(() => {
+    if (!mapData) return [];
+    const flat: Candidate[] = [];
+    for (const tier of ["A", "B", "C"] as Tier[]) {
+      for (const co of (mapData.tiers[tier] || []) as Company[]) {
+        for (const c of co.candidates) {
+          flat.push(c);
+        }
+      }
+    }
+    return flat;
+  }, [mapData]);
 
   // DnD sensors
   const sensors = useSensors(
@@ -912,6 +953,74 @@ function MarketMapInner() {
       loadConnectionCounts(mapData.id);
     }
   }, [mapData?.id, loadConnectionCounts]);
+
+  // Keyboard navigation for candidate review
+  useEffect(() => {
+    if (!activePerson || allCandidates.length === 0) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+      const currentIndex = allCandidates.findIndex(c => c.id === activePerson!.id);
+      if (currentIndex === -1) return;
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          e.preventDefault();
+          if (currentIndex < allCandidates.length - 1) setActivePerson(allCandidates[currentIndex + 1]);
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          e.preventDefault();
+          if (currentIndex > 0) setActivePerson(allCandidates[currentIndex - 1]);
+          break;
+        case "Escape":
+          e.preventDefault();
+          setActivePerson(null);
+          break;
+        case "s":
+          e.preventDefault();
+          fetch(`/api/market-map/${mapData!.id}/candidate/${activePerson!.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "shortlisted" }),
+          }).then(() => loadMap(mapData!.id));
+          break;
+        case "x":
+          e.preventDefault();
+          fetch(`/api/market-map/${mapData!.id}/candidate/${activePerson!.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "rejected" }),
+          }).then(() => {
+            if (currentIndex < allCandidates.length - 1) setActivePerson(allCandidates[currentIndex + 1]);
+            loadMap(mapData!.id);
+          });
+          break;
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePerson, allCandidates, mapData]);
+
+  // Resume upload handler
+  async function handleResumeUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setResumeUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/market-map/parse-resume", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.role_title) setRoleTitle(data.role_title);
+        if (data.role_level) setRoleLevel(data.role_level);
+        if (data.role_stack?.length) setRoleStack(data.role_stack.join(", "));
+        if (data.location) setGeography(data.location);
+      }
+    } catch { /* ignore */ }
+    setResumeUploading(false);
+    if (resumeInputRef.current) resumeInputRef.current.value = "";
+  }
 
   // Generate new map
   async function generateMap() {
@@ -1110,6 +1219,21 @@ function MarketMapInner() {
           {/* Role mode form */}
           {sourcingMode === "role" && (
             <>
+              <div className="mb-4">
+                <input ref={resumeInputRef} type="file" accept=".pdf" onChange={handleResumeUpload} className="hidden" />
+                <button
+                  type="button"
+                  onClick={() => resumeInputRef.current?.click()}
+                  disabled={resumeUploading}
+                  className="flex items-center gap-2 rounded-lg border border-dashed border-neutral-200/50 dark:border-neutral-700/50 px-4 py-3 text-sm text-neutral-400 hover:text-gold hover:border-gold/30 transition-all w-full justify-center"
+                >
+                  {resumeUploading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Parsing resume...</>
+                  ) : (
+                    <><Download className="h-4 w-4 rotate-180" /> Import from Resume (PDF)</>
+                  )}
+                </button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role title</label>

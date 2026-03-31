@@ -194,6 +194,7 @@ export async function POST(request: Request) {
 
     if (companyInfo) {
       updateData.headcount = (companyInfo.estimated_num_employees as number) || null;
+      updateData.departmentalHeadcount = companyInfo.departmental_head_count || null;
       updateData.engHeadcount = Math.round(((companyInfo.estimated_num_employees as number) || 0) * 0.3) || null;
       updateData.hqCity = (companyInfo.city as string) || null;
       updateData.hqCountry = (companyInfo.country as string) || null;

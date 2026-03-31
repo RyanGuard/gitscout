@@ -68,6 +68,28 @@ export async function POST(
       await Promise.allSettled(historyPromises);
     }
 
+    // Auto-generate shortlist notes on bulk status change to shortlisted
+    if (update.status === "shortlisted") {
+      const candidates = await prisma.mapCandidate.findMany({
+        where: { id: { in: candidate_ids }, shortlistNote: null },
+        select: { id: true, fitScore: true, fitReasoning: true, flightRisk: true, flightRiskSignals: true },
+      });
+      for (const c of candidates) {
+        const parts: string[] = [];
+        if (c.fitScore != null) parts.push(`Fit: ${c.fitScore}/100`);
+        if (c.fitReasoning) parts.push(c.fitReasoning);
+        if (c.flightRisk === "high") {
+          parts.push(`High flight risk: ${(c.flightRiskSignals || []).map((s: string) => s.replace(/_/g, " ").toLowerCase()).join(", ")}`);
+        }
+        if (parts.length > 0) {
+          await prisma.mapCandidate.update({
+            where: { id: c.id },
+            data: { shortlistNote: parts.join(" · ") },
+          });
+        }
+      }
+    }
+
     return Response.json({ updated: result.count });
   } catch (error) {
     console.error("[bulk-update] Failed:", error);

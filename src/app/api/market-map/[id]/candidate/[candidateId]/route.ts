@@ -46,6 +46,29 @@ export async function PATCH(
       );
     }
 
+    // Auto-generate shortlist note on status change to shortlisted
+    if (body.status === "shortlisted") {
+      const fullCandidate = await prisma.mapCandidate.findUnique({
+        where: { id: candidateId },
+        select: { shortlistNote: true, fitScore: true, fitReasoning: true, flightRisk: true, flightRiskSignals: true },
+      });
+
+      if (fullCandidate && !fullCandidate.shortlistNote) {
+        const parts: string[] = [];
+        if (fullCandidate.fitScore != null) parts.push(`Fit: ${fullCandidate.fitScore}/100`);
+        if (fullCandidate.fitReasoning) parts.push(fullCandidate.fitReasoning);
+        if (fullCandidate.flightRisk === "high") {
+          parts.push(`High flight risk: ${(fullCandidate.flightRiskSignals || []).map((s: string) => s.replace(/_/g, " ").toLowerCase()).join(", ")}`);
+        }
+        if (parts.length > 0) {
+          await prisma.mapCandidate.update({
+            where: { id: candidateId },
+            data: { shortlistNote: parts.join(" · ") },
+          });
+        }
+      }
+    }
+
     return Response.json({ id: updated.id, status: updated.status });
   } catch {
     return Response.json({ error: "Candidate not found" }, { status: 404 });

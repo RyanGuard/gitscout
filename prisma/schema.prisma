@@ -319,6 +319,7 @@ model MapCompany {
   stackConfidence    Json?
   jdCount            Int?
   stackScanStatus    String?        // null | scanning | complete | failed
+  departmentalHeadcount Json?
   lastStackScanAt    DateTime?
   createdAt          DateTime       @default(now())
   map                MarketMap      @relation(fields: [mapId], references: [id], onDelete: Cascade)
@@ -358,6 +359,7 @@ model MapCandidate {
   githubUrl         String?
   gitscoutScore     Int?
   outreachStatus    String?      // null | draft | sent | responded | bounced
+  shortlistNote     String?
   createdAt         DateTime     @default(now())
   company           MapCompany   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
