@@ -7,6 +7,7 @@
 // Required env vars: GITHUB_ID, GITHUB_SECRET, NEXTAUTH_SECRET, RESEND_API_KEY
 
 import type { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth";
 import type { SendVerificationRequestParams } from "next-auth/providers/email";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
