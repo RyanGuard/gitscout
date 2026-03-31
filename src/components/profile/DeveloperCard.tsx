@@ -5,6 +5,7 @@ import { MapPin, Star, Users, GitFork, Mail, Clock, Building2, Eye } from "lucid
 import { Badge } from "@/components/ui/Badge";
 import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { AddToSequenceFromSearch } from "@/components/search/AddToSequenceFromSearch";
 import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
 import { markProfileViewed, isProfileViewed } from "@/lib/viewedProfiles";
@@ -51,8 +52,9 @@ export function DeveloperCard({ developer }: DeveloperCardProps) {
       } ${viewed ? "opacity-60" : ""}`}
     >
       <div className="relative p-5">
-        {/* Write outreach button */}
-        <div className="absolute top-3 right-3 opacity-0 transition-all group-hover:opacity-100">
+        {/* Outreach actions */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
+          <AddToSequenceFromSearch developer={developer} />
           <DraftInStudioButton
             variant="icon"
             candidate={fromDeveloperProfile(developer, tierInfo?.label)}
