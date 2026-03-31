@@ -233,9 +233,10 @@ export async function POST(request: Request) {
       )
     );
 
-    // Backfill missing LinkedIn URLs via Apollo person match (best effort, non-blocking)
+    // Backfill missing LinkedIn URLs via Apollo person match — Tier A only (credits)
+    const company = await prisma.mapCompany.findUnique({ where: { id: company_id }, select: { tier: true } });
     const missingLinkedin = candidates.filter(c => !c.linkedinUrl && c.apolloPersonId);
-    if (missingLinkedin.length > 0 && apiKey) {
+    if (missingLinkedin.length > 0 && apiKey && company?.tier === "A") {
       try {
         const matchRes = await fetch(`${APOLLO_API}/people/bulk_match`, {
           method: "POST",
