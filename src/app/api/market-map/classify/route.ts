@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
 import { safeErrorMessage } from "@/lib/api-error";
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const {

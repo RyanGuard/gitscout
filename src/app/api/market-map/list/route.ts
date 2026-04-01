@@ -9,6 +9,28 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Auto-fail maps stuck in "generating" for more than 5 minutes
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+    await prisma.marketMap.updateMany({
+      where: {
+        userId,
+        status: "generating",
+        createdAt: { lt: fiveMinAgo },
+      },
+      data: { status: "failed" },
+    });
+
+    // Reset companies stuck in "enriching" for more than 10 minutes back to "pending"
+    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000);
+    await prisma.mapCompany.updateMany({
+      where: {
+        map: { userId },
+        enrichmentStatus: "enriching",
+        createdAt: { lt: tenMinAgo },
+      },
+      data: { enrichmentStatus: "pending" },
+    });
+
     const maps = await prisma.marketMap.findMany({
       where: { userId },
       orderBy: { updatedAt: "desc" },
@@ -48,7 +70,12 @@ export async function GET(request: Request) {
       };
     });
 
-    return Response.json({ maps: results });
+    // Filter out broken maps with 0 companies (unless still generating)
+    const filtered = results.filter(
+      (m) => m.companyCount > 0 || m.status === "generating"
+    );
+
+    return Response.json({ maps: filtered });
   } catch (error) {
     console.error("[market-map/list] Failed:", error);
     return Response.json({ error: safeErrorMessage(error, "Failed to load maps") }, { status: 500 });

@@ -4,6 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
 import { safeErrorMessage } from "@/lib/api-error";
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const userId = await getAuthUserId(request);
   if (!userId) {
@@ -25,9 +27,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "role_title is required" }, { status: 400 });
   }
 
+  // Declared outside try so we can reference in catch for failure cleanup
+  let map: { id: string } | null = null;
   try {
     // 1. Create the market map record
-    const map = await prisma.marketMap.create({
+    map = await prisma.marketMap.create({
       data: {
         userId: userId,
         name: `${role_title} Market Map`,
@@ -113,21 +117,23 @@ Respond ONLY in JSON format:
       );
     }
 
-    // 3. Create map_companies rows
-    const createdCompanies = await Promise.all(
-      companies.map((co) =>
-        prisma.mapCompany.create({
-          data: {
-            mapId: map.id,
-            companyName: co.company_name,
-            companyDomain: co.company_domain,
-            tier: co.tier.toUpperCase(),
-            tierReasoning: co.reasoning,
-            enrichmentStatus: "pending",
-          },
-        })
-      )
-    );
+    // 3. Batch-insert map_companies in a single round-trip
+    await prisma.mapCompany.createMany({
+      data: companies.map((co) => ({
+        mapId: map!.id,
+        companyName: co.company_name,
+        companyDomain: co.company_domain,
+        tier: co.tier.toUpperCase(),
+        tierReasoning: co.reasoning,
+        enrichmentStatus: "pending",
+      })),
+    });
+
+    // Fetch the created companies back (createMany doesn't return records)
+    const createdCompanies = await prisma.mapCompany.findMany({
+      where: { mapId: map!.id },
+      orderBy: { createdAt: "asc" },
+    });
 
     // 4. Update map status — companies created, ready for enrichment
     await prisma.marketMap.update({
@@ -155,6 +161,13 @@ Respond ONLY in JSON format:
     });
   } catch (error) {
     console.error("[market-map] Generation failed:", error);
+    // If we created the map, mark it as failed
+    if (map?.id) {
+      await prisma.marketMap.update({
+        where: { id: map.id },
+        data: { status: "failed" },
+      }).catch(() => {});
+    }
     return Response.json(
       { error: safeErrorMessage(error, "Map generation failed") },
       { status: 500 }

@@ -3,6 +3,8 @@ import { scoreTier, assignTier } from "@/lib/map/tierScoring";
 import { apolloFetch } from "@/lib/apollo-fetch";
 import { safeErrorMessage } from "@/lib/api-error";
 
+export const maxDuration = 60;
+
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
 // Title variations for broader matching

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { safeErrorMessage } from "@/lib/api-error";
 
+export const maxDuration = 60;
+
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
 interface NewsEvent {

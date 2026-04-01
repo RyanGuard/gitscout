@@ -1072,26 +1072,33 @@ function MarketMapInner() {
       router.push(`/map?id=${data.mapId}`);
       trackEvent("map_generated", { roleTitle, roleLevel, sourcingMode });
 
-      // Enrich companies in background
-      for (const co of data.companies) {
-        fetch("/api/market-map/enrich-company", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            map_id: data.mapId,
-            company_id: co.id,
-            company_domain: co.domain,
-            company_name: co.name,
-            role_title: roleTitle,
-            role_level: roleLevel,
-            role_stack: roleStack.split(",").map((s) => s.trim()),
-            geography: geography ? [geography] : [],
-          }),
-        }).then(() => {
-          // Reload map after each enrichment completes
+      // Enrich companies in background — process 2 at a time to avoid timeouts
+      const companies = data.companies || [];
+      (async () => {
+        for (let i = 0; i < companies.length; i += 2) {
+          const batch = companies.slice(i, i + 2);
+          await Promise.all(
+            batch.map((co: { id: string; domain: string; name: string }) =>
+              fetch("/api/market-map/enrich-company", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  map_id: data.mapId,
+                  company_id: co.id,
+                  company_domain: co.domain,
+                  company_name: co.name,
+                  role_title: roleTitle,
+                  role_level: roleLevel,
+                  role_stack: roleStack.split(",").map((s: string) => s.trim()),
+                  geography: geography ? [geography] : [],
+                }),
+              }).catch(() => {})
+            )
+          );
+          // Reload map after each batch to show progress
           loadMap(data.mapId);
-        }).catch(() => {});
-      }
+        }
+      })();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
