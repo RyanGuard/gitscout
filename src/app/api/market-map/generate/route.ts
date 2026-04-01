@@ -2,6 +2,7 @@ import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId(request);
@@ -155,7 +156,7 @@ Respond ONLY in JSON format:
   } catch (error) {
     console.error("[market-map] Generation failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Map generation failed" },
+      { error: safeErrorMessage(error, "Map generation failed") },
       { status: 500 }
     );
   }

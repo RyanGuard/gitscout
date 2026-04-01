@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 
 // GET — list all templates for the user
 export async function GET() {
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
     return Response.json({ id: template.id, name: template.name });
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Failed to save template" },
+      { error: safeErrorMessage(error, "Failed to save template") },
       { status: 500 }
     );
   }

@@ -150,7 +150,7 @@ export function CandidateBrowser({
           entryCount: l.entryCount,
         })));
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchLists failed:', err); }
     setLoadingLists(false);
   }, []);
 
@@ -162,7 +162,7 @@ export function CandidateBrowser({
         const data = await res.json();
         setListEntries(data.entries || []);
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchListEntries failed:', err); }
     setLoadingEntries(false);
   }, []);
 
@@ -180,7 +180,7 @@ export function CandidateBrowser({
           candidateCount: m.candidateCount,
         })));
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchMaps failed:', err); }
     setLoadingMaps(false);
   }, []);
 
@@ -214,7 +214,7 @@ export function CandidateBrowser({
         allCandidates.sort((a, b) => (b.candidate.fitScore || 0) - (a.candidate.fitScore || 0));
         setMapCandidates(allCandidates);
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchMapCandidates failed:', err); }
     setLoadingMapCandidates(false);
   }, []);
 
@@ -227,7 +227,7 @@ export function CandidateBrowser({
         const data = await res.json();
         setSignals((data.signals || []).filter((s: Signal) => s.candidateCount > 0));
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchSignals failed:', err); }
     setLoadingSignals(false);
   }, []);
 
@@ -239,7 +239,7 @@ export function CandidateBrowser({
         const data = await res.json();
         setSurfacedCandidates(data.candidates || []);
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.warn('[candidate-browser] fetchSurfacedCandidates failed:', err); }
     setLoadingCandidates(false);
   }, []);
 

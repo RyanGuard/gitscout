@@ -99,6 +99,11 @@ export async function POST(request: Request) {
     multi_channel: "Multi-channel: mix email, LinkedIn, and text. Email: subject 5-8 words, body under 100 words. LinkedIn connection: under 200 chars. InMail: under 150 words. Text: under 160 chars.",
   };
 
+  // If firstTouch is InMail, override LinkedIn constraints to allow longer messages
+  if (effectiveChannel === 'linkedin' && body.firstTouch === 'inmail') {
+    channelConstraints.linkedin = "LinkedIn InMail: under 300 words. Include a subject line. Be more detailed than a connection request.";
+  }
+
   const toneInstructions: Record<string, string> = {
     professional: "Professional and polished. Respectful, clear, and direct. For LinkedIn connections: 2-3 sentences max.",
     casual: "Ultra-casual and SHORT. Think quick LinkedIn DM energy. 1-2 sentences MAXIMUM. You MUST reference ONE specific detail about this candidate (their repo, fit reasoning, company news, or flight risk signal). Example structure: 'Hey [name], [specific detail you noticed about their work]. [soft ask]' — make it feel like you actually looked at their profile. NO generic openers.",

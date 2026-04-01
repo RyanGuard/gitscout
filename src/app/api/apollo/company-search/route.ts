@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -80,7 +81,7 @@ export async function GET(request: Request) {
     return Response.json({ results });
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Search failed" },
+      { error: safeErrorMessage(error, "Search failed") },
       { status: 500 }
     );
   }

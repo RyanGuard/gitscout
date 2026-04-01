@@ -82,7 +82,7 @@ export function ActiveSequencesTable({
       list = list.filter((s) => s.status === "completed");
     if (filter === "needs_response")
       list = list.filter(
-        (s) => s.responseReceived && s.responseSentiment !== "negative"
+        (s) => !s.responseReceived && s.status === 'sending'
       );
 
     return [...list].sort((a, b) => {

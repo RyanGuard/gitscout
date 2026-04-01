@@ -1,5 +1,6 @@
 import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -142,7 +143,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[reveal] Failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Reveal failed" },
+      { error: safeErrorMessage(error, "Reveal failed") },
       { status: 500 }
     );
   }

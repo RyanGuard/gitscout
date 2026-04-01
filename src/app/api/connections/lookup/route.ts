@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 import {
   enrichOrganization,
   extractInvestors,
@@ -186,7 +187,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[connections] Lookup failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Lookup failed" },
+      { error: safeErrorMessage(error, "Lookup failed") },
       { status: 500 }
     );
   }

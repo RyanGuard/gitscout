@@ -1788,13 +1788,62 @@ function MarketMapInner() {
               </Link>
             </div>
             <div className="flex gap-2">
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors">
-                <Download className="h-3.5 w-3.5" /> Export PDF
+              <button
+                onClick={() => {
+                  if (!mapData) return;
+                  const rows: string[] = ["Company,Tier,Candidate,Title,Seniority,LinkedIn,Fit Score"];
+                  for (const [tier, companies] of Object.entries(mapData.tiers)) {
+                    for (const co of companies) {
+                      if (co.candidates.length === 0) {
+                        rows.push(`"${co.companyName.replace(/"/g, '""')}","${tier}",,,,`);
+                      } else {
+                        for (const c of co.candidates) {
+                          rows.push(
+                            `"${co.companyName.replace(/"/g, '""')}","${tier}","${(c.name || '').replace(/"/g, '""')}","${(c.title || '').replace(/"/g, '""')}","${c.seniority || ''}","${c.linkedinUrl || ''}","${c.fitScore ?? ''}"`
+                          );
+                        }
+                      }
+                    }
+                  }
+                  const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${mapData.name || "market-map"}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors"
+              >
+                <Download className="h-3.5 w-3.5" /> Export CSV
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors">
+              <button
+                onClick={async () => {
+                  if (!mapData) return;
+                  try {
+                    const res = await fetch(`/api/market-map/${mapData.id}/share`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ permission_level: "overview" }),
+                    });
+                    if (!res.ok) throw new Error("Failed to create share link");
+                    const data = await res.json();
+                    await navigator.clipboard.writeText(data.share_url);
+                    showSuccess("Share link copied to clipboard!");
+                  } catch (err) {
+                    showError(err instanceof Error ? err.message : "Failed to share");
+                  }
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/50 dark:bg-neutral-800/50 transition-colors"
+              >
                 <Share2 className="h-3.5 w-3.5" /> Share with HM
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors">
+              <button
+                onClick={() => {
+                  alert("Push to Ashby: select a candidate from the map first, then use the candidate actions menu to push to Ashby.");
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors"
+              >
                 <Send className="h-3.5 w-3.5" /> Push to Ashby
               </button>
             </div>

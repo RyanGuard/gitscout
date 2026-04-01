@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { safeErrorMessage } from "@/lib/api-error";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -385,8 +386,7 @@ Respond ONLY in JSON:
     console.error("[alerts/scan] Failed:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Scan failed",
+        error: safeErrorMessage(error, "Scan failed"),
       },
       { status: 500 }
     );

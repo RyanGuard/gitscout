@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
@@ -190,7 +191,7 @@ Evaluate each candidate for both fit and flight risk.`;
   } catch (error) {
     console.error("[market-map] Classification failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Classification failed" },
+      { error: safeErrorMessage(error, "Classification failed") },
       { status: 500 }
     );
   }

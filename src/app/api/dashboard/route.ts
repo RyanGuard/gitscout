@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { computeOutreachAnalytics } from "@/lib/outreach/analytics";
+import { safeErrorMessage } from "@/lib/api-error";
 
 interface LinkedinAction {
   id: string;
@@ -18,6 +19,7 @@ export async function GET() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  try {
   const [sequences, analytics, linkedinActions, favorites, alerts] = await Promise.all([
     // 1. Recent sequences
     prisma.outreachSequence.findMany({
@@ -75,47 +77,50 @@ export async function GET() {
   const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  // Needs attention: sequences stuck in sending 3+ days
-  const stuckSequences = sequences
-    .filter(
-      (s) => s.status === "sending" && s.updatedAt < threeDaysAgo
-    )
-    .map((s) => ({
-      type: "stuck" as const,
-      id: s.id,
-      candidateName: s.candidateName,
-      reason: "Stuck in sending for 3+ days",
-      updatedAt: s.updatedAt.toISOString(),
-    }));
+  // Needs attention: aggregate by type to match frontend AttentionItem shape
+  const attentionMap: Record<string, { count: number; sequenceIds: string[] }> = {};
 
-  // Needs attention: no response after 7+ days
-  const awaitingResponse = sequences
-    .filter(
-      (s) =>
-        s.status === "sending" &&
-        s.updatedAt < sevenDaysAgo &&
-        !s.responseReceived
-    )
-    .map((s) => ({
-      type: "awaiting_response" as const,
-      id: s.id,
-      candidateName: s.candidateName,
-      reason: "No response after 7+ days",
-      updatedAt: s.updatedAt.toISOString(),
-    }));
+  // Track which sequence IDs have already been categorized (most urgent wins)
+  const categorized = new Set<string>();
 
-  // Needs attention: positive responses needing action
-  const positiveResponses = sequences
-    .filter(
-      (s) => s.responseReceived === true && s.responseSentiment === "positive"
-    )
-    .map((s) => ({
-      type: "positive_response" as const,
-      id: s.id,
-      candidateName: s.candidateName,
-      reason: "Positive response needs follow-up",
-      updatedAt: s.updatedAt.toISOString(),
-    }));
+  // Positive responses needing action (highest priority — act on these first)
+  for (const s of sequences) {
+    if (s.responseReceived === true && s.responseSentiment === "positive") {
+      if (!attentionMap['positive_response']) attentionMap['positive_response'] = { count: 0, sequenceIds: [] };
+      attentionMap['positive_response'].count++;
+      attentionMap['positive_response'].sequenceIds.push(s.id);
+      categorized.add(s.id);
+    }
+  }
+
+  // Sequences stuck in sending 3+ days
+  for (const s of sequences) {
+    if (categorized.has(s.id)) continue;
+    if (s.status === "sending" && s.updatedAt < threeDaysAgo) {
+      if (!attentionMap['stuck']) attentionMap['stuck'] = { count: 0, sequenceIds: [] };
+      attentionMap['stuck'].count++;
+      attentionMap['stuck'].sequenceIds.push(s.id);
+      categorized.add(s.id);
+    }
+  }
+
+  // No response after 7+ days (only if not already in a more urgent category)
+  for (const s of sequences) {
+    if (categorized.has(s.id)) continue;
+    if (s.status === "sending" && s.updatedAt < sevenDaysAgo && !s.responseReceived) {
+      if (!attentionMap['overdue']) attentionMap['overdue'] = { count: 0, sequenceIds: [] };
+      attentionMap['overdue'].count++;
+      attentionMap['overdue'].sequenceIds.push(s.id);
+      categorized.add(s.id);
+    }
+  }
+
+  const needsAttention = Object.entries(attentionMap).map(([type, data]) => ({
+    type,
+    count: data.count,
+    label: '', // Frontend generates labels
+    sequenceIds: data.sequenceIds,
+  }));
 
   // Funnel
   const funnel = {
@@ -200,11 +205,7 @@ export async function GET() {
       updatedAt: s.updatedAt.toISOString(),
     })),
 
-    needsAttention: [
-      ...stuckSequences,
-      ...awaitingResponse,
-      ...positiveResponses,
-    ],
+    needsAttention,
 
     funnel,
 
@@ -246,4 +247,8 @@ export async function GET() {
 
     userName: session.user.name || 'there',
   });
+  } catch (error) {
+    console.error("[dashboard] Failed:", error);
+    return Response.json({ error: safeErrorMessage(error, "Failed to load dashboard") }, { status: 500 });
+  }
 }

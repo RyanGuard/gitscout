@@ -1,4 +1,5 @@
 import { enrichPackages } from "@/lib/enrichment/packages";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     return Response.json(result);
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Enrichment failed" },
+      { error: safeErrorMessage(error, "Enrichment failed") },
       { status: 500 }
     );
   }

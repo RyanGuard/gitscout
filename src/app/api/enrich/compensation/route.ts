@@ -1,4 +1,5 @@
 import { estimateCompensation } from "@/lib/enrichment/compensation";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Estimation failed" },
+      { error: safeErrorMessage(error, "Estimation failed") },
       { status: 500 }
     );
   }

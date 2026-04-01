@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { enrichStackOverflow } from "@/lib/intelligence/stackOverflow";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -55,8 +56,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Stack Overflow enrichment failed",
+        error: safeErrorMessage(error, "Stack Overflow enrichment failed"),
       },
       { status: 500 }
     );

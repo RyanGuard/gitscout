@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCached, setCache } from "@/lib/connections/cache";
+import { safeErrorMessage } from "@/lib/api-error";
 import { scanATSBoards, type ATSScanResult } from "@/lib/map/atsScanner";
 import {
   detectGitHubStack,
@@ -114,7 +115,7 @@ export async function POST(request: Request) {
       .catch(() => {});
 
     return Response.json(
-      { error: error instanceof Error ? error.message : "Stack scan failed" },
+      { error: safeErrorMessage(error, "Stack scan failed") },
       { status: 500 }
     );
   }

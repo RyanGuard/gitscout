@@ -1,4 +1,5 @@
 import { resyncStaleDevelopers } from "@/pipeline/scheduler";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -12,8 +13,6 @@ export async function GET(request: Request) {
     const result = await resyncStaleDevelopers();
     return Response.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error(`[cron] Re-sync failed: ${message}`);
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: safeErrorMessage(error, "Re-sync failed") }, { status: 500 });
   }
 }

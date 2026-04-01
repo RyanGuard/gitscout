@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { enrichDeveloper } from "@/pipeline/enrichment";
 import { resolveDeveloperId } from "@/lib/resolveDevId";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(
   _request: Request,
@@ -20,9 +21,7 @@ export async function POST(
     const contactInfo = await enrichDeveloper(developerId);
     return Response.json({ contactInfo });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Enrichment failed";
-    console.error(`[enrich] Failed for ${rawId}: ${message}`);
+    const message = safeErrorMessage(error, "Enrichment failed");
     return Response.json({ error: message }, { status: 500 });
   }
 }

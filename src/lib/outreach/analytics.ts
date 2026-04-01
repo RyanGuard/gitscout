@@ -8,6 +8,7 @@ export interface OutreachMetrics {
   optimalLength: { min: number; max: number };
   topSignal: { signal: string; rate: number } | null;
   responseRate: number;
+  avgResponseTime: number | null;
   channelBreakdown: {
     channel: string;
     total: number;

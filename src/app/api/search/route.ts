@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { GitHubUser } from "@/types";
+import { safeErrorMessage } from "@/lib/api-error";
 
 // ═══ POST — SSE Streaming Orchestrator (quick + deep in parallel) ═══
 export async function POST(request: Request) {
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
           sendEvent("complete", { quickCount: 0, deepCount: 0, unicorns: 0 });
         }
       } catch (error) {
-        sendEvent("error", { message: error instanceof Error ? error.message : "Search failed" });
+        sendEvent("error", { message: safeErrorMessage(error, "Search failed") });
       } finally {
         controller.close();
       }
@@ -606,18 +607,23 @@ export async function GET(request: Request) {
   });
 
   // --- 5. Filter out empty profiles (failed fetches) and sort ---
-  const validDevelopers = developers.filter(
+  let results = developers.filter(
     (d) => d.name || d.followers > 0 || d.publicRepos > 0 || d.source === "local"
   );
+
+  // Post-fetch hireable filter (GitHub API doesn't support hireable in search)
+  if (hireable) {
+    results = results.filter(r => r.hireable === true);
+  }
 
   // Only re-sort by score when user selected "score" sort (or default)
   // For followers/stars/joined, GitHub already sorted by that — preserve order
   if (sort === "score") {
-    validDevelopers.sort((a, b) => (b.score || 0) - (a.score || 0));
+    results.sort((a, b) => (b.score || 0) - (a.score || 0));
   }
 
   return Response.json({
-    developers: validDevelopers,
+    developers: results,
     total: githubTotal,
     page,
     totalPages: Math.ceil(githubTotal / limit),

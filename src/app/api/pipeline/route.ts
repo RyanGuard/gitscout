@@ -1,4 +1,5 @@
 import { syncDevelopers } from "@/pipeline/github";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -23,7 +24,6 @@ export async function POST(request: Request) {
     const result = await syncDevelopers({ usernames, query });
     return Response.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: safeErrorMessage(error, "Pipeline sync failed") }, { status: 500 });
   }
 }

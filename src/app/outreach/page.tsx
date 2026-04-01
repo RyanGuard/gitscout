@@ -108,7 +108,7 @@ const TONES: { value: Tone; label: string }[] = [
 
 const CHANNEL_LIMITS: Record<string, { words?: number; chars?: number; label: string }> = {
   email: { words: 100, label: "100 words" },
-  linkedin: { words: 150, label: "150 words" },
+  linkedin: { chars: 200, label: "200 chars" },
   text: { chars: 160, label: "160 chars" },
   multi_channel: { words: 100, label: "100 words" },
 };
@@ -367,6 +367,7 @@ function OutreachStudio() {
           channel,
           tone,
           sequenceLength: seqLength,
+          firstTouch,
         }),
       });
 
@@ -1248,7 +1249,7 @@ function OutreachStudio() {
 
         {/* LinkedIn Queue Button */}
         {(channel === 'linkedin' || channel === 'multi_channel') && sequenceId && candidate.linkedinUrl && (
-          <LinkedInQueueButton sequenceId={sequenceId} candidateName={candidate.name} />
+          <LinkedInQueueButton sequenceId={sequenceId} candidateName={candidate.name} viewFirst={viewFirst} likePost={likePost} />
         )}
 
         {/* Ashby Log */}

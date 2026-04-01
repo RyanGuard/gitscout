@@ -8,11 +8,13 @@ import { Loader2, CheckCircle2, Play } from "lucide-react";
 interface LinkedInQueueButtonProps {
   sequenceId: string;
   candidateName: string;
+  viewFirst?: boolean;
+  likePost?: boolean;
 }
 
 // ─── Component ───
 
-export function LinkedInQueueButton({ sequenceId, candidateName }: LinkedInQueueButtonProps) {
+export function LinkedInQueueButton({ sequenceId, candidateName, viewFirst = true, likePost = false }: LinkedInQueueButtonProps) {
   const [queuing, setQueuing] = useState(false);
   const [queued, setQueued] = useState(false);
   const [queuedCount, setQueuedCount] = useState(0);
@@ -26,7 +28,7 @@ export function LinkedInQueueButton({ sequenceId, candidateName }: LinkedInQueue
       const res = await fetch("/api/outreach/linkedin-queue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sequenceId, viewFirst: true, likePost: false }),
+        body: JSON.stringify({ sequenceId, viewFirst, likePost }),
       });
 
       if (!res.ok) {

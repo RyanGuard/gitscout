@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logStatusChange } from "@/lib/map/statusHistory";
+import { safeErrorMessage } from "@/lib/api-error";
 
 const VALID_STATUSES = ["mapped", "shortlisted", "contacted", "responded", "screening", "offer", "rejected"];
 
@@ -94,7 +95,7 @@ export async function POST(
   } catch (error) {
     console.error("[bulk-update] Failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Bulk update failed" },
+      { error: safeErrorMessage(error, "Bulk update failed") },
       { status: 500 }
     );
   }

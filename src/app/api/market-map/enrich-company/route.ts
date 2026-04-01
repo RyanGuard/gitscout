@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { scoreTier, assignTier } from "@/lib/map/tierScoring";
 import { apolloFetch } from "@/lib/apollo-fetch";
+import { safeErrorMessage } from "@/lib/api-error";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -432,7 +433,7 @@ export async function POST(request: Request) {
       },
     }).catch(() => {});
     return Response.json(
-      { error: error instanceof Error ? error.message : "Enrichment failed" },
+      { error: safeErrorMessage(error, "Enrichment failed") },
       { status: 500 }
     );
   }

@@ -272,6 +272,15 @@ function PersonRow({ person }: { person: Person }) {
         <button
           className="flex items-center gap-1 rounded-md border border-neutral-200/50 px-2 py-1 text-[11px] font-medium text-neutral-600 transition-colors hover:border-gold-border hover:bg-gold-bg hover:text-gold dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:border-gold-border dark:hover:text-gold"
           title="Save to list"
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.set('name', person.name);
+            params.set('title', person.title);
+            if (person.linkedinUrl) params.set('linkedin', person.linkedinUrl);
+            if (person.city) params.set('location', [person.city, person.state].filter(Boolean).join(', '));
+            params.set('source', 'company');
+            window.location.href = `/outreach?${params.toString()}`;
+          }}
         >
           <Bookmark className="h-3 w-3" />
           Save
@@ -279,6 +288,16 @@ function PersonRow({ person }: { person: Person }) {
         <button
           className="flex items-center gap-1 rounded-md border border-neutral-200/50 px-2 py-1 text-[11px] font-medium text-neutral-600 transition-colors hover:border-gold-border hover:bg-gold-bg hover:text-gold dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:border-gold-border dark:hover:text-gold"
           title="Add to sequence"
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.set('name', person.name);
+            params.set('title', person.title);
+            if (person.linkedinUrl) params.set('linkedin', person.linkedinUrl);
+            if (person.city) params.set('location', [person.city, person.state].filter(Boolean).join(', '));
+            params.set('source', 'company');
+            params.set('channel', 'linkedin');
+            window.location.href = `/outreach?${params.toString()}`;
+          }}
         >
           <ListPlus className="h-3 w-3" />
           Sequence

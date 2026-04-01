@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(
   _request: Request,
@@ -87,7 +88,7 @@ export async function POST(
     });
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Clone failed" },
+      { error: safeErrorMessage(error, "Clone failed") },
       { status: 500 }
     );
   }

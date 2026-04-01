@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
+import { safeErrorMessage } from "@/lib/api-error";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -171,7 +172,7 @@ Respond ONLY in JSON:
   } catch (error) {
     console.error("[enrich-news] Failed:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "News enrichment failed" },
+      { error: safeErrorMessage(error, "News enrichment failed") },
       { status: 500 }
     );
   }

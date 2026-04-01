@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeErrorMessage } from "@/lib/api-error";
 import {
   enrichOrganization,
   extractInvestors,
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[connections] Setup home base error:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Setup failed" },
+      { error: safeErrorMessage(error, "Setup failed") },
       { status: 500 }
     );
   }
