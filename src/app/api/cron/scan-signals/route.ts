@@ -51,14 +51,18 @@ export async function GET(req: NextRequest) {
       // Step 1: Fetch news from Apollo
       let articles: Array<{ title: string; snippet: string; url: string; published_date: string }> = [];
 
+      // Build news search body — use org ID if available, fall back to name
+      const newsBody: Record<string, unknown> = { page: 1, per_page: 10 };
+      if (company.apolloOrgId) {
+        newsBody.organization_ids = [company.apolloOrgId];
+      } else {
+        newsBody.q_organization_name = company.companyName;
+      }
+
       const newsRes = await fetch(`${APOLLO_API}/news_articles/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
-        body: JSON.stringify({
-          q_organization_name: company.companyName,
-          page: 1,
-          per_page: 10,
-        }),
+        body: JSON.stringify(newsBody),
       });
 
       if (newsRes.ok) {

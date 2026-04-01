@@ -36,15 +36,45 @@ export async function POST(request: Request) {
     if (cached && cached.expiresAt > new Date()) {
       articles = cached.data as typeof articles;
     } else {
-      // Fetch news from Apollo
+      // Look up Apollo org ID from our DB
+      let apolloOrgId: string | null = null;
+      try {
+        const co = await prisma.mapCompany.findUnique({
+          where: { id: company_id },
+          select: { apolloOrgId: true, companyDomain: true },
+        });
+        apolloOrgId = co?.apolloOrgId || null;
+
+        // If no org ID cached, try to resolve via Apollo org enrichment
+        if (!apolloOrgId && co?.companyDomain) {
+          const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?domain=${co.companyDomain}`, {
+            headers: { "X-Api-Key": apiKey },
+          });
+          if (orgRes.ok) {
+            const orgData = await orgRes.json();
+            apolloOrgId = orgData.organization?.id || null;
+            if (apolloOrgId) {
+              await prisma.mapCompany.update({
+                where: { id: company_id },
+                data: { apolloOrgId },
+              }).catch(() => {});
+            }
+          }
+        }
+      } catch { /* org lookup is optional */ }
+
+      // Fetch news from Apollo — try org ID first, fall back to name search
+      const newsBody: Record<string, unknown> = { page: 1, per_page: 10 };
+      if (apolloOrgId) {
+        newsBody.organization_ids = [apolloOrgId];
+      } else {
+        newsBody.q_organization_name = company_name;
+      }
+
       const newsRes = await fetch(`${APOLLO_API}/news_articles/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
-        body: JSON.stringify({
-          q_organization_name: company_name,
-          page: 1,
-          per_page: 10,
-        }),
+        body: JSON.stringify(newsBody),
       });
 
       if (newsRes.ok) {
