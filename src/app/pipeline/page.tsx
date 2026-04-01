@@ -15,6 +15,7 @@ import {
   Smartphone,
   ExternalLink,
   FileEdit,
+  Download,
 } from "lucide-react";
 import {
   DndContext,
@@ -295,6 +296,31 @@ export default function PipelinePage() {
     0,
   );
 
+  function exportCSV() {
+    const rows = [["name", "title", "company", "stage", "channel", "days_in_stage", "linkedin_url"]];
+    for (const stage of stages) {
+      for (const c of stage.candidates) {
+        rows.push([
+          c.name,
+          c.title || "",
+          c.company || "",
+          c.stage,
+          c.channel,
+          String(c.daysInStage),
+          c.linkedinUrl || "",
+        ]);
+      }
+    }
+    const csv = rows.map((r) => r.map((v) => `"${v.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pipeline-export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="flex-1 min-h-screen bg-background">
       {/* Header */}
@@ -308,6 +334,15 @@ export default function PipelinePage() {
                 : `${totalCandidates} candidate${totalCandidates !== 1 ? "s" : ""} across ${stages.length} stages`}
             </p>
           </div>
+          {!loading && stages.length > 0 && (
+            <button
+              onClick={exportCSV}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Export CSV
+            </button>
+          )}
         </div>
       </div>
 

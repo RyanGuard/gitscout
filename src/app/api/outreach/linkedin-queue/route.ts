@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { sequenceId, viewFirst, likePost } = body;
+  const { sequenceId, viewFirst, likePost, scheduledFor } = body;
 
   if (!sequenceId) {
     return Response.json({ error: "Sequence ID is required" }, { status: 400 });
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "LinkedIn agent not configured" }, { status: 500 });
   }
 
-  const now = new Date();
+  const now = scheduledFor ? new Date(scheduledFor) : new Date();
   const linkedinUrl = sequence.candidateLinkedinUrl;
   const candidateName = sequence.candidateName;
 

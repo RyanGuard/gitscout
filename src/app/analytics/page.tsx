@@ -20,6 +20,7 @@ import {
   ArrowDown,
   Filter,
   Sun,
+  Download,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════
@@ -209,17 +210,65 @@ export default function AnalyticsPage() {
   const maxHourlyRate = Math.max(...displayHours.map((h) => h.rate), 1);
   const bestHourRate = Math.max(...displayHours.filter((h) => h.sent >= 1).map((h) => h.rate), 0);
 
+  function exportCSV() {
+    const rows = [["date", "channel", "tone", "sent", "responded", "response_rate"]];
+    for (const d of daily) {
+      for (const ch of channels) {
+        for (const t of tones) {
+          rows.push([
+            d.date,
+            ch.channel,
+            t.tone,
+            String(ch.sent),
+            String(ch.responded),
+            String(ch.rate),
+          ]);
+        }
+      }
+    }
+    // If no daily/channel/tone combos, export summary rows per channel+tone
+    if (rows.length <= 1) {
+      for (const ch of channels) {
+        for (const t of tones) {
+          rows.push([
+            "",
+            ch.channel,
+            t.tone,
+            String(ch.sent),
+            String(ch.responded),
+            String(ch.rate),
+          ]);
+        }
+      }
+    }
+    const csv = rows.map((r) => r.map((v) => `"${v.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "analytics-export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <BarChart3 className="h-6 w-6 text-gold" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold text-text">Outreach Analytics</h1>
           <p className="text-sm text-text-muted">
             Performance insights across channels, tones, and signals
           </p>
         </div>
+        <button
+          onClick={exportCSV}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Export CSV
+        </button>
       </div>
 
       {/* ──────── Filter Bar ──────── */}

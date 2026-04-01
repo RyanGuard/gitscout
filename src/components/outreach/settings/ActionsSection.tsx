@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, RefreshCw, Sparkles, Zap } from "lucide-react";
+import { Loader2, RefreshCw, Sparkles, Zap, FlaskConical } from "lucide-react";
 
 // ─── Props ───
 
@@ -9,9 +9,11 @@ interface ActionsSectionProps {
   onRewrite: () => void;
   onImprove: () => void;
   onRegenerateStep: (step: number) => void;
+  onGenerateVariant?: () => void;
   generating: boolean;
   rewriting: boolean;
   improving: boolean;
+  generatingVariant?: boolean;
   hasMessages: boolean;
   canGenerate: boolean;
   activeStep: number;
@@ -24,9 +26,11 @@ export function ActionsSection({
   onRewrite,
   onImprove,
   onRegenerateStep,
+  onGenerateVariant,
   generating,
   rewriting,
   improving,
+  generatingVariant,
   hasMessages,
   canGenerate,
   activeStep,
@@ -81,6 +85,16 @@ export function ActionsSection({
             <RefreshCw className="h-3 w-3" />
             Regenerate this step
           </button>
+          {onGenerateVariant && (
+            <button
+              onClick={onGenerateVariant}
+              disabled={generatingVariant}
+              className="w-full rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-1.5"
+            >
+              {generatingVariant ? <Loader2 className="h-3 w-3 animate-spin" /> : <FlaskConical className="h-3 w-3" />}
+              Generate Variant
+            </button>
+          )}
         </div>
       )}
     </div>

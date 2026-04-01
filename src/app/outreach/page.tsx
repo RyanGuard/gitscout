@@ -518,6 +518,41 @@ function OutreachStudio() {
     }
   }
 
+  // ─── Generate variant for A/B testing ───
+  async function handleGenerateVariant() {
+    const msg = messages[activeStep];
+    if (!msg || !sequenceId) return;
+    setGeneratingVariant(true);
+    try {
+      const res = await fetch("/api/outreach/variant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sequenceId,
+          stepNumber: msg.stepNumber,
+          candidateContext: {
+            name: candidate.name,
+            title: candidate.title,
+            company: candidate.company,
+            ...candidate.context,
+          },
+          channel: msg.channel,
+          tone,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setVariants((prev) => ({ ...prev, [activeStep]: data.body }));
+        setShowVariant((prev) => ({ ...prev, [activeStep]: true }));
+        trackEvent("outreach_variant_generated");
+      }
+    } catch (err) {
+      console.error("Generate variant error:", err);
+    } finally {
+      setGeneratingVariant(false);
+    }
+  }
+
   // ─── Load suggestions ───
   async function handleGetSuggestions() {
     setLoadingSuggestions(true);
@@ -1094,10 +1129,67 @@ function OutreachStudio() {
                 )}
               </div>
 
+              {/* A/B Variant toggle */}
+              {variants[activeStep] && (
+                <div className="mt-3 rounded-lg border border-border bg-surface p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FlaskConical className="h-3.5 w-3.5 text-text-muted" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">A/B Variant</span>
+                  </div>
+                  <div className="flex items-center gap-1 mb-2">
+                    <button
+                      onClick={() => setShowVariant((prev) => ({ ...prev, [activeStep]: false }))}
+                      className={cn(
+                        "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                        !showVariant[activeStep]
+                          ? "bg-gold text-white"
+                          : "border border-border text-text-secondary hover:bg-surface-secondary"
+                      )}
+                    >
+                      Original
+                    </button>
+                    <button
+                      onClick={() => setShowVariant((prev) => ({ ...prev, [activeStep]: true }))}
+                      className={cn(
+                        "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                        showVariant[activeStep]
+                          ? "bg-gold text-white"
+                          : "border border-border text-text-secondary hover:bg-surface-secondary"
+                      )}
+                    >
+                      Variant B
+                    </button>
+                    {showVariant[activeStep] && (
+                      <button
+                        onClick={() => {
+                          updateMessage(activeStep, { body: variants[activeStep] });
+                          setVariants((prev) => {
+                            const next = { ...prev };
+                            delete next[activeStep];
+                            return next;
+                          });
+                          setShowVariant((prev) => ({ ...prev, [activeStep]: false }));
+                        }}
+                        className="ml-auto text-[10px] font-semibold text-gold hover:text-gold-hover"
+                      >
+                        Use this variant
+                      </button>
+                    )}
+                  </div>
+                  {showVariant[activeStep] && (
+                    <div className="rounded-lg border border-border bg-white dark:bg-neutral-800 p-3">
+                      <p className="text-sm text-neutral-900 dark:text-neutral-100 leading-relaxed whitespace-pre-wrap">
+                        {variants[activeStep]}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* LinkedIn preview */}
               {channel === "linkedin" && messages.length > 0 && activeMsg?.channel === "linkedin" && (
                 <div className="mt-3">
-                  <LinkedInPreview message={activeMsg.body} candidateName={candidate.name} />
+                  <LinkedInPreview message={showVariant[activeStep] && variants[activeStep] ? variants[activeStep] : activeMsg.body} candidateName={candidate.name} />
                 </div>
               )}
             </>
@@ -1264,9 +1356,11 @@ function OutreachStudio() {
           onRewrite={handleRewrite}
           onImprove={handleImprove}
           onRegenerateStep={handleRegenerateStep}
+          onGenerateVariant={sequenceId ? handleGenerateVariant : undefined}
           generating={generating}
           rewriting={rewriting}
           improving={improving}
+          generatingVariant={generatingVariant}
           hasMessages={messages.length > 0}
           canGenerate={!!candidate.name.trim()}
           activeStep={activeStep}

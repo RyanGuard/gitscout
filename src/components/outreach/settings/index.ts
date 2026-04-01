@@ -12,6 +12,7 @@ export { IntelligenceSection } from "./IntelligenceSection";
 export { SuggestionsSection } from "./SuggestionsSection";
 export { SettingsPanel } from "./SettingsPanel";
 export { LinkedInQueueButton } from "./LinkedInQueueButton";
+export { LinkedInPreview } from "./LinkedInPreview";
 export { AshbyLogSection } from "./AshbyLogSection";
 
 export type {
