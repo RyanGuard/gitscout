@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Send, Check, Loader2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { showSuccess, showError } from "@/lib/toast";
 
 interface SequenceItem {
   id: string;
@@ -64,10 +65,11 @@ export function AddToSequenceButton({ developerId, sourceType = "developer", cla
         const data = await res.json();
         if (data.enrolled > 0) {
           setAddedTo((prev) => new Set(prev).add(sequenceId));
+          showSuccess("Enrolled in sequence");
         }
       }
     } catch {
-      // ignore
+      showError("Failed to enroll");
     } finally {
       setEnrolling(null);
     }

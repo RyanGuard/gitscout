@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Plus, Check, Loader2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { showSuccess, showError } from "@/lib/toast";
 
 interface ListItem {
   id: string;
@@ -54,9 +55,10 @@ export function AddToListButton({ developerId, className }: AddToListButtonProps
       });
       if (res.ok || res.status === 409) {
         setAddedTo((prev) => new Set(prev).add(listId));
+        showSuccess("Added to list");
       }
     } catch {
-      // ignore
+      showError("Failed to add to list");
     }
   }
 

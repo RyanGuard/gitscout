@@ -22,7 +22,7 @@ import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton"
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromMapCandidate } from "@/lib/outreach/candidateNormalizer";
 import CompanyTimeline from "@/components/map/CompanyTimeline";
-import { showError } from "@/lib/toast";
+import { showError, showSuccess } from "@/lib/toast";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -989,7 +989,7 @@ function MarketMapInner() {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: "shortlisted" }),
-          }).then(() => loadMap(mapData!.id));
+          }).then(() => { showSuccess("Shortlisted"); loadMap(mapData!.id); });
           break;
         case "x":
           e.preventDefault();
@@ -998,6 +998,7 @@ function MarketMapInner() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: "rejected" }),
           }).then(() => {
+            showSuccess("Rejected — advancing");
             if (currentIndex < allCandidates.length - 1) setActivePerson(allCandidates[currentIndex + 1]);
             loadMap(mapData!.id);
           });
@@ -1047,6 +1048,9 @@ function MarketMapInner() {
           role_level: roleLevel,
           role_stack: roleStack.split(",").map((s) => s.trim()).filter(Boolean),
           geography: geography ? [geography] : [],
+          role_description: roleDescription || undefined,
+          comp_range_min: compRangeMin ? parseInt(compRangeMin) * 1000 : undefined,
+          comp_range_max: compRangeMax ? parseInt(compRangeMax) * 1000 : undefined,
         }),
       });
 
@@ -1279,6 +1283,37 @@ function MarketMapInner() {
                     className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
                 </div>
               </div>
+
+              {/* Advanced fields toggle */}
+              <button type="button" onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-gold transition-colors mb-3">
+                <ChevronDown className={`h-3 w-3 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+                {showAdvanced ? "Hide" : "Show"} advanced options
+              </button>
+
+              {showAdvanced && (
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Role description</label>
+                    <textarea value={roleDescription} onChange={(e) => setRoleDescription(e.target.value)}
+                      placeholder="Describe the ideal candidate, team context, key responsibilities..."
+                      rows={3} className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50 resize-none" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Comp min ($K)</label>
+                      <input type="number" value={compRangeMin} onChange={(e) => setCompRangeMin(e.target.value)} placeholder="150"
+                        className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 block mb-1.5">Comp max ($K)</label>
+                      <input type="number" value={compRangeMax} onChange={(e) => setCompRangeMax(e.target.value)} placeholder="220"
+                        className="w-full rounded-lg border border-neutral-200/50 dark:border-neutral-700/50 bg-transparent dark:bg-neutral-900/40 px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-gold/50" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <button onClick={generateMap} disabled={generating || !roleTitle}
                 className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-neutral-900 dark:text-white hover:bg-gold-hover transition-colors disabled:opacity-50">
                 {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Map className="h-4 w-4" />}
