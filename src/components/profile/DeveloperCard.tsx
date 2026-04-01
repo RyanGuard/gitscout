@@ -26,7 +26,7 @@ interface DeveloperCardProps {
 }
 
 export function DeveloperCard({ developer, selected, onSelect }: DeveloperCardProps) {
-  const topLanguages = developer.languages.slice(0, 4);
+  const topLanguages = (developer.languages || []).slice(0, 4);
   const tierInfo = developer.score > 0 ? getTierInfo(developer.score) : null;
   const tierAccent = tierInfo ? SCORE_ACCENTS[tierInfo.label] : undefined;
   const hasEmail = !!developer.email;

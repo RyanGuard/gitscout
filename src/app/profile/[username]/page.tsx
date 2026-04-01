@@ -456,7 +456,7 @@ export default async function ProfilePage({
       </div>
 
       {/* Languages */}
-      {developer.languages.length > 0 && (
+      {developer.languages?.length > 0 && (
         <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
           <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
             Languages
@@ -466,7 +466,7 @@ export default async function ProfilePage({
       )}
 
       {/* Repositories */}
-      {developer.repositories.length > 0 && (
+      {developer.repositories?.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
             Top Repositories
