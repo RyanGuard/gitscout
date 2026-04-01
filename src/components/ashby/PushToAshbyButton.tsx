@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Send, Check, Loader2, AlertCircle, X, Briefcase } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { showSuccess, showError } from "@/lib/toast";
 import type { AshbyJob } from "@/types";
 
 interface PushToAshbyButtonProps {
@@ -84,11 +85,14 @@ export function PushToAshbyButton({
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Push failed");
+        showError(data.error || "Push to Ashby failed");
         return;
       }
       setPushed(true);
+      showSuccess("Pushed to Ashby");
     } catch {
       setError("Network error");
+      showError("Failed to push to Ashby");
     } finally {
       setLoading(false);
     }
