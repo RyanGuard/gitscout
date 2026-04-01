@@ -315,6 +315,8 @@ model MapCompany {
   newsFetchedAt     DateTime?
   flightRiskCompany String?        // low | medium | high
   enrichmentStatus  String         @default("pending") // pending | enriching | complete | failed
+  enrichmentSubstatus String?
+  enrichmentError   String?
   hidden            Boolean        @default(false)
   apolloOrgId        String?
   techStackVerified  String[]       @default([])

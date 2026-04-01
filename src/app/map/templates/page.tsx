@@ -62,8 +62,14 @@ export default function TemplatesPage() {
   }
 
   async function deleteTemplate(templateId: string) {
-    setTemplates((prev) => prev.filter((t) => t.id !== templateId));
-    // No delete API yet — would need to add
+    const prev = templates;
+    setTemplates((t) => t.filter((t) => t.id !== templateId));
+    try {
+      const res = await fetch(`/api/market-map/templates/${templateId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+    } catch {
+      setTemplates(prev);
+    }
   }
 
   if (!session) {

@@ -98,10 +98,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Mark company as enriching
+    // Atomic lock — prevent double-enrichment
+    const lockResult = await prisma.mapCompany.updateMany({
+      where: { id: company_id, enrichmentStatus: { notIn: ["enriching"] } },
+      data: { enrichmentStatus: "enriching", enrichmentSubstatus: "starting", enrichmentError: null },
+    });
+    if (lockResult.count === 0) {
+      return Response.json({ status: "already_enriching" }, { status: 200 });
+    }
+
     await prisma.mapCompany.update({
       where: { id: company_id },
-      data: { enrichmentStatus: "enriching" },
+      data: { enrichmentSubstatus: "fetching_people" },
     });
 
     // Check cache
@@ -197,10 +205,13 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update company with enriched info
-    const updateData: Record<string, unknown> = {
-      enrichmentStatus: "complete",
-    };
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: { enrichmentSubstatus: "updating_company" },
+    }).catch(() => {});
+
+    // Update company with enriched info (keep enriching — mark complete after candidates)
+    const updateData: Record<string, unknown> = {};
 
     if (companyInfo) {
       updateData.headcount = (companyInfo.estimated_num_employees as number) || null;
@@ -246,9 +257,22 @@ export async function POST(request: Request) {
       });
     }
 
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: { enrichmentSubstatus: "inserting_candidates" },
+    }).catch(() => {});
+
+    // Deduplicate: check for existing candidates
+    const existingCandidates = await prisma.mapCandidate.findMany({
+      where: { companyId: company_id },
+      select: { apolloPersonId: true },
+    });
+    const existingIds = new Set(existingCandidates.map(c => c.apolloPersonId).filter(Boolean));
+    const newPeople = people.filter(p => !existingIds.has(p.id));
+
     // Insert candidates
     const candidates = await Promise.all(
-      people.map((p) =>
+      newPeople.map((p) =>
         prisma.mapCandidate.create({
           data: {
             mapId: map_id,
@@ -269,6 +293,12 @@ export async function POST(request: Request) {
         })
       )
     );
+
+    // Mark enrichment complete after candidates inserted
+    await prisma.mapCompany.update({
+      where: { id: company_id },
+      data: { enrichmentStatus: "complete", enrichmentSubstatus: null },
+    });
 
     // Backfill missing LinkedIn URLs via Apollo person match — Tier A only (credits)
     const company = await prisma.mapCompany.findUnique({ where: { id: company_id }, select: { tier: true } });
@@ -392,7 +422,11 @@ export async function POST(request: Request) {
     console.error(`[market-map] Enrichment failed for ${company_domain}:`, error);
     await prisma.mapCompany.update({
       where: { id: company_id },
-      data: { enrichmentStatus: "failed" },
+      data: {
+        enrichmentStatus: "failed",
+        enrichmentSubstatus: null,
+        enrichmentError: error instanceof Error ? error.message.slice(0, 500) : "Unknown error",
+      },
     }).catch(() => {});
     return Response.json(
       { error: error instanceof Error ? error.message : "Enrichment failed" },
