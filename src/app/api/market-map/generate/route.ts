@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
 import { safeErrorMessage } from "@/lib/api-error";
+import crypto from "crypto";
 
 export const maxDuration = 60;
 
@@ -45,6 +46,7 @@ export async function POST(request: Request) {
         status: "generating",
       },
     });
+    console.log("[market-map] Map created:", map.id);
 
     // 2. Ask Claude to suggest companies
     const anthropic = new Anthropic();
@@ -74,13 +76,14 @@ Respond ONLY in JSON format:
     const aiStart = Date.now();
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 4000,
+      max_tokens: 2000,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
     });
 
     // Parse Claude's response
     const text = response.content[0].type === "text" ? response.content[0].text : "";
+    console.log("[market-map] Claude response received, parsing...");
 
     logAiCall(
       { userId: userId, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
@@ -117,9 +120,13 @@ Respond ONLY in JSON format:
       );
     }
 
+    console.log(`[market-map] Parsed ${companies.length} companies, inserting...`);
+
     // 3. Batch-insert map_companies in a single round-trip
+    //    Generate IDs client-side to avoid Prisma/DB cuid() default issues with createMany
     await prisma.mapCompany.createMany({
       data: companies.map((co) => ({
+        id: crypto.randomUUID(),
         mapId: map!.id,
         companyName: co.company_name,
         companyDomain: co.company_domain,
@@ -128,6 +135,8 @@ Respond ONLY in JSON format:
         enrichmentStatus: "pending",
       })),
     });
+
+    console.log("[market-map] Companies inserted, fetching back...");
 
     // Fetch the created companies back (createMany doesn't return records)
     const createdCompanies = await prisma.mapCompany.findMany({
@@ -140,6 +149,8 @@ Respond ONLY in JSON format:
       where: { id: map.id },
       data: { status: "ready" },
     });
+
+    console.log(`[market-map] Generation complete: ${createdCompanies.length} companies for map ${map.id}`);
 
     // 5. Return the map ID and company list so frontend can render skeleton
     return Response.json({
