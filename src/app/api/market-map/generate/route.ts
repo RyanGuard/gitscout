@@ -1,12 +1,11 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
     // 1. Create the market map record
     const map = await prisma.marketMap.create({
       data: {
-        userId: session.user.id,
+        userId: userId,
         name: `${role_title} Market Map`,
         roleTitle: role_title,
         roleLevel: role_level || null,
@@ -79,7 +78,7 @@ Respond ONLY in JSON format:
     const text = response.content[0].type === "text" ? response.content[0].text : "";
 
     logAiCall(
-      { userId: session.user.id, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
+      { userId: userId, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
       { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
     ).catch(() => {});
     let companies: Array<{

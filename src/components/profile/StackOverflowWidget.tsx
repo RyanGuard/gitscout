@@ -103,7 +103,7 @@ export function StackOverflowWidget({ name }: StackOverflowWidgetProps) {
   if (error || !data) return null;
 
   const tier = getTier(data.reputation);
-  const topTags = data.topTags.slice(0, 5);
+  const topTags = (data.topTags || []).slice(0, 5);
 
   return (
     <div className="rounded-xl border border-neutral-200/50 bg-surface p-5 shadow-sm dark:border-neutral-800/80">

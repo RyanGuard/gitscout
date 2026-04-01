@@ -6,7 +6,7 @@ interface LanguageBarProps {
 }
 
 export function LanguageBar({ languages }: LanguageBarProps) {
-  if (languages.length === 0) return null;
+  if (!languages || languages.length === 0) return null;
 
   return (
     <div>

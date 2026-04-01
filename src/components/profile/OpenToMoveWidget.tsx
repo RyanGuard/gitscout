@@ -130,7 +130,7 @@ export function OpenToMoveWidget({ developerId, companyDomain }: OpenToMoveWidge
   if (error || !data || data.score === 0) return null;
 
   const config = LIKELIHOOD_CONFIG[data.likelihood];
-  const topSignals = data.signals.slice(0, 3);
+  const topSignals = (data.signals || []).slice(0, 3);
 
   return (
     <div className="flex items-center gap-4 rounded-xl border border-neutral-200/50 bg-surface p-4 shadow-sm transition-all hover:shadow-md dark:border-neutral-800/80">

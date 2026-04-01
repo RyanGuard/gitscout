@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Heart } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { showError } from "@/lib/toast";
 
 interface FavoriteButtonProps {
   developerId: string;
@@ -60,7 +61,7 @@ export function FavoriteButton({ developerId, className }: FavoriteButtonProps) 
         setFavorited(true);
       }
     } catch {
-      // ignore
+      showError("Failed to update favorite");
     } finally {
       setLoading(false);
     }

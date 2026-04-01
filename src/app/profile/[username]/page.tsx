@@ -92,7 +92,7 @@ async function getDeveloper(username: string) {
         totalStars: local.totalStars,
         score: local.score,
         languages: local.languages,
-        repositories: local.repositories.map((r) => ({
+        repositories: (local.repositories || []).map((r) => ({
           id: r.id,
           name: r.name,
           fullName: r.fullName,
@@ -472,7 +472,7 @@ export default async function ProfilePage({
             Top Repositories
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {developer.repositories.map((repo) => (
+            {(developer.repositories || []).map((repo) => (
               <RepoCard key={repo.id} repo={repo} />
             ))}
           </div>
