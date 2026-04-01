@@ -76,12 +76,18 @@ function buildRoleSummary(rc: SequenceStatusCardProps["roleContext"]): string {
   }
 
   if (rc.payRange && (rc.payRange.min || rc.payRange.max)) {
-    const min = rc.payRange.min ? `$${rc.payRange.min}` : "";
-    const max = rc.payRange.max ? `$${rc.payRange.max}` : "";
+    const fmtPay = (v: string): string => {
+      const n = parseInt(v, 10);
+      if (isNaN(n)) return v;
+      if (n >= 1000) return `$${Math.round(n / 1000)}k`;
+      return `$${n}`;
+    };
+    const min = rc.payRange.min ? fmtPay(rc.payRange.min) : "";
+    const max = rc.payRange.max ? fmtPay(rc.payRange.max) : "";
     if (min && max) {
-      parts.push(`${min}-${max}k`);
+      parts.push(`${min}-${max}`);
     } else {
-      parts.push(`${min || max}k`);
+      parts.push(min || max);
     }
   }
 

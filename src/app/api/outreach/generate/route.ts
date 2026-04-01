@@ -84,7 +84,15 @@ export async function POST(request: Request) {
   }
   if (body.roleContext) {
     const rc = body.roleContext;
-    if (rc.payRange?.min) roleInfo.push(`Compensation: $${rc.payRange.min}-$${rc.payRange.max}`);
+    if (rc.payRange?.min) {
+      const fmtPay = (v: string): string => {
+        const n = parseInt(v, 10);
+        if (isNaN(n)) return v;
+        if (n >= 1000) return `$${Math.round(n / 1000)}k`;
+        return `$${n}`;
+      };
+      roleInfo.push(`Compensation: ${fmtPay(rc.payRange.min)}-${fmtPay(rc.payRange.max)}`);
+    }
     if (rc.workModel) roleInfo.push(`Work model: ${rc.workModel}`);
     if (rc.techStack?.length) roleInfo.push(`Tech stack: ${rc.techStack.join(', ')}`);
     if (rc.teamSize) roleInfo.push(`Team size: ${rc.teamSize}`);

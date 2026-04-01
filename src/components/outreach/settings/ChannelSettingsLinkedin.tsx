@@ -113,8 +113,16 @@ export function ChannelSettingsLinkedin({
       <div className="mt-4 rounded-lg border border-gold-border bg-gold-bg px-3 py-2">
         <p className="text-[11px] font-semibold text-gold">Requires GitScout Agent</p>
         <p className="mt-0.5 text-[10px] text-text-dim">
-          LinkedIn actions are queued and executed by the GitScout Agent browser extension.
+          LinkedIn actions are queued and executed by the GitScout Agent desktop app running on your machine.
         </p>
+        <a
+          href="https://gitscout.dev/agent"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 inline-block text-[10px] font-medium text-gold hover:underline"
+        >
+          Download at gitscout.dev/agent
+        </a>
       </div>
     </div>
   );

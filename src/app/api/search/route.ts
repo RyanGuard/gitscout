@@ -286,10 +286,18 @@ function parseNaturalQuery(raw: string): {
 
   for (const word of words) {
     const clean = word.replace(/[,.:;!?]/g, "");
-    const aliased = LANGUAGE_ALIASES[clean] || clean;
+    const aliased = LANGUAGE_ALIASES[clean];
 
-    if (KNOWN_LANGUAGES.has(aliased)) {
+    if (aliased) {
+      // Alias matched — add the resolved language
       if (!languages.includes(aliased)) languages.push(aliased);
+      // Keep the original term for bio matching (e.g. "react" should still appear
+      // in the GitHub query so developers with "React" in their bio are found)
+      if (!FILLER_WORDS.has(clean) && clean.length > 1) {
+        remainingTerms.push(clean);
+      }
+    } else if (KNOWN_LANGUAGES.has(clean)) {
+      if (!languages.includes(clean)) languages.push(clean);
     } else if (!FILLER_WORDS.has(clean) && clean.length > 1) {
       remainingTerms.push(clean);
     }
@@ -464,9 +472,13 @@ export async function GET(request: Request) {
     : sort === "joined" ? "joined"
     : "followers"; // default: most followed first
 
+  // When sorting by score, fetch a larger pool from GitHub so we can re-rank
+  // by our own scoring algorithm instead of just reshuffling the top-by-followers
+  const fetchLimit = sort === "score" ? Math.min(limit * 3, 60) : limit;
+
   const ghParams = new URLSearchParams({
     q: ghQuery,
-    per_page: String(limit),
+    per_page: String(fetchLimit),
     page: String(page),
   });
   if (ghSort) ghParams.set("sort", ghSort);
@@ -624,6 +636,8 @@ export async function GET(request: Request) {
   // For followers/stars/joined, GitHub already sorted by that — preserve order
   if (sort === "score") {
     results.sort((a, b) => (b.score || 0) - (a.score || 0));
+    // We fetched a larger pool (fetchLimit) — trim back to the requested page size
+    results = results.slice(0, limit);
   }
 
   return Response.json({

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { TierBadge, getTierInfo } from "@/components/ui/TierBadge";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { AddToSequenceFromSearch } from "@/components/search/AddToSequenceFromSearch";
+import { AddToListFromSearch } from "@/components/search/AddToListFromSearch";
 import { fromDeveloperProfile } from "@/lib/outreach/candidateNormalizer";
 import { formatNumber, getLanguageColor, timeAgo } from "@/lib/utils";
 import { markProfileViewed, isProfileViewed } from "@/lib/viewedProfiles";
@@ -56,6 +57,7 @@ export function DeveloperCard({ developer, selected, onSelect }: DeveloperCardPr
       <div className="relative p-5">
         {/* Outreach actions */}
         <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
+          <AddToListFromSearch developer={developer} />
           <AddToSequenceFromSearch developer={developer} />
           <DraftInStudioButton
             variant="icon"

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { SearchResults } from "@/components/search/SearchResults";
 import { RecommendedProfiles } from "@/components/search/RecommendedProfiles";
 import { SearchDiscovery } from "@/components/search/SearchDiscovery";
+import { SavedSearches } from "@/components/search/SavedSearches";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
@@ -316,6 +317,11 @@ function SearchPageInner() {
           </button>
         </div>
       </form>
+
+      {/* Saved searches */}
+      <div className="mx-auto max-w-3xl mb-4 flex justify-end">
+        <SavedSearches currentQuery={query} currentFilters={filters} />
+      </div>
 
       <div className="flex gap-6">
         {/* Filter sidebar */}

@@ -244,7 +244,7 @@ export function RoleContextPanel({ value, onChange }: RoleContextPanelProps) {
             type="number"
             value={value.payRange?.min ?? ""}
             onChange={(e) => updatePayRange({ min: e.target.value })}
-            placeholder="Min"
+            placeholder="e.g. 180000"
             className="w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-xs outline-none focus:border-gold"
           />
           <span className="shrink-0 text-[10px] text-text-dim">&ndash;</span>
@@ -252,7 +252,7 @@ export function RoleContextPanel({ value, onChange }: RoleContextPanelProps) {
             type="number"
             value={value.payRange?.max ?? ""}
             onChange={(e) => updatePayRange({ max: e.target.value })}
-            placeholder="Max"
+            placeholder="e.g. 220000"
             className="w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-xs outline-none focus:border-gold"
           />
         </div>
