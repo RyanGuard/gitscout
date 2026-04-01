@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
-  Search, Target, List, Map, Link2, BarChart3, Bell, Building2,
+  Search, Target, List, Map, Link2, BarChart3, Bell, Building2, FileText,
   Settings, ChevronLeft, ChevronRight, Sparkles, Send, LayoutDashboard,
 } from "lucide-react";
 
@@ -23,6 +23,12 @@ interface NavSection {
 }
 
 const SECTIONS: NavSection[] = [
+  {
+    label: "Plan",
+    items: [
+      { id: "intake", label: "Intake call", href: "/intake/new", icon: FileText },
+    ],
+  },
   {
     label: "Find",
     items: [
