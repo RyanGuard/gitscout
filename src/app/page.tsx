@@ -403,8 +403,7 @@ function Dashboard() {
 export default function Home() {
   const { data: session, status } = useSession();
 
-  if (status === "loading") return null; // AppShell handles the loading spinner
-
-  if (session) return <Dashboard />;
-  return <Landing />;
+  // Show landing page (with sign-in button) while loading — never show a blank page
+  if (status === "loading" || !session) return <Landing />;
+  return <Dashboard />;
 }
