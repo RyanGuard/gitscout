@@ -241,250 +241,278 @@ export default async function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const developer = await getDeveloper(username);
 
-  if (!developer) notFound();
+  try {
+    const developer = await getDeveloper(username);
 
-  return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-8">
-      <Link
-        href="/search"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-      >
-        &larr; Back to search
-      </Link>
+    if (!developer) notFound();
 
-      {/* Source badge */}
-      {developer.source === "github" && (
-        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
-          Live from GitHub — this developer hasn&apos;t been indexed yet. Data may be limited.
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <Link
+          href="/search"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+        >
+          &larr; Back to search
+        </Link>
+
+        {/* Source badge */}
+        {developer.source === "github" && (
+          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+            Live from GitHub — this developer hasn&apos;t been indexed yet. Data may be limited.
+          </div>
+        )}
+
+        {/* Profile header */}
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="flex flex-col items-start gap-6 sm:flex-row">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={developer.avatarUrl || `https://github.com/${developer.username}.png`}
+              alt={developer.username}
+              className="h-28 w-28 rounded-full border-4 border-neutral-100 dark:border-neutral-800"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
+                  {developer.name || developer.username}
+                </h1>
+                {developer.hireable && (
+                  <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                    Hireable
+                  </Badge>
+                )}
+                {developer.score > 0 && (
+                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    Score: {developer.score}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-neutral-500">@{developer.username}</p>
+
+              {developer.bio && (
+                <p className="mt-2 text-neutral-700 dark:text-neutral-300">
+                  {developer.bio}
+                </p>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+                {developer.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" /> {developer.location}
+                  </span>
+                )}
+                {developer.company && (
+                  <span className="flex items-center gap-1">
+                    <Building2 className="h-4 w-4" /> {developer.company}
+                  </span>
+                )}
+                {developer.blog && (
+                  <a
+                    href={
+                      developer.blog.startsWith("http")
+                        ? developer.blog
+                        : `https://${developer.blog}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-gold"
+                  >
+                    <LinkIcon className="h-4 w-4" /> Website
+                  </a>
+                )}
+                {developer.twitterUsername && (
+                  <a
+                    href={`https://twitter.com/${developer.twitterUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-gold"
+                  >
+                    <AtSign className="h-4 w-4" /> @{developer.twitterUsername}
+                  </a>
+                )}
+                {developer.email && (
+                  <span className="flex items-center gap-1">
+                    <Mail className="h-4 w-4" /> {developer.email}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-4 flex gap-6 text-sm">
+                <span className="flex items-center gap-1 font-medium">
+                  <Star className="h-4 w-4 text-yellow-500" />
+                  {formatNumber(developer.totalStars)} stars
+                </span>
+                <span className="flex items-center gap-1 font-medium">
+                  <Users className="h-4 w-4 text-blue-500" />
+                  {formatNumber(developer.followers)} followers
+                </span>
+                <span className="flex items-center gap-1 font-medium">
+                  <GitFork className="h-4 w-4 text-purple-500" />
+                  {developer.publicRepos} repos
+                </span>
+              </div>
+
+              {/* Action toolbar — all key actions in one row */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <a
+                  href={`https://github.com/${developer.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                >
+                  GitHub <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+                <ProfileActions
+                  developerId={developer.id}
+                  username={developer.username}
+                  isLocal={developer.source === "local"}
+                />
+                <FindSimilar
+                  username={developer.username}
+                  displayName={developer.name || developer.username}
+                />
+                <ShareCard
+                  username={developer.username}
+                  displayName={developer.name || developer.username}
+                  score={developer.score}
+                />
+                <DraftInStudioButton
+                  variant="button"
+                  candidate={fromDeveloperProfile({
+                    id: developer.id,
+                    username: developer.username,
+                    name: developer.name,
+                    email: developer.email,
+                    company: developer.company,
+                    location: developer.location,
+                    bio: developer.bio,
+                    score: developer.score,
+                    languages: developer.languages?.map((l: { language: string; percentage: number }) => ({ language: l.language, percentage: l.percentage })),
+                    repositories: developer.repositories?.slice(0, 5).map((r: { name: string; stars: number; language: string | null }) => ({ name: r.name, stars: r.stars, language: r.language })),
+                    contactInfo: (developer as any).contactInfo ?? null,
+                  })}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Profile header */}
-      <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
-        <div className="flex flex-col items-start gap-6 sm:flex-row">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={developer.avatarUrl || `https://github.com/${developer.username}.png`}
-            alt={developer.username}
-            className="h-28 w-28 rounded-full border-4 border-neutral-100 dark:border-neutral-800"
+        {/* AI Actions — Scouting Report + Outreach Draft */}
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ScoutingReport
+            username={developer.username}
+            profileData={{
+              name: developer.name,
+              bio: developer.bio,
+              location: developer.location,
+              company: developer.company,
+              followers: developer.followers,
+              totalStars: developer.totalStars,
+              publicRepos: developer.publicRepos,
+              hireable: developer.hireable,
+              languages: (developer.languages || []).map((l) => ({
+                language: l.language,
+                percentage: l.percentage,
+              })),
+              repositories: (developer.repositories || []).map((r) => ({
+                name: r.name,
+                stars: r.stars,
+                language: r.language,
+                description: r.description,
+              })),
+            }}
           />
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
-                {developer.name || developer.username}
-              </h1>
-              {developer.hireable && (
-                <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  Hireable
-                </Badge>
-              )}
-              {developer.score > 0 && (
-                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                  Score: {developer.score}
-                </Badge>
-              )}
-            </div>
-            <p className="text-neutral-500">@{developer.username}</p>
+          <OutreachDraft
+            username={developer.username}
+            profileData={{
+              name: developer.name,
+              bio: developer.bio,
+              location: developer.location,
+              company: developer.company,
+              followers: developer.followers,
+              totalStars: developer.totalStars,
+              publicRepos: developer.publicRepos,
+              languages: (developer.languages || []).map((l) => ({
+                language: l.language,
+                percentage: l.percentage,
+              })),
+              repositories: (developer.repositories || []).map((r) => ({
+                name: r.name,
+                stars: r.stars,
+                language: r.language,
+                description: r.description,
+              })),
+            }}
+          />
+        </div>
 
-            {developer.bio && (
-              <p className="mt-2 text-neutral-700 dark:text-neutral-300">
-                {developer.bio}
-              </p>
-            )}
+        {/* Score Breakdown — loads async, shows 5-pillar analysis */}
+        <ProfileErrorBoundary>
+          <div className="mt-6">
+            <ScoreBreakdown username={developer.username} />
+          </div>
+        </ProfileErrorBoundary>
 
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-              {developer.location && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" /> {developer.location}
-                </span>
-              )}
-              {developer.company && (
-                <span className="flex items-center gap-1">
-                  <Building2 className="h-4 w-4" /> {developer.company}
-                </span>
-              )}
-              {developer.blog && (
-                <a
-                  href={
-                    developer.blog.startsWith("http")
-                      ? developer.blog
-                      : `https://${developer.blog}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-gold"
-                >
-                  <LinkIcon className="h-4 w-4" /> Website
-                </a>
-              )}
-              {developer.twitterUsername && (
-                <a
-                  href={`https://twitter.com/${developer.twitterUsername}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-gold"
-                >
-                  <AtSign className="h-4 w-4" /> @{developer.twitterUsername}
-                </a>
-              )}
-              {developer.email && (
-                <span className="flex items-center gap-1">
-                  <Mail className="h-4 w-4" /> {developer.email}
-                </span>
-              )}
-            </div>
+        {/* Open to Move + Stack Overflow — wrapped in error boundary so API failures don't crash the page */}
+        <ProfileErrorBoundary>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <OpenToMoveWidget developerId={developer.id} companyDomain={developer.company?.replace(/^@/, "").split(" ")[0].toLowerCase().includes(".") ? developer.company.replace(/^@/, "").split(" ")[0].toLowerCase() : undefined} />
+            <StackOverflowWidget name={developer.name || developer.username} />
+          </div>
+        </ProfileErrorBoundary>
 
-            <div className="mt-4 flex gap-6 text-sm">
-              <span className="flex items-center gap-1 font-medium">
-                <Star className="h-4 w-4 text-yellow-500" />
-                {formatNumber(developer.totalStars)} stars
-              </span>
-              <span className="flex items-center gap-1 font-medium">
-                <Users className="h-4 w-4 text-blue-500" />
-                {formatNumber(developer.followers)} followers
-              </span>
-              <span className="flex items-center gap-1 font-medium">
-                <GitFork className="h-4 w-4 text-purple-500" />
-                {developer.publicRepos} repos
-              </span>
-            </div>
+        {/* Languages */}
+        {developer.languages?.length > 0 && (
+          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
+            <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
+              Languages
+            </h2>
+            <LanguageBar languages={developer.languages} />
+          </div>
+        )}
 
-            {/* Action toolbar — all key actions in one row */}
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <a
-                href={`https://github.com/${developer.username}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-              >
-                GitHub <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-              <ProfileActions
-                developerId={developer.id}
-                username={developer.username}
-                isLocal={developer.source === "local"}
-              />
-              <FindSimilar
-                username={developer.username}
-                displayName={developer.name || developer.username}
-              />
-              <ShareCard
-                username={developer.username}
-                displayName={developer.name || developer.username}
-                score={developer.score}
-              />
-              <DraftInStudioButton
-                variant="button"
-                candidate={fromDeveloperProfile({
-                  id: developer.id,
-                  username: developer.username,
-                  name: developer.name,
-                  email: developer.email,
-                  company: developer.company,
-                  location: developer.location,
-                  bio: developer.bio,
-                  score: developer.score,
-                  languages: developer.languages?.map((l: { language: string; percentage: number }) => ({ language: l.language, percentage: l.percentage })),
-                  repositories: developer.repositories?.slice(0, 5).map((r: { name: string; stars: number; language: string | null }) => ({ name: r.name, stars: r.stars, language: r.language })),
-                  contactInfo: (developer as any).contactInfo ?? null,
-                })}
-              />
+        {/* Repositories */}
+        {developer.repositories?.length > 0 && (
+          <div className="mt-6">
+            <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
+              Top Repositories
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(developer.repositories || []).map((repo) => (
+                <RepoCard key={repo.id} repo={repo} />
+              ))}
             </div>
           </div>
+        )}
+
+        {/* (AI features and Find Similar / Share Card are in the header toolbar above) */}
+      </div>
+    );
+  } catch (error) {
+    console.error("[profile] Render failed:", error);
+    // Fallback: just show GitHub link — never crash the page
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <Link
+          href="/search"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+        >
+          &larr; Back to search
+        </Link>
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">@{username}</h1>
+          <p className="mt-2 text-neutral-500">We had trouble loading this profile.</p>
+          <a
+            href={`https://github.com/${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+          >
+            View on GitHub &#8599;
+          </a>
         </div>
       </div>
-
-      {/* AI Actions — Scouting Report + Outreach Draft */}
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <ScoutingReport
-          username={developer.username}
-          profileData={{
-            name: developer.name,
-            bio: developer.bio,
-            location: developer.location,
-            company: developer.company,
-            followers: developer.followers,
-            totalStars: developer.totalStars,
-            publicRepos: developer.publicRepos,
-            hireable: developer.hireable,
-            languages: (developer.languages || []).map((l) => ({
-              language: l.language,
-              percentage: l.percentage,
-            })),
-            repositories: (developer.repositories || []).map((r) => ({
-              name: r.name,
-              stars: r.stars,
-              language: r.language,
-              description: r.description,
-            })),
-          }}
-        />
-        <OutreachDraft
-          username={developer.username}
-          profileData={{
-            name: developer.name,
-            bio: developer.bio,
-            location: developer.location,
-            company: developer.company,
-            followers: developer.followers,
-            totalStars: developer.totalStars,
-            publicRepos: developer.publicRepos,
-            languages: (developer.languages || []).map((l) => ({
-              language: l.language,
-              percentage: l.percentage,
-            })),
-            repositories: (developer.repositories || []).map((r) => ({
-              name: r.name,
-              stars: r.stars,
-              language: r.language,
-              description: r.description,
-            })),
-          }}
-        />
-      </div>
-
-      {/* Score Breakdown — loads async, shows 5-pillar analysis */}
-      <ProfileErrorBoundary>
-        <div className="mt-6">
-          <ScoreBreakdown username={developer.username} />
-        </div>
-      </ProfileErrorBoundary>
-
-      {/* Open to Move + Stack Overflow — wrapped in error boundary so API failures don't crash the page */}
-      <ProfileErrorBoundary>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <OpenToMoveWidget developerId={developer.id} companyDomain={developer.company?.replace(/^@/, "").split(" ")[0].toLowerCase().includes(".") ? developer.company.replace(/^@/, "").split(" ")[0].toLowerCase() : undefined} />
-          <StackOverflowWidget name={developer.name || developer.username} />
-        </div>
-      </ProfileErrorBoundary>
-
-      {/* Languages */}
-      {developer.languages?.length > 0 && (
-        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
-            Languages
-          </h2>
-          <LanguageBar languages={developer.languages} />
-        </div>
-      )}
-
-      {/* Repositories */}
-      {developer.repositories?.length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
-            Top Repositories
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {(developer.repositories || []).map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* (AI features and Find Similar / Share Card are in the header toolbar above) */}
-    </div>
-  );
+    );
+  }
 }
