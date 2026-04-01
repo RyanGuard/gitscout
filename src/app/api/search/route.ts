@@ -220,10 +220,10 @@ const ROLE_SEARCH_TERMS: Record<string, string> = {
 const FILLER_WORDS = new Set([
   "developers", "developer", "engineers", "engineer", "devs", "dev",
   "programmers", "programmer", "coders", "coder", "looking", "for",
-  "find", "search", "show", "me", "the", "best", "top", "senior",
-  "junior", "mid", "level", "experienced", "who", "that", "are",
-  "with", "and", "or", "a", "an", "hiring", "staff", "principal",
-  "lead", "head",
+  "find", "search", "show", "me", "the", "best", "top",
+  "level", "experienced", "who", "that", "are",
+  "with", "and", "or", "a", "an", "hiring",
+  "head",
 ]);
 
 // Parse a natural language search into structured GitHub query parts
@@ -331,8 +331,9 @@ function buildGitHubQuery(params: {
     ...parsed.languages,
   ];
   const uniqueLanguages = [...new Set(allLanguages)];
-  if (uniqueLanguages.length > 0) {
-    parts.push(`language:${uniqueLanguages[0]}`);
+  // Send up to 2 languages
+  for (const lang of uniqueLanguages.slice(0, 2)) {
+    parts.push(`language:${lang}`);
   }
 
   // Merge location: explicit filter takes priority, then extracted
@@ -371,7 +372,7 @@ function buildGitHubQuery(params: {
 
 // Quick surface score from REST API data only (no GraphQL needed)
 // This is a fast estimate — full 5-pillar score comes after indexing
-function quickScore(user: GitHubUser): { score: number; tier: string } {
+function quickScore(user: GitHubUser & { totalStars?: number }): { score: number; tier: string } {
   // Follower signal — logarithmic scale, no hard cap
   // 100 followers ≈ 3.6, 1K ≈ 5.6, 10K ≈ 7.4, 100K ≈ 9.3, 293K ≈ 10
   const followerSignal = Math.min(10, Math.log10(1 + user.followers) * 1.85);
@@ -392,7 +393,10 @@ function quickScore(user: GitHubUser): { score: number; tier: string } {
     : 0;
   const ageBonus = accountAge >= 8 ? 1 : accountAge >= 5 ? 0.5 : 0;
 
-  const raw = followerSignal * 4 + repoSignal * 2 + ratioBonus * 3 + profileBonus * 2 + ageBonus * 2;
+  // Star signal — logarithmic scale, proxy for code quality
+  const starSignal = Math.min(10, Math.log10(Math.max(1, user.totalStars || 0)) * 2.5);
+
+  const raw = followerSignal * 3 + repoSignal * 2 + starSignal * 3 + ratioBonus * 2 + profileBonus * 2 + ageBonus * 2;
   const score = Math.round(Math.min(100, raw) * 10) / 10;
 
   const tier = score >= 90 ? "Unicorn" : score >= 75 ? "On Fire" : score >= 60 ? "Gem" : score >= 40 ? "Seedling" : "Mystery";

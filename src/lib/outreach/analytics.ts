@@ -48,6 +48,7 @@ export function computeOutreachAnalytics(
       optimalLength: { min: 40, max: 80 },
       topSignal: null,
       responseRate: 0,
+      avgResponseTime: null,
       channelBreakdown: [],
     };
   }
@@ -105,6 +106,14 @@ export function computeOutreachAnalytics(
   const optimalMax =
     respondedWordCounts.length > 0 ? Math.max(...respondedWordCounts) : 80;
 
+  // Compute average response time from analytics with response data
+  const responseTimes = analytics
+    .filter(a => a.responseReceived && a.responseTimeHours != null)
+    .map(a => a.responseTimeHours!);
+  const avgResponseTime = responseTimes.length > 0
+    ? Math.round(responseTimes.reduce((s, t) => s + t, 0) / responseTimes.length)
+    : null;
+
   return {
     hasEnoughData: true,
     totalDataPoints,
@@ -123,6 +132,7 @@ export function computeOutreachAnalytics(
       totalDataPoints > 0
         ? Math.round((totalResponded / totalDataPoints) * 100)
         : 0,
+    avgResponseTime,
     channelBreakdown: Object.entries(channelStats).map(([channel, stats]) => ({
       channel,
       total: stats.total,
