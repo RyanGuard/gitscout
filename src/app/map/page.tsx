@@ -872,11 +872,17 @@ function MarketMapInner() {
     setError(null);
     try {
       const res = await fetch(`/api/market-map/${id}`);
-      if (!res.ok) throw new Error("Failed to load map");
+      if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error("MAP_NOT_FOUND");
+        }
+        throw new Error("SERVER_ERROR");
+      }
       const data = await res.json();
       setMapData(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load map");
+      const msg = err instanceof Error ? err.message : "SERVER_ERROR";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -1512,7 +1518,32 @@ function MarketMapInner() {
 
       {error && (
         <div className="mb-4 rounded-lg border border-red-800/30 bg-red-950/50 px-4 py-3 text-sm text-red-300">
-          {error}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              {error === "MAP_NOT_FOUND" ? (
+                <>
+                  <p className="font-medium">Map not found</p>
+                  <p className="mt-1 text-red-400/80">This map may have been deleted or the link is invalid.</p>
+                </>
+              ) : error === "Please sign in to generate market maps" ? (
+                <p>{error}</p>
+              ) : (
+                <>
+                  <p className="font-medium">Something went wrong</p>
+                  <p className="mt-1 text-red-400/80">We had trouble loading this map. Please try again or create a new one.</p>
+                </>
+              )}
+            </div>
+            {(error === "MAP_NOT_FOUND" || error === "SERVER_ERROR") && (
+              <button
+                onClick={() => { setError(null); setMapData(null); router.push("/map"); }}
+                className="shrink-0 rounded-lg bg-gold/90 px-3 py-1.5 text-xs font-semibold text-black hover:bg-gold transition-colors"
+              >
+                <Plus className="mr-1 inline-block h-3 w-3" />
+                Create a new map
+              </button>
+            )}
+          </div>
         </div>
       )}
 
