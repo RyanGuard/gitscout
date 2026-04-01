@@ -20,6 +20,7 @@ import {
 import { ConnectionResults } from "@/components/connections/ConnectionResults";
 import { LinkedinImport } from "@/components/connections/LinkedinImport";
 import { showError } from "@/lib/toast";
+import { trackEvent } from "@/lib/posthog";
 
 interface HomeBase {
   id: string;
@@ -133,6 +134,7 @@ export default function ConnectionsPage() {
           updatedAt: new Date().toISOString(),
         });
         setSetupDomain("");
+        trackEvent("home_base_setup", { domain: setupDomain });
       }
     } catch {
       showError("Failed to set up home base");
@@ -158,6 +160,7 @@ export default function ConnectionsPage() {
       const data = await res.json();
       if (res.ok) {
         setLookupResult(data);
+        trackEvent("connection_lookup", { targetDomain: targetDomain });
       } else {
         setLookupError(data.error || "Lookup failed");
       }

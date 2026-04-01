@@ -10,6 +10,7 @@ import { SearchDiscovery } from "@/components/search/SearchDiscovery";
 import { FeatureHint } from "@/components/ui/FeatureHint";
 import { getViewedProfiles, getViewedCount, clearViewedProfiles } from "@/lib/viewedProfiles";
 import type { SearchResult } from "@/types";
+import { trackEvent } from "@/lib/posthog";
 
 interface LinkedinLookupResult {
   person: {
@@ -215,6 +216,7 @@ function SearchPageInner() {
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!inputValue.trim()) return;
+    trackEvent("search_executed", { query: inputValue.trim() });
 
     // Detect LinkedIn URLs
     if (isLinkedInUrl(inputValue)) {

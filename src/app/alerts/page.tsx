@@ -29,6 +29,7 @@ import {
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromSurfacedCandidate } from "@/lib/outreach/candidateNormalizer";
 import { showError } from "@/lib/toast";
+import { trackEvent } from "@/lib/posthog";
 
 // ═══════════════════════════════════════════════════════════
 //  LINKEDIN ICON — lucide-react does not export one
@@ -897,6 +898,7 @@ export default function AlertsPage() {
         }
         const newCompany = await res.json();
         await fetchWatchlist();
+        trackEvent("company_watched", { domain });
 
         // Auto-scan immediately so user sees results right away
         if (newCompany.id) {
@@ -977,6 +979,7 @@ export default function AlertsPage() {
         if (!res.ok) throw new Error("Scan failed");
         // Refresh both signals and watchlist after scan
         await Promise.all([fetchSignals(), fetchWatchlist()]);
+        trackEvent("company_scanned", { companyId: id });
       } catch {
         showError("Scan failed. Try again.");
       } finally {

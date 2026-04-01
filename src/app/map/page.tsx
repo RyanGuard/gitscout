@@ -23,6 +23,7 @@ import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromMapCandidate } from "@/lib/outreach/candidateNormalizer";
 import CompanyTimeline from "@/components/map/CompanyTimeline";
 import { showError, showSuccess } from "@/lib/toast";
+import { trackEvent } from "@/lib/posthog";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -887,6 +888,7 @@ function MarketMapInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ company_id: companyId, company_name: companyName, company_domain: companyDomain }),
     });
+    trackEvent("stack_verified", { companyName, companyDomain });
     if (mapData) loadMap(mapData.id);
   }
 
@@ -1060,7 +1062,9 @@ function MarketMapInner() {
       }
 
       const data = await res.json();
+      showSuccess(`Map generated! Enriching ${data.companies.length} companies...`);
       router.push(`/map?id=${data.mapId}`);
+      trackEvent("map_generated", { roleTitle, roleLevel, sourcingMode });
 
       // Enrich companies in background
       for (const co of data.companies) {
@@ -1114,6 +1118,7 @@ function MarketMapInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidate_ids: Array.from(selectedIds), update: { status } }),
     });
+    trackEvent("bulk_status_updated", { status, count: selectedIds.size });
     setSelectedIds(new Set());
     loadMap(mapData.id);
   }
@@ -1131,6 +1136,7 @@ function MarketMapInner() {
           body: JSON.stringify({ candidate_ids: batch }),
         });
       }
+      trackEvent("contacts_revealed", { count: ids.length });
       loadMap(mapData.id);
     } catch (err) {
       console.error("Reveal contacts error:", err);
@@ -1214,7 +1220,7 @@ function MarketMapInner() {
             ]).map((mode) => (
               <button
                 key={mode.id}
-                onClick={() => setSourcingMode(mode.id)}
+                onClick={() => { setSourcingMode(mode.id); trackEvent("sourcing_mode_changed", { mode: mode.id }); }}
                 className={`flex-1 rounded-md px-3 py-2 text-center transition-colors ${
                   sourcingMode === mode.id
                     ? "bg-gold text-white shadow-sm"
@@ -1541,6 +1547,7 @@ function MarketMapInner() {
                   key={mode.id}
                   onClick={() => {
                     setSourcingMode(mode.id);
+                    trackEvent("sourcing_mode_changed", { mode: mode.id });
                     if (mode.id === "stack") verifyAllStacks();
                   }}
                   className={`rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors ${

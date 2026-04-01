@@ -31,6 +31,7 @@ import { fromMapCandidate, type CandidateData } from "@/lib/outreach/candidateNo
 import { CandidateProfileCard } from "@/components/outreach/CandidateProfileCard";
 import { CompactCandidateHeader } from "@/components/outreach/CompactCandidateHeader";
 import { SequenceStatusCard } from "@/components/outreach/SequenceStatusCard";
+import { trackEvent } from "@/lib/posthog";
 
 // ─── Custom Icons ───
 
@@ -382,6 +383,7 @@ function OutreachStudio() {
       setActiveStep(0);
       setSequenceStatus("draft");
       setFirstVisit(false);
+      trackEvent("outreach_generated", { channel, tone, sequenceLength: seqLength });
       loadData();
     } catch (err) {
       console.error("Generate error:", err);
@@ -417,6 +419,7 @@ function OutreachStudio() {
           body: data.body,
           subjectLine: data.subject_line ?? msg.subjectLine,
         });
+        trackEvent("outreach_improved");
       }
     } catch (err) {
       console.error("Improve error:", err);
@@ -452,6 +455,7 @@ function OutreachStudio() {
           body: data.body,
           subjectLine: data.subject_line ?? msg.subjectLine,
         });
+        trackEvent("outreach_rewritten");
       }
     } catch (err) {
       console.error("Rewrite error:", err);
@@ -570,6 +574,7 @@ function OutreachStudio() {
     if (!msg) return;
     const text = msg.subjectLine ? `Subject: ${msg.subjectLine}\n\n${msg.body}` : msg.body;
     navigator.clipboard.writeText(text);
+    trackEvent("outreach_copied");
   }
 
   function exportCSV() {
@@ -591,6 +596,7 @@ function OutreachStudio() {
     a.download = `outreach-${candidate.name.replace(/\s+/g, "-").toLowerCase()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    trackEvent("outreach_exported_csv");
   }
 
   // ─── Save as template ───

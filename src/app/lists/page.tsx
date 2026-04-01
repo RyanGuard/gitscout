@@ -7,6 +7,7 @@ import { List, Plus, Loader2 } from "lucide-react";
 import { ListCard } from "@/components/crm/ListCard";
 import { showError } from "@/lib/toast";
 import type { CandidateListSummary } from "@/types";
+import { trackEvent } from "@/lib/posthog";
 
 export default function ListsPage() {
   const { data: session, status } = useSession();
@@ -51,6 +52,7 @@ export default function ListsPage() {
       if (res.ok) {
         const list = await res.json();
         setLists((prev) => [list, ...prev]);
+        trackEvent("list_created", { name: name.trim() });
         setName("");
         setDescription("");
         setShowCreate(false);

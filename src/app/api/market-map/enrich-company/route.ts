@@ -299,6 +299,7 @@ export async function POST(request: Request) {
     });
 
     // Backfill missing LinkedIn URLs via Apollo person match — Tier A only (credits)
+    await prisma.mapCompany.update({ where: { id: company_id }, data: { enrichmentSubstatus: "backfilling_linkedin" } }).catch(() => {});
     const company = await prisma.mapCompany.findUnique({ where: { id: company_id }, select: { tier: true } });
     const missingLinkedin = candidates.filter(c => !c.linkedinUrl && c.apolloPersonId);
     if (missingLinkedin.length > 0 && apiKey && company?.tier === "A") {
@@ -324,12 +325,13 @@ export async function POST(request: Request) {
             }
           }
         }
-      } catch {
-        // Non-fatal — LinkedIn URLs are nice-to-have during enrichment
+      } catch (err) {
+        console.warn("[enrich] LinkedIn backfill failed:", err);
       }
     }
 
     // Chain: fetch news for this company (non-blocking — best effort)
+    await prisma.mapCompany.update({ where: { id: company_id }, data: { enrichmentSubstatus: "enriching_news" } }).catch(() => {});
     let newsResult: { events?: object[]; flightRisk?: string; summary?: string } = {};
     try {
       const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
@@ -344,11 +346,12 @@ export async function POST(request: Request) {
       if (newsRes.ok) {
         newsResult = await newsRes.json();
       }
-    } catch {
-      // News enrichment failure is non-fatal
+    } catch (err) {
+      console.warn("[enrich] News enrichment failed:", err);
     }
 
     // Chain: auto-classify candidates if we have a role brief
+    await prisma.mapCompany.update({ where: { id: company_id }, data: { enrichmentSubstatus: "classifying" } }).catch(() => {});
     let classifyResult: { classified?: number; highRisk?: number } = {};
     if (candidates.length > 0 && (role_title || role_stack?.length)) {
       try {
@@ -394,10 +397,13 @@ export async function POST(request: Request) {
         if (classifyRes.ok) {
           classifyResult = await classifyRes.json();
         }
-      } catch {
-        // Classification failure is non-fatal
+      } catch (err) {
+        console.warn("[enrich] Classification failed:", err);
       }
     }
+
+    // Clear substatus after all chains complete
+    await prisma.mapCompany.update({ where: { id: company_id }, data: { enrichmentSubstatus: null } }).catch(() => {});
 
     return Response.json({
       companyId: company_id,
