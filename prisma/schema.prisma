@@ -891,6 +891,7 @@ model OutreachStudioMessage {
   body            String
   sentAt          DateTime?
   respondedAt     DateTime?
+  resendMessageId String?
   revisionHistory Json?            // array of { body, timestamp }
   createdAt       DateTime         @default(now())
   sequence        OutreachSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)

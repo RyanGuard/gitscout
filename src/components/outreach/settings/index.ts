@@ -13,6 +13,7 @@ export { SuggestionsSection } from "./SuggestionsSection";
 export { SettingsPanel } from "./SettingsPanel";
 export { LinkedInQueueButton } from "./LinkedInQueueButton";
 export { LinkedInPreview } from "./LinkedInPreview";
+export { EmailSendButton } from "./EmailSendButton";
 export { AshbyLogSection } from "./AshbyLogSection";
 
 export type {

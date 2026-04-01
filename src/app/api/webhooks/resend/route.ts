@@ -80,106 +80,141 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  if (!message) {
+  // --- 3b. Also check OutreachStudioMessage (Outreach Studio emails) ---
+  const studioMessage = await prisma.outreachStudioMessage.findFirst({
+    where: { resendMessageId },
+    include: { sequence: true },
+  });
+
+  if (!message && !studioMessage) {
     // No matching message — could be from a non-sequence email; acknowledge
     return Response.json({ received: true, matched: false });
   }
 
-  // --- 4. Update message status based on event type ---
-  switch (type) {
-    case "email.delivered": {
-      // Only update if not already in a later state
-      if (message.status === "sent" || message.status === "scheduled") {
-        await prisma.sequenceMessage.update({
-          where: { id: message.id },
-          data: { status: "sent", sentAt: message.sentAt ?? eventTime },
-        });
+  // --- 4a. Update OutreachStudioMessage if matched ---
+  if (studioMessage) {
+    switch (type) {
+      case "email.delivered": {
+        // sentAt already set on send; nothing extra needed
+        break;
       }
-      break;
-    }
-
-    case "email.opened": {
-      // Mark as opened — this is a progression from sent
-      if (
-        message.status === "sent" ||
-        message.status === "scheduled" ||
-        message.status === "draft"
-      ) {
-        await prisma.sequenceMessage.update({
-          where: { id: message.id },
-          data: { status: "opened", openedAt: message.openedAt ?? eventTime },
+      case "email.opened":
+      case "email.clicked": {
+        // Mark the sequence as having received a response signal
+        await prisma.outreachSequence.update({
+          where: { id: studioMessage.sequenceId },
+          data: { status: "completed" },
         });
+        break;
       }
-      break;
-    }
-
-    case "email.bounced":
-    case "email.complained": {
-      await prisma.sequenceMessage.update({
-        where: { id: message.id },
-        data: { status: "bounced" },
-      });
-
-      // Also mark the enrollment as bounced so we stop sending
-      await prisma.sequenceEnrollment.update({
-        where: { id: message.enrollmentId },
-        data: { status: "bounced" },
-      });
-      break;
-    }
-
-    case "email.clicked": {
-      // Treat a click as an open if we haven't recorded one yet
-      if (!message.openedAt) {
-        await prisma.sequenceMessage.update({
-          where: { id: message.id },
-          data: { status: "opened", openedAt: eventTime },
+      case "email.bounced":
+      case "email.complained": {
+        await prisma.outreachSequence.update({
+          where: { id: studioMessage.sequenceId },
+          data: { status: "draft" },
         });
+        break;
       }
-      break;
-    }
-
-    case "email.delivery_delayed": {
-      // No status change — just log awareness; the message stays in its
-      // current state until Resend sends a final delivered or bounced event.
-      break;
     }
   }
 
-  // --- 5. Check if all messages in the sequence enrollment are done ---
-  if (type === "email.delivered" || type === "email.opened") {
-    const allMessages = await prisma.sequenceMessage.findMany({
-      where: { enrollmentId: message.enrollmentId },
-    });
+  // --- 4b. Update batch SequenceMessage if matched ---
+  if (message) {
+    switch (type) {
+      case "email.delivered": {
+        // Only update if not already in a later state
+        if (message.status === "sent" || message.status === "scheduled") {
+          await prisma.sequenceMessage.update({
+            where: { id: message.id },
+            data: { status: "sent", sentAt: message.sentAt ?? eventTime },
+          });
+        }
+        break;
+      }
 
-    const allDelivered = allMessages.every(
-      (m) =>
-        m.status === "sent" ||
-        m.status === "opened" ||
-        m.status === "replied" ||
-        m.status === "bounced",
-    );
+      case "email.opened": {
+        // Mark as opened — this is a progression from sent
+        if (
+          message.status === "sent" ||
+          message.status === "scheduled" ||
+          message.status === "draft"
+        ) {
+          await prisma.sequenceMessage.update({
+            where: { id: message.id },
+            data: { status: "opened", openedAt: message.openedAt ?? eventTime },
+          });
+        }
+        break;
+      }
 
-    if (allDelivered && message.enrollment.status === "active") {
-      const totalSteps = await prisma.sequenceStep.count({
-        where: { sequenceId: message.enrollment.sequenceId },
-      });
+      case "email.bounced":
+      case "email.complained": {
+        await prisma.sequenceMessage.update({
+          where: { id: message.id },
+          data: { status: "bounced" },
+        });
 
-      // If we've sent all steps and they're all delivered/opened, mark complete
-      if (allMessages.length >= totalSteps) {
+        // Also mark the enrollment as bounced so we stop sending
         await prisma.sequenceEnrollment.update({
           where: { id: message.enrollmentId },
-          data: {
-            status: "completed",
-            completedAt: new Date(),
-          },
+          data: { status: "bounced" },
+        });
+        break;
+      }
+
+      case "email.clicked": {
+        // Treat a click as an open if we haven't recorded one yet
+        if (!message.openedAt) {
+          await prisma.sequenceMessage.update({
+            where: { id: message.id },
+            data: { status: "opened", openedAt: eventTime },
+          });
+        }
+        break;
+      }
+
+      case "email.delivery_delayed": {
+        // No status change — just log awareness; the message stays in its
+        // current state until Resend sends a final delivered or bounced event.
+        break;
+      }
+    }
+
+    // --- 5. Check if all messages in the sequence enrollment are done ---
+    if (type === "email.delivered" || type === "email.opened") {
+      const allMessages = await prisma.sequenceMessage.findMany({
+        where: { enrollmentId: message.enrollmentId },
+      });
+
+      const allDelivered = allMessages.every(
+        (m) =>
+          m.status === "sent" ||
+          m.status === "opened" ||
+          m.status === "replied" ||
+          m.status === "bounced",
+      );
+
+      if (allDelivered && message.enrollment.status === "active") {
+        const totalSteps = await prisma.sequenceStep.count({
+          where: { sequenceId: message.enrollment.sequenceId },
         });
 
-        // Increment totalCompleted on the parent sequence
-        await prisma.sequence.update({
-          where: { id: message.enrollment.sequenceId },
-          data: { totalCompleted: { increment: 1 } },
-        });
+        // If we've sent all steps and they're all delivered/opened, mark complete
+        if (allMessages.length >= totalSteps) {
+          await prisma.sequenceEnrollment.update({
+            where: { id: message.enrollmentId },
+            data: {
+              status: "completed",
+              completedAt: new Date(),
+            },
+          });
+
+          // Increment totalCompleted on the parent sequence
+          await prisma.sequence.update({
+            where: { id: message.enrollment.sequenceId },
+            data: { totalCompleted: { increment: 1 } },
+          });
+        }
       }
     }
   }

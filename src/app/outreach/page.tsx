@@ -25,6 +25,7 @@ import {
   SuggestionsSection,
   LinkedInQueueButton,
   LinkedInPreview,
+  EmailSendButton,
   AshbyLogSection,
 } from "@/components/outreach/settings";
 import type { RoleContext } from "@/components/outreach/settings";
@@ -1369,6 +1370,11 @@ function OutreachStudio() {
         {/* LinkedIn Queue Button */}
         {(channel === 'linkedin' || channel === 'multi_channel') && sequenceId && candidate.linkedinUrl && (
           <LinkedInQueueButton sequenceId={sequenceId} candidateName={candidate.name} viewFirst={viewFirst} likePost={likePost} />
+        )}
+
+        {/* Email Send Button */}
+        {(channel === 'email' || channel === 'multi_channel') && sequenceId && candidate.email && (
+          <EmailSendButton sequenceId={sequenceId} candidateName={candidate.name} candidateEmail={candidate.email} />
         )}
 
         {/* Ashby Log */}
