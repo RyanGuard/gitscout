@@ -718,6 +718,10 @@ function MarketMapInner() {
   const [roleLevel, setRoleLevel] = useState("senior");
   const [roleStack, setRoleStack] = useState("Go, Kubernetes");
   const [geography, setGeography] = useState("San Francisco");
+  const [roleDescription, setRoleDescription] = useState("");
+  const [compRangeMin, setCompRangeMin] = useState("");
+  const [compRangeMax, setCompRangeMax] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Form state — stack mode
   const [targetStack, setTargetStack] = useState<string[]>([]);

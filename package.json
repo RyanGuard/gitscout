@@ -26,7 +26,6 @@
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@react-pdf/renderer": "^4.3.2",
-    "@sentry/nextjs": "^10.47.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "fast-xml-parser": "^5.5.9",

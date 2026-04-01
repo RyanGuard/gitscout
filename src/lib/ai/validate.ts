@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
-
 export function validateMapGeneration(companies: Array<{ company_name: string; company_domain: string; tier: string; reasoning: string }>): string[] {
   const issues: string[] = [];
 
@@ -25,10 +23,7 @@ export function validateMapGeneration(companies: Array<{ company_name: string; c
   if (tiers.C === 0) issues.push("No Tier C companies");
 
   if (issues.length > 0) {
-    Sentry.captureMessage("AI output validation issues: map_generate", {
-      level: "warning",
-      extra: { issues, companyCount: companies.length, tiers },
-    });
+    console.warn("AI output validation issues: map_generate", { issues, companyCount: companies.length, tiers });
   }
 
   return issues;
@@ -50,10 +45,7 @@ export function validateClassification(classifications: Array<{ id: string; fit_
   }
 
   if (issues.length > 0) {
-    Sentry.captureMessage("AI output validation issues: classify", {
-      level: "warning",
-      extra: { issues, candidateCount: classifications.length },
-    });
+    console.warn("AI output validation issues: classify", { issues, candidateCount: classifications.length });
   }
 
   return issues;
@@ -90,10 +82,7 @@ export function validateOutreachMessages(messages: Array<{ step_number: number; 
   }
 
   if (issues.length > 0) {
-    Sentry.captureMessage("AI output validation issues: outreach", {
-      level: "warning",
-      extra: { issues, channel, messageCount: messages.length },
-    });
+    console.warn("AI output validation issues: outreach", { issues, channel, messageCount: messages.length });
   }
 
   return issues;

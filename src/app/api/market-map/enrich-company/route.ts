@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { scoreTier, assignTier } from "@/lib/map/tierScoring";
+import { apolloFetch } from "@/lib/apollo-fetch";
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 
@@ -150,11 +151,10 @@ export async function POST(request: Request) {
         searchBody.person_locations = geography;
       }
 
-      const res = await fetch(`${APOLLO_API}/mixed_people/api_search`, {
+      const res = await apolloFetch(`${APOLLO_API}/mixed_people/api_search`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
         body: JSON.stringify(searchBody),
-      });
+      }, { label: "people_search" });
 
       if (res.ok) {
         const data = await res.json();
@@ -190,9 +190,7 @@ export async function POST(request: Request) {
       companyInfo = cachedCompany as Record<string, unknown>;
     } else {
       try {
-        const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?domain=${company_domain}`, {
-          headers: { "X-Api-Key": apiKey },
-        });
+        const orgRes = await apolloFetch(`${APOLLO_API}/organizations/enrich?domain=${company_domain}`, {}, { label: "org_enrich" });
         if (orgRes.ok) {
           const orgData = await orgRes.json();
           companyInfo = orgData.organization || null;
@@ -305,15 +303,14 @@ export async function POST(request: Request) {
     const missingLinkedin = candidates.filter(c => !c.linkedinUrl && c.apolloPersonId);
     if (missingLinkedin.length > 0 && apiKey && company?.tier === "A") {
       try {
-        const matchRes = await fetch(`${APOLLO_API}/people/bulk_match`, {
+        const matchRes = await apolloFetch(`${APOLLO_API}/people/bulk_match`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "X-Api-Key": apiKey },
           body: JSON.stringify({
             reveal_personal_emails: false,
             reveal_phone_number: false,
             details: missingLinkedin.map(c => ({ id: c.apolloPersonId })),
           }),
-        });
+        }, { label: "linkedin_backfill" });
         if (matchRes.ok) {
           const matchData = await matchRes.json();
           const matches = matchData.matches || [];

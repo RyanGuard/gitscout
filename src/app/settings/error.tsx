@@ -1,11 +1,8 @@
 "use client";
-import * as Sentry from "@sentry/nextjs";
-import { useEffect } from "react";
 import { AlertTriangle, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => { Sentry.captureException(error); }, [error]);
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
       <div className="rounded-full bg-red-500/10 p-4 mb-4">
