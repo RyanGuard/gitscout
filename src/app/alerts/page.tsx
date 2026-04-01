@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromSurfacedCandidate } from "@/lib/outreach/candidateNormalizer";
-import { showError } from "@/lib/toast";
+import { showError, showSuccess } from "@/lib/toast";
 import { trackEvent } from "@/lib/posthog";
 
 // ═══════════════════════════════════════════════════════════
@@ -774,6 +774,20 @@ export default function AlertsPage() {
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
   const [unreadOnly, setUnreadOnly] = useState(false);
 
+  // List picker state
+  const [listPickerFor, setListPickerFor] = useState<string | null>(null);
+  const [lists, setLists] = useState<Array<{ id: string; name: string; entryCount: number }>>([]);
+  const [listsLoading, setListsLoading] = useState(false);
+  const [savingToList, setSavingToList] = useState<string | null>(null);
+  const [newListName, setNewListName] = useState("");
+  const [creatingList, setCreatingList] = useState(false);
+
+  // Sequence picker state
+  const [seqPickerFor, setSeqPickerFor] = useState<string | null>(null);
+  const [sequences, setSequences] = useState<Array<{ id: string; name: string; status: string; totalEnrolled: number }>>([]);
+  const [seqLoading, setSeqLoading] = useState(false);
+  const [enrollingIn, setEnrollingIn] = useState<string | null>(null);
+
   // Auth redirect
   useEffect(() => {
     if (authStatus === "unauthenticated") {
@@ -989,15 +1003,70 @@ export default function AlertsPage() {
     [fetchSignals, fetchWatchlist]
   );
 
-  // Candidate actions (stubs for now — wire to real API later)
-  const handleSaveToList = useCallback((candidateId: string) => {
-    // TODO: open list picker modal
-    console.log("Save to list:", candidateId);
+  // Candidate actions — list picker
+  const handleSaveToList = useCallback(async (candidateId: string) => {
+    setListPickerFor(candidateId);
+    setListsLoading(true);
+    try {
+      const res = await fetch("/api/lists");
+      if (res.ok) { const data = await res.json(); setLists(data.lists || []); }
+    } catch { showError("Failed to load lists"); }
+    finally { setListsLoading(false); }
   }, []);
 
-  const handleAddToSequence = useCallback((candidateId: string) => {
-    // TODO: open sequence picker modal
-    console.log("Add to sequence:", candidateId);
+  const saveToList = useCallback(async (candidateId: string, listId: string) => {
+    setSavingToList(listId);
+    try {
+      const res = await fetch("/api/alerts/save-to-list", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateId, listId }),
+      });
+      if (res.ok) { showSuccess("Saved to list"); setListPickerFor(null); }
+      else { showError("Failed to save"); }
+    } catch { showError("Failed to save to list"); }
+    finally { setSavingToList(null); }
+  }, []);
+
+  const createListAndSave = useCallback(async (candidateId: string) => {
+    if (!newListName.trim()) return;
+    setCreatingList(true);
+    try {
+      const res = await fetch("/api/lists", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newListName.trim() }) });
+      if (res.ok) {
+        const list = await res.json();
+        setLists(prev => [{ id: list.id, name: list.name, entryCount: 0 }, ...prev]);
+        await saveToList(candidateId, list.id);
+        setNewListName("");
+      }
+    } catch { showError("Failed to create list"); }
+    finally { setCreatingList(false); }
+  }, [newListName, saveToList]);
+
+  // Candidate actions — sequence picker
+  const handleAddToSequence = useCallback(async (candidateId: string) => {
+    setSeqPickerFor(candidateId);
+    setSeqLoading(true);
+    try {
+      const res = await fetch("/api/sequences");
+      if (res.ok) {
+        const data = await res.json();
+        setSequences((data.sequences || []).filter((s: { status: string }) => s.status === "draft" || s.status === "active"));
+      }
+    } catch { showError("Failed to load sequences"); }
+    finally { setSeqLoading(false); }
+  }, []);
+
+  const enrollInSequence = useCallback(async (candidateId: string, sequenceId: string) => {
+    setEnrollingIn(sequenceId);
+    try {
+      const res = await fetch(`/api/sequences/${sequenceId}/enroll`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidates: [{ type: "map_candidate", id: candidateId }] }),
+      });
+      if (res.ok) { showSuccess("Added to sequence"); setSeqPickerFor(null); }
+      else { showError("Failed to enroll"); }
+    } catch { showError("Failed to add to sequence"); }
+    finally { setEnrollingIn(null); }
   }, []);
 
   const handleDismissCandidate = useCallback((candidateId: string) => {
@@ -1182,6 +1251,77 @@ export default function AlertsPage() {
           />
         </div>
       </div>
+
+      {/* List Picker Modal */}
+      {listPickerFor && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setListPickerFor(null)} />
+          <div className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-80 rounded-xl border border-neutral-200/50 bg-surface shadow-2xl dark:border-neutral-800/80">
+            <div className="p-4 border-b border-neutral-200/50 dark:border-neutral-800/50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Save to List</h3>
+                <button onClick={() => setListPickerFor(null)} className="text-neutral-400 hover:text-neutral-600"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+            <div className="max-h-60 overflow-y-auto p-2">
+              {listsLoading && <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin text-neutral-400" /></div>}
+              {!listsLoading && lists.length === 0 && <p className="px-2 py-3 text-xs text-neutral-400 text-center">No lists yet</p>}
+              {!listsLoading && lists.map(list => (
+                <button key={list.id} onClick={() => saveToList(listPickerFor, list.id)} disabled={savingToList === list.id}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-gold/5">
+                  <span className="truncate">{list.name}</span>
+                  {savingToList === list.id ? <Loader2 className="h-3.5 w-3.5 animate-spin text-gold" /> : <span className="text-xs text-neutral-400">{list.entryCount}</span>}
+                </button>
+              ))}
+            </div>
+            <div className="border-t border-neutral-200/50 dark:border-neutral-800/50 p-3">
+              <div className="flex gap-2">
+                <input type="text" value={newListName} onChange={(e) => setNewListName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && listPickerFor && createListAndSave(listPickerFor)}
+                  placeholder="New list name..." className="flex-1 rounded-lg border border-neutral-200/50 bg-transparent px-3 py-1.5 text-xs outline-none focus:border-gold/50 dark:border-neutral-700/50" />
+                <button onClick={() => listPickerFor && createListAndSave(listPickerFor)} disabled={creatingList || !newListName.trim()}
+                  className="rounded-lg bg-gold px-3 py-1.5 text-xs font-medium text-white hover:bg-gold-hover disabled:opacity-50">
+                  {creatingList ? "..." : "Create"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Sequence Picker Modal */}
+      {seqPickerFor && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setSeqPickerFor(null)} />
+          <div className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-80 rounded-xl border border-neutral-200/50 bg-surface shadow-2xl dark:border-neutral-800/80">
+            <div className="p-4 border-b border-neutral-200/50 dark:border-neutral-800/50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Add to Sequence</h3>
+                <button onClick={() => setSeqPickerFor(null)} className="text-neutral-400 hover:text-neutral-600"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+            <div className="max-h-60 overflow-y-auto p-2">
+              {seqLoading && <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin text-neutral-400" /></div>}
+              {!seqLoading && sequences.length === 0 && (
+                <div className="px-2 py-3 text-center">
+                  <p className="text-xs text-neutral-400">No active sequences</p>
+                  <a href="/outreach/new" className="text-xs text-gold hover:underline mt-1 inline-block">Create one</a>
+                </div>
+              )}
+              {!seqLoading && sequences.map(seq => (
+                <button key={seq.id} onClick={() => enrollInSequence(seqPickerFor, seq.id)} disabled={enrollingIn === seq.id}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-gold/5">
+                  <div className="min-w-0 flex-1 text-left">
+                    <span className="truncate block">{seq.name}</span>
+                    <span className="text-[10px] text-neutral-400">{seq.status} · {seq.totalEnrolled} enrolled</span>
+                  </div>
+                  {enrollingIn === seq.id && <Loader2 className="h-3.5 w-3.5 animate-spin text-gold" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

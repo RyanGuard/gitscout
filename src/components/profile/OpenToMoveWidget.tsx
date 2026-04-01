@@ -50,7 +50,7 @@ function ScoreCircle({ score, likelihood }: { score: number; likelihood: "likely
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
-  const config = LIKELIHOOD_CONFIG[likelihood];
+  const config = LIKELIHOOD_CONFIG[likelihood] || LIKELIHOOD_CONFIG.possible;
 
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
@@ -129,7 +129,8 @@ export function OpenToMoveWidget({ developerId, companyDomain }: OpenToMoveWidge
   if (loading) return <SkeletonLoader />;
   if (error || !data || data.score === 0) return null;
 
-  const config = LIKELIHOOD_CONFIG[data.likelihood];
+  const config = LIKELIHOOD_CONFIG[data.likelihood as keyof typeof LIKELIHOOD_CONFIG];
+  if (!config) return null;
   const topSignals = (data.signals || []).slice(0, 3);
 
   return (
