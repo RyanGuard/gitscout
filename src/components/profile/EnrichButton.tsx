@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { Sparkles, RefreshCw, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { showSuccess, showError as toastError } from "@/lib/toast";
 import { ContactCard } from "@/components/profile/ContactCard";
 import type { ContactInfo } from "@/types";
 
@@ -57,9 +58,11 @@ export function EnrichButton({ developerId, className }: EnrichButtonProps) {
       const statusData = await statusRes.json();
       if (statusData.enriched) {
         setContactInfo(statusData.contactInfo);
+        showSuccess("Contact info enriched");
       }
     } catch {
       setError("Enrichment failed — please try again");
+      toastError("Enrichment failed");
     } finally {
       setLoading(false);
     }

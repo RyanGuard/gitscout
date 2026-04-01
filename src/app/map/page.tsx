@@ -1118,6 +1118,7 @@ function MarketMapInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidate_ids: Array.from(selectedIds), update: { status } }),
     });
+    showSuccess(`Updated ${selectedIds.size} candidates to ${status}`);
     trackEvent("bulk_status_updated", { status, count: selectedIds.size });
     setSelectedIds(new Set());
     loadMap(mapData.id);
@@ -1136,10 +1137,12 @@ function MarketMapInner() {
           body: JSON.stringify({ candidate_ids: batch }),
         });
       }
+      showSuccess(`Revealed contacts for ${ids.length} candidates`);
       trackEvent("contacts_revealed", { count: ids.length });
       loadMap(mapData.id);
     } catch (err) {
       console.error("Reveal contacts error:", err);
+      showError("Failed to reveal contacts");
     } finally {
       setRevealLoading(false);
     }

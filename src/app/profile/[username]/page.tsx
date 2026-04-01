@@ -408,11 +408,11 @@ export default async function ProfilePage({
             totalStars: developer.totalStars,
             publicRepos: developer.publicRepos,
             hireable: developer.hireable,
-            languages: developer.languages.map((l) => ({
+            languages: (developer.languages || []).map((l) => ({
               language: l.language,
               percentage: l.percentage,
             })),
-            repositories: developer.repositories.map((r) => ({
+            repositories: (developer.repositories || []).map((r) => ({
               name: r.name,
               stars: r.stars,
               language: r.language,
@@ -430,11 +430,11 @@ export default async function ProfilePage({
             followers: developer.followers,
             totalStars: developer.totalStars,
             publicRepos: developer.publicRepos,
-            languages: developer.languages.map((l) => ({
+            languages: (developer.languages || []).map((l) => ({
               language: l.language,
               percentage: l.percentage,
             })),
-            repositories: developer.repositories.map((r) => ({
+            repositories: (developer.repositories || []).map((r) => ({
               name: r.name,
               stars: r.stars,
               language: r.language,
