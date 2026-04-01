@@ -5,12 +5,11 @@ import type { FunnelData } from "./types";
 // ─── Config ───
 
 const STAGES: { key: keyof FunnelData; label: string }[] = [
-  { key: "drafted", label: "Drafted" },
-  { key: "sent", label: "Sent" },
-  { key: "viewed", label: "Viewed" },
-  { key: "connected", label: "Connected" },
-  { key: "messaged", label: "Messaged" },
+  { key: "sourced", label: "Sourced" },
+  { key: "outreach_sent", label: "Outreach Sent" },
   { key: "responded", label: "Responded" },
+  { key: "interested", label: "Interested" },
+  { key: "in_ats", label: "In ATS" },
 ];
 
 // ─── Component ───

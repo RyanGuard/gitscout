@@ -326,7 +326,8 @@ export default function AnalyticsPage() {
         <h2 className="mb-4 text-sm font-semibold text-text">Response Timeline (Last 30 Days)</h2>
         <div className="flex items-end gap-[3px]" style={{ height: 140 }}>
           {daily.map((d) => {
-            const sentHeight = maxDailySent > 0 ? (d.sent / maxDailySent) * 120 : 0;
+            const sentOnly = d.sent - d.responded;
+            const sentOnlyHeight = maxDailySent > 0 ? (sentOnly / maxDailySent) * 120 : 0;
             const respHeight = maxDailySent > 0 ? (d.responded / maxDailySent) * 120 : 0;
             return (
               <div
@@ -338,15 +339,15 @@ export default function AnalyticsPage() {
                 <div className="pointer-events-none absolute -top-6 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#1a1a1a] px-2 py-1 text-[9px] text-text-muted shadow-lg group-hover:block">
                   {formatDate(d.date)}: {d.sent} sent, {d.responded} resp
                 </div>
-                {/* Sent bar */}
+                {/* Sent-only bar (stacked on top) */}
                 <div
-                  className="w-full rounded-t bg-text-muted/20 transition-all group-hover:bg-text-muted/40"
-                  style={{ height: Math.max(sentHeight, d.sent > 0 ? 2 : 0) }}
+                  className="w-full bg-text-muted/20 transition-all group-hover:bg-text-muted/40"
+                  style={{ height: Math.max(sentOnlyHeight, sentOnly > 0 ? 2 : 0) }}
                 />
-                {/* Responded bar (overlay) */}
+                {/* Responded bar (stacked below) */}
                 <div
-                  className="absolute bottom-0 w-full rounded-t bg-emerald-500/50 transition-all group-hover:bg-emerald-500/70"
-                  style={{ height: Math.max(respHeight, d.responded > 0 ? 2 : 0) }}
+                  className="w-full rounded-b bg-emerald-500/50 transition-all group-hover:bg-emerald-500/70"
+                  style={{ height: Math.max(respHeight, d.responded > 0 ? 2 : 0), borderTopLeftRadius: sentOnly <= 0 ? '0.25rem' : 0, borderTopRightRadius: sentOnly <= 0 ? '0.25rem' : 0 }}
                 />
               </div>
             );

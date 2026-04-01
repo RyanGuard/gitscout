@@ -47,12 +47,11 @@ export interface AgentStatus {
 }
 
 export interface FunnelData {
-  drafted: number;
-  sent: number;
-  viewed: number;
-  connected: number;
-  messaged: number;
+  sourced: number;
+  outreach_sent: number;
   responded: number;
+  interested: number;
+  in_ats: number;
 }
 
 export interface FavoriteDeveloper {

@@ -6,7 +6,7 @@ import {
   Search, Users, Zap, Globe, Code,
   Code2, Server, Cpu, Smartphone, LogIn,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 
 import { MetricCards } from "@/components/dashboard/MetricCards";
@@ -238,12 +238,11 @@ const defaultAgent: AgentStatus = {
 };
 
 const defaultFunnel: FunnelData = {
-  drafted: 0,
-  sent: 0,
-  viewed: 0,
-  connected: 0,
-  messaged: 0,
+  sourced: 0,
+  outreach_sent: 0,
   responded: 0,
+  interested: 0,
+  in_ats: 0,
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -306,9 +305,15 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
+  const fetchDashboard = useCallback(() => {
     fetch("/api/dashboard").then(r => r.json()).then(setData).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+    const interval = setInterval(fetchDashboard, 60000);
+    return () => clearInterval(interval);
+  }, [fetchDashboard]);
 
   if (loading) return <DashboardSkeleton />;
 

@@ -14,6 +14,7 @@ import {
   Mail,
   Smartphone,
   ExternalLink,
+  FileEdit,
 } from "lucide-react";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -68,6 +69,7 @@ const STAGE_CONFIG: Record<
   string,
   { icon: React.ComponentType<{ className?: string }>; color: string }
 > = {
+  draft: { icon: FileEdit, color: "text-zinc-400" },
   sourced: { icon: Users, color: "text-blue-400" },
   outreach_sent: { icon: Send, color: "text-amber-400" },
   responded: { icon: MessageSquare, color: "text-purple-400" },

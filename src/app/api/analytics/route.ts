@@ -144,27 +144,28 @@ export async function GET(request: Request) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, stats]) => ({ date, ...stats }));
 
-  // --- Recent responses ---
-  const respondedAnalytics = analytics
-    .filter((a) => a.responseReceived)
-    .slice(0, 20);
-
-  // Map analytics to sequence data for candidate names
-  const recentResponses = respondedAnalytics.map((a) => {
-    // Try to find a matching sequence
-    const seq = sequences.find(
-      (s) => s.channel === a.channel && s.responseReceived
-    );
-
-    return {
-      id: a.id,
-      candidateName: seq?.candidateName || "Unknown",
-      channel: a.channel,
-      sentiment: a.responseSentiment || "neutral",
-      responseTimeHours: a.responseTimeHours,
-      date: a.createdAt.toISOString(),
-    };
+  // --- Recent responses (query sequences directly instead of matching analytics) ---
+  const recentResponseSequences = await prisma.outreachSequence.findMany({
+    where: { userId, responseReceived: true },
+    orderBy: { updatedAt: 'desc' },
+    take: 20,
+    select: {
+      id: true,
+      candidateName: true,
+      channel: true,
+      responseSentiment: true,
+      updatedAt: true,
+    },
   });
+
+  const recentResponses = recentResponseSequences.map((s) => ({
+    id: s.id,
+    candidateName: s.candidateName,
+    channel: s.channel,
+    sentiment: s.responseSentiment || "neutral",
+    responseTimeHours: null as number | null,
+    date: s.updatedAt.toISOString(),
+  }));
 
   return Response.json({
     summary: {

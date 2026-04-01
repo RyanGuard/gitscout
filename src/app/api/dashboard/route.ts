@@ -39,7 +39,7 @@ export async function GET() {
       prisma.$queryRaw<LinkedinAction[]>`
       SELECT id, action_type, status, target_name, scheduled_for, executed_at
       FROM linkedin_action_queue
-      WHERE user_id = ${process.env.SUPABASE_AGENT_USER_ID || ""}
+      WHERE user_id = ${session.user.id || process.env.SUPABASE_AGENT_USER_ID || ""}
       AND scheduled_for >= CURRENT_DATE - INTERVAL '30 days'
       ORDER BY scheduled_for DESC
       LIMIT 100
@@ -122,22 +122,28 @@ export async function GET() {
     sequenceIds: data.sequenceIds,
   }));
 
-  // Funnel
+  // Funnel — aligned with pipeline stages
+  const developersWithSequences = new Set(
+    sequences.map((s) => s.sourceDeveloperId).filter((id): id is string => id !== null),
+  );
+
+  const sourcedCount = await prisma.candidateEntry.count({
+    where: {
+      list: { userId: session.user.id },
+      developerId: { notIn: Array.from(developersWithSequences) },
+    },
+  }).catch(() => 0);
+
   const funnel = {
-    drafted: sequences.filter((s) => s.status === "draft").length,
-    sent: sequences.filter(
-      (s) => s.status === "sending" || s.status === "completed"
+    sourced: sourcedCount,
+    outreach_sent: sequences.filter((s) => s.status === "sending" && !s.responseReceived).length,
+    responded: sequences.filter(
+      (s) => s.responseReceived && s.responseSentiment !== "positive" && !s.ashbyPushedAt,
     ).length,
-    viewed: linkedinActions.filter(
-      (a) => a.action_type === "view_profile" && a.status === "completed"
+    interested: sequences.filter(
+      (s) => s.responseSentiment === "positive" && !s.ashbyPushedAt,
     ).length,
-    connected: linkedinActions.filter(
-      (a) => a.action_type === "connect" && a.status === "completed"
-    ).length,
-    messaged: linkedinActions.filter(
-      (a) => a.action_type === "message" && a.status === "completed"
-    ).length,
-    responded: sequences.filter((s) => s.responseReceived).length,
+    in_ats: sequences.filter((s) => s.ashbyPushedAt != null).length,
   };
 
   // Agent status

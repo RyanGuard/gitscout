@@ -87,6 +87,7 @@ export async function GET() {
   }
 
   // Classify sequences into pipeline stages
+  const drafts: PipelineCandidate[] = [];
   const outreachSent: PipelineCandidate[] = [];
   const responded: PipelineCandidate[] = [];
   const interested: PipelineCandidate[] = [];
@@ -129,11 +130,14 @@ export async function GET() {
     } else if (seq.status === "sending") {
       candidate.stage = "outreach_sent";
       outreachSent.push(candidate);
+    } else if (seq.status === "draft" || seq.status === "ready") {
+      candidate.stage = "draft";
+      drafts.push(candidate);
     }
-    // draft / ready sequences without any action don't appear in the pipeline
   }
 
   const stages: PipelineStage[] = [
+    { id: "draft", label: "Drafts", candidates: drafts },
     { id: "sourced", label: "Sourced", candidates: sourcedCandidates },
     { id: "outreach_sent", label: "Outreach Sent", candidates: outreachSent },
     { id: "responded", label: "Responded", candidates: responded },
