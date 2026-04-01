@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Anthropic from "@anthropic-ai/sdk";
+import { logAiCall } from "@/lib/ai/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const aiStart = Date.now();
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 2000,
@@ -54,6 +56,11 @@ ${message}`,
     if (!jsonMatch) {
       return Response.json({ error: "Failed to parse AI response" }, { status: 500 });
     }
+
+    logAiCall(
+      { userId: session.user.id, feature: "outreach_improve", metadata: { channel } },
+      { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
+    ).catch(() => {});
 
     return Response.json(JSON.parse(jsonMatch[0]));
   } catch (err) {

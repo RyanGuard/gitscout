@@ -250,8 +250,8 @@ function SearchPageInner() {
           router.push(`/search?${params}`);
           return;
         }
-      } catch {
-        // Fall through to normal search
+      } catch (err) {
+        console.error("[search] AI interpretation failed, falling back to normal search:", err);
       }
     }
 

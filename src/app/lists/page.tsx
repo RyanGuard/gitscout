@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { List, Plus, Loader2 } from "lucide-react";
 import { ListCard } from "@/components/crm/ListCard";
+import { showError } from "@/lib/toast";
 import type { CandidateListSummary } from "@/types";
 
 export default function ListsPage() {
@@ -22,8 +23,8 @@ export default function ListsPage() {
       const res = await fetch("/api/lists");
       const data = await res.json();
       setLists(data.lists || []);
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error("[lists] Failed to fetch lists:", err);
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export default function ListsPage() {
         setShowCreate(false);
       }
     } catch {
-      // ignore
+      showError("Failed to create list");
     } finally {
       setCreating(false);
     }

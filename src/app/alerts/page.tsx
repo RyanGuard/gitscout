@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromSurfacedCandidate } from "@/lib/outreach/candidateNormalizer";
+import { showError } from "@/lib/toast";
 
 // ═══════════════════════════════════════════════════════════
 //  LINKEDIN ICON — lucide-react does not export one
@@ -793,8 +794,8 @@ export default function AlertsPage() {
       const data = await res.json();
       setSignals(data.signals || []);
       setSignalsTotal(data.total || 0);
-    } catch {
-      // Silent fail — UI shows empty state
+    } catch (err) {
+      console.error("[alerts] Failed to fetch signals:", err);
     } finally {
       setSignalsLoading(false);
     }
@@ -807,8 +808,8 @@ export default function AlertsPage() {
       if (!res.ok) throw new Error("Failed to fetch watchlist");
       const data = await res.json();
       setCompanies(data.companies || []);
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.error("[alerts] Failed to fetch watchlist:", err);
     } finally {
       setCompaniesLoading(false);
     }
@@ -842,7 +843,8 @@ export default function AlertsPage() {
           ...prev,
           [signalId]: data.surfacedCandidates || [],
         }));
-      } catch {
+      } catch (err) {
+        console.error("[alerts] Failed to fetch signal candidates:", err);
         setSignalCandidates((prev) => ({
           ...prev,
           [signalId]: [],
@@ -906,14 +908,14 @@ export default function AlertsPage() {
               body: JSON.stringify({ watchedCompanyId: newCompany.id }),
             });
             await Promise.all([fetchSignals(), fetchWatchlist()]);
-          } catch {
-            // Scan failed silently — company still added
+          } catch (err) {
+            console.error("[alerts] Auto-scan failed after adding company:", err);
           } finally {
             setScanningId(null);
           }
         }
       } catch {
-        // Could show a toast here
+        showError("Failed to add company");
       } finally {
         setAddingCompany(false);
       }
@@ -935,6 +937,7 @@ export default function AlertsPage() {
           body: JSON.stringify({ isActive }),
         });
       } catch {
+        showError("Failed to update company");
         setCompanies((prev) =>
           prev.map((c) => (c.id === id ? { ...c, isActive: !isActive } : c))
         );
@@ -954,6 +957,7 @@ export default function AlertsPage() {
         });
         if (!res.ok) throw new Error("Failed to remove");
       } catch {
+        showError("Failed to remove company");
         setCompanies(prev);
       }
     },
@@ -974,7 +978,7 @@ export default function AlertsPage() {
         // Refresh both signals and watchlist after scan
         await Promise.all([fetchSignals(), fetchWatchlist()]);
       } catch {
-        // Silent fail
+        showError("Scan failed. Try again.");
       } finally {
         setScanningId(null);
       }

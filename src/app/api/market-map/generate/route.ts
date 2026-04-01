@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
+import { logAiCall } from "@/lib/ai/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -66,6 +67,7 @@ Respond ONLY in JSON format:
 
     const userMessage = `Find companies for this role: ${role_title}${role_level ? `, ${role_level} level` : ""}${role_stack?.length ? `, tech stack: ${role_stack.join(", ")}` : ""}${geography?.length ? `, location preference: ${geography.join(", ")}` : ""}${role_description ? `. Additional context: ${role_description}` : ""}`;
 
+    const aiStart = Date.now();
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
@@ -75,6 +77,11 @@ Respond ONLY in JSON format:
 
     // Parse Claude's response
     const text = response.content[0].type === "text" ? response.content[0].text : "";
+
+    logAiCall(
+      { userId: session.user.id, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
+      { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
+    ).catch(() => {});
     let companies: Array<{
       company_name: string;
       company_domain: string;

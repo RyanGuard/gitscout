@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
+import { logAiCall } from "@/lib/ai/logger";
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId(request);
@@ -160,6 +161,7 @@ Sequence length: ${length} messages
 Remember: each message needs a DIFFERENT personalization angle. ${effectiveChannel === "multi_channel" ? "Vary the channels across the sequence." : ""}`;
 
   try {
+    const aiStart = Date.now();
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
@@ -174,6 +176,11 @@ Remember: each message needs a DIFFERENT personalization angle. ${effectiveChann
     }
 
     const generated = JSON.parse(jsonMatch[0]);
+
+    logAiCall(
+      { userId, feature: "outreach_generate", metadata: { channel: effectiveChannel, tone: effectiveTone, sequenceLength: length } },
+      { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
+    ).catch(() => {});
 
     // Save to database
     const sequence = await prisma.outreachSequence.create({

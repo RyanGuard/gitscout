@@ -22,6 +22,7 @@ import { AddToSequenceButton } from "@/components/sequences/AddToSequenceButton"
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
 import { fromMapCandidate } from "@/lib/outreach/candidateNormalizer";
 import CompanyTimeline from "@/components/map/CompanyTimeline";
+import { showError } from "@/lib/toast";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -926,7 +927,9 @@ function MarketMapInner() {
         const data = await res.json();
         setCompanySearchResults(data.companies || []);
       }
-    } catch { /* ignore */ }
+    } catch {
+      showError("Company search failed. Try again.");
+    }
     setCompanySearching(false);
   }
 

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { ConnectionResults } from "@/components/connections/ConnectionResults";
 import { LinkedinImport } from "@/components/connections/LinkedinImport";
+import { showError } from "@/lib/toast";
 
 interface HomeBase {
   id: string;
@@ -70,8 +71,8 @@ export default function ConnectionsPage() {
       const res = await fetch("/api/connections/home-base");
       const data = await res.json();
       setHomeBase(data.homeBase);
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.error("[connections] Failed to fetch home base:", err);
     } finally {
       setLoading(false);
     }
@@ -98,7 +99,7 @@ export default function ConnectionsPage() {
       // Reset the stuck record
       fetch(`/api/connections/home-base/${homeBase.id}/reset`, { method: "POST" })
         .then(() => fetchHomeBase())
-        .catch(() => {});
+        .catch((err: unknown) => console.error("[connections] Failed to reset stuck home base:", err));
       return;
     }
 
@@ -134,7 +135,7 @@ export default function ConnectionsPage() {
         setSetupDomain("");
       }
     } catch {
-      // Error handled by UI state
+      showError("Failed to set up home base");
     } finally {
       setSettingUp(false);
     }
@@ -161,6 +162,7 @@ export default function ConnectionsPage() {
         setLookupError(data.error || "Lookup failed");
       }
     } catch {
+      showError("Connection lookup failed");
       setLookupError("Failed to connect to server");
     } finally {
       setLookingUp(false);
@@ -178,7 +180,7 @@ export default function ConnectionsPage() {
       });
       fetchHomeBase();
     } catch {
-      // Error
+      showError("Failed to refresh home base");
     } finally {
       setSettingUp(false);
     }

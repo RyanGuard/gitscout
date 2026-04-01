@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
+import { logAiCall } from "@/lib/ai/logger";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
@@ -126,6 +127,7 @@ ${newsContext}${jobContext}${growthContext}
 
 Evaluate each candidate for both fit and flight risk.`;
 
+    const aiStart = Date.now();
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
@@ -134,6 +136,11 @@ Evaluate each candidate for both fit and flight risk.`;
     });
 
     const text = response.content[0].type === "text" ? response.content[0].text : "";
+
+    logAiCall(
+      { feature: "classify", metadata: { candidateCount: candidates.length } },
+      { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
+    ).catch(() => {});
     let classifications: Array<{
       id: string;
       fit_score: number;

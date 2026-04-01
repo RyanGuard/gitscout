@@ -107,6 +107,7 @@ model User {
   sellingPointKits        SellingPointKit[]
   savedSearches           SavedSearch[]
   intakeSessions          IntakeSession[]
+  feedback                UserFeedback[]
 }
 
 model Account {
@@ -971,4 +972,41 @@ model SavedSearch {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUALITY & OBSERVABILITY
+// ═══════════════════════════════════════════════════════════
+
+model AiCall {
+  id           String   @id @default(cuid())
+  userId       String?
+  feature      String
+  model        String   @default("claude-sonnet-4-20250514")
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  latencyMs    Int      @default(0)
+  success      Boolean  @default(true)
+  errorMessage String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([feature])
+  @@index([createdAt])
+}
+
+model UserFeedback {
+  id        String   @id @default(cuid())
+  userId    String
+  feature   String
+  rating    Int
+  comment   String?
+  context   Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([feature])
+  @@index([createdAt])
 }
