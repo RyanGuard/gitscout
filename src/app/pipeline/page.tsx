@@ -16,6 +16,15 @@ import {
   ExternalLink,
   FileEdit,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { useDroppable, useDraggable } from "@dnd-kit/core";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -91,63 +100,85 @@ function ChannelIcon({ channel, className }: { channel: string; className?: stri
   }
 }
 
-// ─── Candidate Card ───
+// ─── Draggable Candidate Card ───
 
-function CandidateCard({ candidate }: { candidate: PipelineCandidate }) {
+function DraggableCandidateCard({ candidate }: { candidate: PipelineCandidate }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: candidate.id,
+    data: { stage: candidate.stage },
+  });
+
+  const style: React.CSSProperties = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: "grab",
+  };
+
   return (
-    <div className="rounded-lg border border-border bg-surface p-3 space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-foreground truncate">
-            {candidate.name}
-          </p>
-          {candidate.title && (
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
-              {candidate.title}
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      <div className="rounded-lg border border-border bg-surface p-3 space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-foreground truncate">
+              {candidate.name}
             </p>
-          )}
-          {candidate.company && (
-            <p className="text-xs text-muted-foreground/70 truncate">
-              {candidate.company}
-            </p>
+            {candidate.title && (
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                {candidate.title}
+              </p>
+            )}
+            {candidate.company && (
+              <p className="text-xs text-muted-foreground/70 truncate">
+                {candidate.company}
+              </p>
+            )}
+          </div>
+          <ChannelIcon
+            channel={candidate.channel}
+            className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 mt-0.5"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-muted-foreground/60">
+            {candidate.daysInStage === 0
+              ? "Today"
+              : candidate.daysInStage === 1
+                ? "1 day"
+                : `${candidate.daysInStage} days`}
+          </span>
+          {candidate.sequenceId && (
+            <a
+              href={`/outreach/${candidate.sequenceId}`}
+              className="text-[10px] font-medium text-gold hover:text-gold/80 flex items-center gap-1 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Open in Studio
+              <ExternalLink className="h-2.5 w-2.5" />
+            </a>
           )}
         </div>
-        <ChannelIcon
-          channel={candidate.channel}
-          className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 mt-0.5"
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] text-muted-foreground/60">
-          {candidate.daysInStage === 0
-            ? "Today"
-            : candidate.daysInStage === 1
-              ? "1 day"
-              : `${candidate.daysInStage} days`}
-        </span>
-        {candidate.sequenceId && (
-          <a
-            href={`/outreach/${candidate.sequenceId}`}
-            className="text-[10px] font-medium text-gold hover:text-gold/80 flex items-center gap-1 transition-colors"
-          >
-            Open in Studio
-            <ExternalLink className="h-2.5 w-2.5" />
-          </a>
-        )}
       </div>
     </div>
   );
 }
 
-// ─── Column ───
+// ─── Droppable Column ───
 
 function PipelineColumn({ stage }: { stage: PipelineStage }) {
   const config = STAGE_CONFIG[stage.id] || { icon: Users, color: "text-zinc-400" };
   const StageIcon = config.icon;
+  const { setNodeRef, isOver } = useDroppable({ id: stage.id });
 
   return (
-    <div className="min-w-[250px] flex flex-col">
+    <div
+      ref={setNodeRef}
+      className={`min-w-[250px] flex flex-col rounded-xl p-2 -m-2 transition-all ${
+        isOver ? "ring-2 ring-gold/60 bg-gold/5" : ""
+      }`}
+    >
       {/* Column header */}
       <div className="flex items-center gap-2 px-1 pb-3">
         <StageIcon className={`h-4 w-4 ${config.color}`} />
@@ -165,7 +196,7 @@ function PipelineColumn({ stage }: { stage: PipelineStage }) {
           </div>
         ) : (
           stage.candidates.map((candidate) => (
-            <CandidateCard key={candidate.id} candidate={candidate} />
+            <DraggableCandidateCard key={candidate.id} candidate={candidate} />
           ))
         )}
       </div>
@@ -181,6 +212,10 @@ export default function PipelinePage() {
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   const fetchPipeline = useCallback(async () => {
     try {
@@ -203,6 +238,57 @@ export default function PipelinePage() {
     }
     if (session?.user?.id) fetchPipeline();
   }, [session?.user?.id, status, router, fetchPipeline]);
+
+  // ─── Drag end handler ───
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const candidateId = String(active.id);
+    const destStage = String(over.id);
+    const sourceStage = (active.data.current as { stage?: string })?.stage;
+
+    // No-op if dropped on the same stage
+    if (!sourceStage || sourceStage === destStage) return;
+
+    // "sourced" candidates are list entries — cannot be moved via PATCH
+    if (sourceStage === "sourced") return;
+    // Cannot move to "sourced" stage
+    if (destStage === "sourced") return;
+
+    // Optimistic UI: move candidate between stages locally
+    setStages((prev) => {
+      const next = prev.map((s) => ({ ...s, candidates: [...s.candidates] }));
+      const srcCol = next.find((s) => s.id === sourceStage);
+      const dstCol = next.find((s) => s.id === destStage);
+      if (!srcCol || !dstCol) return prev;
+
+      const idx = srcCol.candidates.findIndex((c) => c.id === candidateId);
+      if (idx === -1) return prev;
+
+      const [moved] = srcCol.candidates.splice(idx, 1);
+      moved.stage = destStage;
+      moved.daysInStage = 0;
+      dstCol.candidates.unshift(moved);
+      return next;
+    });
+
+    // PATCH the backend
+    try {
+      const res = await fetch(`/api/pipeline/candidates/${candidateId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stage: destStage }),
+      });
+      if (!res.ok) {
+        // Revert on failure — refetch
+        fetchPipeline();
+      }
+    } catch {
+      // Revert on network error — refetch
+      fetchPipeline();
+    }
+  }
 
   const totalCandidates = stages.reduce(
     (sum, s) => sum + s.candidates.length,
@@ -236,11 +322,17 @@ export default function PipelinePage() {
             <p className="text-sm text-red-400">{error}</p>
           </div>
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {stages.map((stage) => (
-              <PipelineColumn key={stage.id} stage={stage} />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-4 overflow-x-auto pb-4">
+              {stages.map((stage) => (
+                <PipelineColumn key={stage.id} stage={stage} />
+              ))}
+            </div>
+          </DndContext>
         )}
       </div>
     </div>

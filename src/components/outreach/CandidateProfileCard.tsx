@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, MapPin, Building2, Mail, Star, Shield, AlertTriangle, Users, Zap } from "lucide-react";
+import { ExternalLink, MapPin, Building2, Mail, Star, Shield, AlertTriangle, Users, Zap, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getLanguageColor } from "@/lib/utils";
 import type { CandidateData } from "@/lib/outreach/candidateNormalizer";
@@ -57,9 +57,28 @@ function ctx(candidate: CandidateData): Ctx {
   return (candidate.context as Ctx) || {};
 }
 
+// ─── Outreach History Types ───
+
+export interface OutreachHistoryItem {
+  id: string;
+  channel: string;
+  tone: string;
+  status: string;
+  responseReceived: boolean;
+  responseSentiment: string | null;
+  messageCount: number;
+  createdAt: string;
+}
+
 // ─── Component ───
 
-export function CandidateProfileCard({ candidate }: { candidate: CandidateData }) {
+export function CandidateProfileCard({
+  candidate,
+  outreachHistory,
+}: {
+  candidate: CandidateData;
+  outreachHistory?: OutreachHistoryItem[];
+}) {
   const c = ctx(candidate);
   const hasLinks = candidate.linkedinUrl || candidate.githubUrl || candidate.email;
   const hasRepos = c.topRepos && c.topRepos.length > 0;
@@ -373,6 +392,69 @@ export function CandidateProfileCard({ candidate }: { candidate: CandidateData }
           {c.signalContext && (
             <p className="text-[11px] text-text-muted">{String(c.signalContext)}</p>
           )}
+        </div>
+      )}
+
+      {/* ── Previous Outreach ── */}
+      {outreachHistory && outreachHistory.length > 0 && (
+        <div className="rounded-xl border border-border bg-surface p-4">
+          {/* Warning banner */}
+          <div className="rounded-lg bg-warning-bg border border-warning/20 px-3 py-2 mb-3 text-[11px] text-warning flex items-center gap-1.5">
+            <AlertTriangle className="h-3 w-3 shrink-0" />
+            You&apos;ve reached out to this person before.
+          </div>
+
+          <h3 className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-3 flex items-center gap-1.5">
+            <Send className="h-3 w-3" />
+            Previous Outreach
+          </h3>
+
+          <div className="space-y-1.5">
+            {outreachHistory.map((item) => {
+              const date = new Date(item.createdAt);
+              const formatted = date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
+              const channelLabel =
+                item.channel === "linkedin"
+                  ? "LinkedIn"
+                  : item.channel === "multi_channel"
+                    ? "Multi-channel"
+                    : item.channel.charAt(0).toUpperCase() + item.channel.slice(1);
+
+              let outcome: string;
+              if (item.responseReceived && item.responseSentiment === "positive") {
+                outcome = "Positive response";
+              } else if (item.responseReceived && item.responseSentiment === "negative") {
+                outcome = "Negative response";
+              } else if (item.responseReceived) {
+                outcome = "Responded";
+              } else if (item.status === "completed") {
+                outcome = "No response";
+              } else if (item.status === "sending") {
+                outcome = "Sent";
+              } else {
+                outcome = "Draft";
+              }
+
+              const isPositive = item.responseReceived && item.responseSentiment === "positive";
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="text-text-secondary">
+                    {channelLabel} &mdash; Sent {formatted} &mdash; {outcome}
+                    {isPositive && (
+                      <span className="ml-1 text-success">&#10003;</span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

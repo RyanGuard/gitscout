@@ -7,7 +7,7 @@ import {
   Send, Mail, MessageSquare, Smartphone, Layers, Copy, Download,
   Bookmark, Loader2, ArrowUp, ArrowDown, Plus, X,
   Building2, MapPin, ChevronDown, ChevronLeft, ChevronRight,
-  Minus, FileText, AlertCircle, CheckCircle2, Users,
+  Minus, FileText, AlertCircle, CheckCircle2, Users, FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CandidateBrowser } from "@/components/outreach/CandidateBrowser";
@@ -24,11 +24,12 @@ import {
   IntelligenceSection,
   SuggestionsSection,
   LinkedInQueueButton,
+  LinkedInPreview,
   AshbyLogSection,
 } from "@/components/outreach/settings";
 import type { RoleContext } from "@/components/outreach/settings";
 import { fromMapCandidate, type CandidateData } from "@/lib/outreach/candidateNormalizer";
-import { CandidateProfileCard } from "@/components/outreach/CandidateProfileCard";
+import { CandidateProfileCard, type OutreachHistoryItem } from "@/components/outreach/CandidateProfileCard";
 import { CompactCandidateHeader } from "@/components/outreach/CompactCandidateHeader";
 import { SequenceStatusCard } from "@/components/outreach/SequenceStatusCard";
 import { trackEvent } from "@/lib/posthog";
@@ -191,6 +192,9 @@ function OutreachStudio() {
   const [generating, setGenerating] = useState(false);
   const [improving, setImproving] = useState(false);
   const [rewriting, setRewriting] = useState(false);
+  const [generatingVariant, setGeneratingVariant] = useState(false);
+  const [variants, setVariants] = useState<Record<number, string>>({});
+  const [showVariant, setShowVariant] = useState<Record<number, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
@@ -201,6 +205,9 @@ function OutreachStudio() {
   const [savedSequences, setSavedSequences] = useState<{ id: string; candidateName: string; status: string; updatedAt: string }[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [firstVisit, setFirstVisit] = useState(true);
+
+  // Outreach history for the selected candidate
+  const [outreachHistory, setOutreachHistory] = useState<OutreachHistoryItem[]>([]);
 
   // Response tracking
   const [showResponseModal, setShowResponseModal] = useState(false);
@@ -315,6 +322,17 @@ function OutreachStudio() {
     setStrategy("");
     setSuggestions(null);
     setFirstVisit(false);
+    setOutreachHistory([]);
+
+    // Fetch outreach history for this candidate
+    if (data.linkedinUrl || data.email) {
+      fetch(
+        `/api/outreach/history?linkedin=${encodeURIComponent(data.linkedinUrl || "")}&email=${encodeURIComponent(data.email || "")}`,
+      )
+        .then((r) => r.json())
+        .then((result) => setOutreachHistory(result.sequences || []))
+        .catch(() => {});
+    }
   }
 
   // ─── Batch navigation ───
@@ -1002,7 +1020,7 @@ function OutreachStudio() {
                 </div>
               ) : candidate.name ? (
                 <div className="w-full h-full overflow-y-auto text-left">
-                  <CandidateProfileCard candidate={candidate} />
+                  <CandidateProfileCard candidate={candidate} outreachHistory={outreachHistory} />
                 </div>
               ) : (
                 <>
@@ -1075,6 +1093,13 @@ function OutreachStudio() {
                   </div>
                 )}
               </div>
+
+              {/* LinkedIn preview */}
+              {channel === "linkedin" && messages.length > 0 && activeMsg?.channel === "linkedin" && (
+                <div className="mt-3">
+                  <LinkedInPreview message={activeMsg.body} candidateName={candidate.name} />
+                </div>
+              )}
             </>
           )}
         </div>
