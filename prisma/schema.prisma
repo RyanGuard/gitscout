@@ -106,6 +106,7 @@ model User {
   outreachStudioTemplates OutreachStudioTemplate[]
   sellingPointKits        SellingPointKit[]
   savedSearches           SavedSearch[]
+  intakeSessions          IntakeSession[]
 }
 
 model Account {
@@ -284,6 +285,7 @@ model MarketMap {
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   companies       MapCompany[]
   shares          MapShare[]
+  intake          IntakeSession?
 
   @@index([userId])
 }
@@ -425,6 +427,40 @@ model MapShare {
 
   @@index([mapId])
   @@index([shareToken])
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INTAKE SESSIONS
+// ═══════════════════════════════════════════════════════════
+
+model IntakeSession {
+  id               String    @id @default(cuid())
+  userId           String
+  mapId            String?   @unique
+
+  mode             String    @default("guided")
+  rawNotes         String?
+
+  roleBasics       Json?
+  candidateProfile Json?
+  technicalReqs    Json?
+  compensation     Json?
+  logistics        Json?
+  interviewProcess Json?
+  sellingPoints    Json?
+  sourcingStrategy Json?
+  redFlags         Json?
+
+  roleBrief        String?
+  realityCheck     Json?
+
+  status           String    @default("draft")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  map              MarketMap? @relation(fields: [mapId], references: [id])
+
+  @@index([userId])
 }
 
 // --- Phase 3: Outreach ---

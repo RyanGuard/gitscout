@@ -7,7 +7,7 @@ import {
   ChevronDown, X, Users, Building2, TrendingUp, MapPin,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
   CheckSquare, Square, ExternalLink, Link2, Shield, Filter,
-  GripVertical, Search, Save, Copy, Clock, Mail, Pencil,
+  GripVertical, Search, Save, Copy, Clock, Mail, Pencil, FileText, ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -1214,6 +1214,17 @@ function MarketMapInner() {
                 <p className={`text-[10px] mt-0.5 ${sourcingMode === mode.id ? "text-white/70" : "text-neutral-400"}`}>{mode.desc}</p>
               </button>
             ))}
+          </div>
+
+          <div className="flex items-center justify-end mb-3">
+            <Link
+              href="/intake/new"
+              className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-gold transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Start from an intake call
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
 
           {/* Role mode form */}

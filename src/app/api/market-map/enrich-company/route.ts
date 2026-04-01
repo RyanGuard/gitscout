@@ -82,6 +82,16 @@ export async function POST(request: Request) {
     return Response.json({ error: "map_id, company_id, company_domain required" }, { status: 400 });
   }
 
+  // Look up intake data for enriched classification
+  let intakeData: Record<string, unknown> | null = null;
+  try {
+    const mapWithIntake = await prisma.marketMap.findUnique({
+      where: { id: map_id },
+      include: { intake: true },
+    });
+    intakeData = mapWithIntake?.intake as unknown as Record<string, unknown> | null;
+  } catch { /* intake lookup is optional */ }
+
   const apiKey = process.env.APOLLO_API_KEY;
   if (!apiKey) {
     return Response.json({ error: "APOLLO_API_KEY not configured" }, { status: 500 });
@@ -327,6 +337,20 @@ export async function POST(request: Request) {
               level: role_level,
               stack: role_stack,
               geography,
+              ...(intakeData?.candidateProfile ? {
+                must_haves: (intakeData.candidateProfile as Record<string, unknown>).mustHaves,
+                nice_to_haves: (intakeData.candidateProfile as Record<string, unknown>).niceToHaves,
+                years_experience: (intakeData.candidateProfile as Record<string, unknown>).yearsExperience,
+                personality: (intakeData.candidateProfile as Record<string, unknown>).personality,
+              } : {}),
+              ...(intakeData?.redFlags ? {
+                disqualifiers: (intakeData.redFlags as Record<string, unknown>).disqualifiers,
+              } : {}),
+              ...(intakeData?.roleBasics ? {
+                description: (intakeData.roleBasics as Record<string, unknown>).responsibilities,
+                team_size: (intakeData.roleBasics as Record<string, unknown>).teamSize,
+                is_backfill: (intakeData.roleBasics as Record<string, unknown>).isBackfill,
+              } : {}),
             },
             candidates: candidates.map((c) => ({
               id: c.id,
