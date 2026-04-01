@@ -1537,11 +1537,11 @@ function MarketMapInner() {
               ) : (
                 <>
                   <p className="font-medium">Something went wrong</p>
-                  <p className="mt-1 text-red-400/80">We had trouble loading this map. Please try again or create a new one.</p>
+                  <p className="mt-1 text-red-400/80">{error}</p>
                 </>
               )}
             </div>
-            {(error === "MAP_NOT_FOUND" || error === "SERVER_ERROR") && (
+            {error && error !== "Please sign in to generate market maps" && (
               <button
                 onClick={() => { setError(null); setMapData(null); router.push("/map"); }}
                 className="shrink-0 rounded-lg bg-gold/90 px-3 py-1.5 text-xs font-semibold text-black hover:bg-gold transition-colors"
