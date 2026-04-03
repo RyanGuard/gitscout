@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Sparkles, Loader2, GitFork } from "lucide-react";
 
@@ -23,41 +24,33 @@ interface DiscoverResult {
   repos: Array<{ name: string; fullName: string; stars: number; description: string }>;
 }
 
+function discoverCoreQuery(raw: string): string {
+  return raw
+    .replace(/\b(in|at|from|near)\s+[A-Z][a-z]+(\s+[A-Z][a-z]+)*/g, "")
+    .replace(/\b(senior|junior|mid|staff|principal|lead|developer|engineer|engineers|developers)\b/gi, "")
+    .trim();
+}
+
 export function RecommendedProfiles({ query }: { query: string }) {
-  const [data, setData] = useState<DiscoverResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const lastFetchedQueryRef = useRef("");
+  const coreQuery = useMemo(() => discoverCoreQuery(query), [query]);
+  const canDiscover = coreQuery.length >= 2;
 
-  useEffect(() => {
-    if (!query || query === lastFetchedQueryRef.current) return;
-
-    const coreQuery = query
-      .replace(/\b(in|at|from|near)\s+[A-Z][a-z]+(\s+[A-Z][a-z]+)*/g, "")
-      .replace(/\b(senior|junior|mid|staff|principal|lead|developer|engineer|engineers|developers)\b/gi, "")
-      .trim();
-
-    if (!coreQuery || coreQuery.length < 2) return;
-
-    lastFetchedQueryRef.current = query;
-
-    queueMicrotask(() => {
-      setLoading(true);
-      fetch(`/api/search/discover?q=${encodeURIComponent(coreQuery)}&limit=8`)
-        .then((res) => (res.ok ? res.json() : null))
-        .then((result) => {
-          if (result) setData(result);
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    });
-  }, [query]);
+  const { data, isPending: loading } = useQuery({
+    queryKey: ["search-discover", coreQuery],
+    queryFn: async (): Promise<DiscoverResult | null> => {
+      const res = await fetch(`/api/search/discover?q=${encodeURIComponent(coreQuery)}&limit=8`);
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: canDiscover,
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (!query) return null;
 
   return (
     <div className="w-72 shrink-0">
       <div className="sticky top-4 space-y-4">
-        {/* Discovered via repos */}
         <div className="rounded-xl border border-neutral-200/50 bg-surface p-4 shadow-sm dark:border-neutral-800/80">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-4 w-4 text-gold" />
@@ -66,25 +59,31 @@ export function RecommendedProfiles({ query }: { query: string }) {
             </h3>
           </div>
 
-          {loading && (
+          {!canDiscover && (
+            <p className="text-xs text-neutral-400 py-3">
+              Add a bit more to your search to discover related profiles from repos.
+            </p>
+          )}
+
+          {canDiscover && loading && (
             <div className="flex items-center justify-center py-6">
               <Loader2 className="h-4 w-4 animate-spin text-gold" />
             </div>
           )}
 
-          {!loading && !data && (
+          {canDiscover && !loading && !data && (
             <p className="text-xs text-neutral-400 py-3">
               Searching repos for contributors...
             </p>
           )}
 
-          {!loading && data && data.developers.length === 0 && (
+          {canDiscover && !loading && data && data.developers.length === 0 && (
             <p className="text-xs text-neutral-400 py-3">
               No additional profiles found via repo discovery.
             </p>
           )}
 
-          {!loading && data && data.developers.length > 0 && (
+          {canDiscover && !loading && data && data.developers.length > 0 && (
             <div className="space-y-2.5">
               {data.developers.map((dev) => (
                 <Link
@@ -114,9 +113,11 @@ export function RecommendedProfiles({ query }: { query: string }) {
                       </p>
                     )}
                   </div>
-                  <span className={`shrink-0 text-[10px] font-bold tabular-nums ${
-                    dev.score >= 75 ? "text-gold" : dev.score >= 60 ? "text-blue-500" : "text-neutral-400"
-                  }`}>
+                  <span
+                    className={`shrink-0 text-[10px] font-bold tabular-nums ${
+                      dev.score >= 75 ? "text-gold" : dev.score >= 60 ? "text-blue-500" : "text-neutral-400"
+                    }`}
+                  >
                     {Math.round(dev.score)}
                   </span>
                 </Link>
@@ -124,8 +125,7 @@ export function RecommendedProfiles({ query }: { query: string }) {
             </div>
           )}
 
-          {/* Source repos */}
-          {!loading && data && data.repos && data.repos.length > 0 && (
+          {canDiscover && !loading && data && data.repos && data.repos.length > 0 && (
             <div className="mt-3 pt-3 border-t border-neutral-200/50 dark:border-neutral-700/50">
               <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-400 mb-1.5">
                 Source repos
@@ -140,7 +140,9 @@ export function RecommendedProfiles({ query }: { query: string }) {
                     className="flex items-center justify-between text-[10px] text-neutral-500 hover:text-gold transition-colors"
                   >
                     <span className="truncate">{repo.name}</span>
-                    <span className="shrink-0 ml-1">⭐ {repo.stars > 1000 ? `${(repo.stars / 1000).toFixed(1)}k` : repo.stars}</span>
+                    <span className="shrink-0 ml-1">
+                      ⭐ {repo.stars > 1000 ? `${(repo.stars / 1000).toFixed(1)}k` : repo.stars}
+                    </span>
                   </a>
                 ))}
               </div>

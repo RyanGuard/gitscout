@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Send, Mail, MessageSquare, Smartphone, Layers, Copy, Download,
   Bookmark, Loader2, ArrowUp, ArrowDown, Plus, X,
@@ -189,13 +190,10 @@ function OutreachStudio() {
   const [variants, setVariants] = useState<Record<number, string>>({});
   const [showVariant, setShowVariant] = useState<Record<number, boolean>>({});
   const [error, setError] = useState<string | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
   const [templateDesc, setTemplateDesc] = useState("");
-  const [savedSequences, setSavedSequences] = useState<{ id: string; candidateName: string; status: string; updatedAt: string }[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   // Outreach history for the selected candidate
   const [outreachHistory, setOutreachHistory] = useState<OutreachHistoryItem[]>([]);
@@ -228,6 +226,39 @@ function OutreachStudio() {
   const [batchMapId, setBatchMapId] = useState<string | null>(null);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const queryClient = useQueryClient();
+  const userId = session?.user?.id;
+
+  const { data: bootstrap } = useQuery({
+    queryKey: ["outreach-studio", userId],
+    enabled: authStatus === "authenticated" && Boolean(userId),
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const [analyticsRes, templatesRes, seqRes] = await Promise.all([
+        fetch("/api/outreach/analytics").then((r) => r.json()).catch(() => null),
+        fetch("/api/outreach/templates").then((r) => r.json()).catch(() => ({ templates: [] })),
+        fetch("/api/outreach/sequences").then((r) => r.json()).catch(() => ({ sequences: [] })),
+      ]);
+      return {
+        analytics: analyticsRes as AnalyticsData | null,
+        templates: (templatesRes.templates || []) as TemplateItem[],
+        sequences: (seqRes.sequences || []) as {
+          id: string;
+          candidateName: string;
+          status: string;
+          updatedAt: string;
+        }[],
+      };
+    },
+  });
+
+  const analytics = bootstrap?.analytics ?? null;
+  const templates = bootstrap?.templates ?? [];
+  const savedSequences = bootstrap?.sequences ?? [];
+
+  function refreshOutreachStudio() {
+    void queryClient.invalidateQueries({ queryKey: ["outreach-studio"] });
+  }
 
   // ─── Auth check ───
   useEffect(() => {
@@ -280,26 +311,6 @@ function OutreachStudio() {
       }
     }
   }, [searchParams]);
-
-  // ─── Load analytics + templates + sequences ───
-  const loadData = useCallback(async () => {
-    if (!session?.user?.id) return;
-
-    const [analyticsRes, templatesRes, seqRes] = await Promise.all([
-      fetch("/api/outreach/analytics").then((r) => r.json()).catch(() => null),
-      fetch("/api/outreach/templates").then((r) => r.json()).catch(() => ({ templates: [] })),
-      fetch("/api/outreach/sequences").then((r) => r.json()).catch(() => ({ sequences: [] })),
-    ]);
-
-    if (analyticsRes) setAnalytics(analyticsRes);
-    setTemplates(templatesRes.templates || []);
-    const seqs = seqRes.sequences || [];
-    setSavedSequences(seqs);
-  }, [session?.user?.id]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   // ─── Select candidate from browser ───
   function handleSelectCandidate(data: CandidateData) {
@@ -389,7 +400,7 @@ function OutreachStudio() {
       setActiveStep(0);
       setSequenceStatus("draft");
       trackEvent("outreach_generated", { channel, tone, sequenceLength: seqLength });
-      loadData();
+      refreshOutreachStudio();
     } catch (err) {
       console.error("Generate error:", err);
       setError("Network error — check your connection and try again");
@@ -673,7 +684,7 @@ function OutreachStudio() {
       setShowSaveTemplate(false);
       setTemplateName("");
       setTemplateDesc("");
-      loadData();
+      refreshOutreachStudio();
     } catch (err) {
       console.error("Save template error:", err);
     }
@@ -779,7 +790,7 @@ function OutreachStudio() {
     });
     setSequenceStatus("completed");
     setShowResponseModal(false);
-    loadData();
+    refreshOutreachStudio();
   }
 
   async function markNoResponse() {
@@ -793,7 +804,7 @@ function OutreachStudio() {
       }),
     });
     setSequenceStatus("completed");
-    loadData();
+    refreshOutreachStudio();
   }
 
   // ─── Active message ───

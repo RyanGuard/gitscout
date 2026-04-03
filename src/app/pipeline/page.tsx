@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Loader2,
   Users,
@@ -71,6 +72,30 @@ interface PipelineStage {
   id: string;
   label: string;
   candidates: PipelineCandidate[];
+}
+
+const PIPELINE_CANDIDATES_KEY = ["pipeline", "candidates"] as const;
+
+function moveCandidateBetweenStages(
+  stages: PipelineStage[],
+  candidateId: string,
+  sourceStage: string,
+  destStage: string,
+): PipelineStage[] {
+  const next = stages.map((s) => ({ ...s, candidates: [...s.candidates] }));
+  const srcCol = next.find((s) => s.id === sourceStage);
+  const dstCol = next.find((s) => s.id === destStage);
+  if (!srcCol || !dstCol) return stages;
+  const idx = srcCol.candidates.findIndex((c) => c.id === candidateId);
+  if (idx === -1) return stages;
+  const [moved] = srcCol.candidates.splice(idx, 1);
+  const updated: PipelineCandidate = {
+    ...moved,
+    stage: destStage,
+    daysInStage: 0,
+  };
+  dstCol.candidates.unshift(updated);
+  return next;
 }
 
 // ─── Stage config ───
@@ -210,35 +235,37 @@ function PipelineColumn({ stage }: { stage: PipelineStage }) {
 export default function PipelinePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [stages, setStages] = useState<PipelineStage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const canFetchPipeline = status === "authenticated" && Boolean(session?.user?.id);
+
+  const {
+    data: stages = [],
+    isPending: queryPending,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: PIPELINE_CANDIDATES_KEY,
+    enabled: canFetchPipeline,
+    retry: 1,
+    queryFn: async () => {
+      const res = await fetch("/api/pipeline/candidates");
+      if (!res.ok) throw new Error("Failed to load pipeline");
+      const data = await res.json();
+      return (data.stages || []) as PipelineStage[];
+    },
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
-  const fetchPipeline = useCallback(async () => {
-    try {
-      const res = await fetch("/api/pipeline/candidates");
-      if (!res.ok) throw new Error("Failed to load pipeline");
-      const data = await res.json();
-      setStages(data.stages || []);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load pipeline");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/api/auth/signin?callbackUrl=/pipeline");
-      return;
     }
-    if (session?.user?.id) fetchPipeline();
-  }, [session?.user?.id, status, router, fetchPipeline]);
+  }, [status, router]);
 
   // ─── Drag end handler ───
   async function handleDragEnd(event: DragEndEvent) {
@@ -257,24 +284,10 @@ export default function PipelinePage() {
     // Cannot move to "sourced" stage
     if (destStage === "sourced") return;
 
-    // Optimistic UI: move candidate between stages locally
-    setStages((prev) => {
-      const next = prev.map((s) => ({ ...s, candidates: [...s.candidates] }));
-      const srcCol = next.find((s) => s.id === sourceStage);
-      const dstCol = next.find((s) => s.id === destStage);
-      if (!srcCol || !dstCol) return prev;
+    queryClient.setQueryData<PipelineStage[]>(PIPELINE_CANDIDATES_KEY, (prev = []) =>
+      moveCandidateBetweenStages(prev, candidateId, sourceStage, destStage),
+    );
 
-      const idx = srcCol.candidates.findIndex((c) => c.id === candidateId);
-      if (idx === -1) return prev;
-
-      const [moved] = srcCol.candidates.splice(idx, 1);
-      moved.stage = destStage;
-      moved.daysInStage = 0;
-      dstCol.candidates.unshift(moved);
-      return next;
-    });
-
-    // PATCH the backend
     try {
       const res = await fetch(`/api/pipeline/candidates/${candidateId}`, {
         method: "PATCH",
@@ -282,14 +295,14 @@ export default function PipelinePage() {
         body: JSON.stringify({ stage: destStage }),
       });
       if (!res.ok) {
-        // Revert on failure — refetch
-        fetchPipeline();
+        await queryClient.invalidateQueries({ queryKey: PIPELINE_CANDIDATES_KEY });
       }
     } catch {
-      // Revert on network error — refetch
-      fetchPipeline();
+      await queryClient.invalidateQueries({ queryKey: PIPELINE_CANDIDATES_KEY });
     }
   }
+
+  const loading = status === "loading" || (canFetchPipeline && queryPending);
 
   const totalCandidates = stages.reduce(
     (sum, s) => sum + s.candidates.length,
@@ -352,9 +365,18 @@ export default function PipelinePage() {
           <div className="flex items-center justify-center py-24">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        ) : error ? (
-          <div className="flex items-center justify-center py-24">
-            <p className="text-sm text-red-400">{error}</p>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-24">
+            <p className="text-sm text-red-400">
+              {error instanceof Error ? error.message : "Failed to load pipeline"}
+            </p>
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-surface"
+            >
+              Retry
+            </button>
           </div>
         ) : (
           <DndContext

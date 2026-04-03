@@ -3,11 +3,11 @@
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Mail, MessageSquare, ArrowLeft, Loader2,
-  Play, Pause, Clock, Copy,
+  Play, Pause, Clock, Copy, AlertCircle,
 } from "lucide-react";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -91,14 +91,27 @@ export default function SequenceDetailPage() {
   const queryClient = useQueryClient();
 
   const isAuthReady = authStatus === "authenticated" && Boolean(session?.user?.id);
-  const { data, isPending } = useQuery({
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["sequence-detail", id],
     enabled: isAuthReady && Boolean(id),
+    retry: 1,
     queryFn: async () => {
-      const [seqRes, enrollRes] = await Promise.all([
-        fetch(`/api/sequences/${id}`),
-        fetch(`/api/sequences/${id}/enrollments`),
-      ]);
+      let seqRes: Response;
+      let enrollRes: Response;
+      try {
+        [seqRes, enrollRes] = await Promise.all([
+          fetch(`/api/sequences/${id}`),
+          fetch(`/api/sequences/${id}/enrollments`),
+        ]);
+      } catch {
+        throw new Error("Network error — check your connection and try again.");
+      }
       let sequence: SequenceDetail | null = null;
       let enrollments: Enrollment[] = [];
       if (seqRes.ok) sequence = await seqRes.json();
@@ -114,7 +127,22 @@ export default function SequenceDetailPage() {
   const enrollments = data?.enrollments ?? [];
 
   const [tab, setTab] = useState<"overview" | "enrollments" | "messages">("overview");
-  const [acting, setActing] = useState(false);
+
+  const toggleMutation = useMutation({
+    mutationFn: async (action: "pause" | "activate") => {
+      const endpoint =
+        action === "pause"
+          ? `/api/sequences/${id}/pause`
+          : `/api/sequences/${id}/activate`;
+      const res = await fetch(endpoint, { method: "POST" });
+      if (!res.ok) {
+        throw new Error("Could not update sequence status. Try again.");
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["sequence-detail", id] });
+    },
+  });
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
@@ -122,16 +150,9 @@ export default function SequenceDetailPage() {
     }
   }, [authStatus, router]);
 
-  async function toggleStatus() {
+  function toggleStatus() {
     if (!sequence) return;
-    setActing(true);
-    const endpoint =
-      sequence.status === "active"
-        ? `/api/sequences/${id}/pause`
-        : `/api/sequences/${id}/activate`;
-    await fetch(endpoint, { method: "POST" });
-    await queryClient.invalidateQueries({ queryKey: ["sequence-detail", id] });
-    setActing(false);
+    toggleMutation.mutate(sequence.status === "active" ? "pause" : "activate");
   }
 
   const loading =
@@ -141,6 +162,24 @@ export default function SequenceDetailPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 text-center">
+        <AlertCircle className="mx-auto h-10 w-10 text-red-400 mb-3" />
+        <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">
+          {error instanceof Error ? error.message : "Something went wrong loading this sequence."}
+        </p>
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          className="rounded-lg bg-gold px-4 py-2 text-sm font-medium text-white hover:bg-gold-hover"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -183,24 +222,34 @@ export default function SequenceDetailPage() {
             <p className="mt-1 text-sm text-neutral-500">{sequence.roleTitle}</p>
           )}
         </div>
-        <button
-          onClick={toggleStatus}
-          disabled={acting}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-            sequence.status === "active"
-              ? "border border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
-              : "bg-gold text-white hover:bg-gold-hover"
-          }`}
-        >
-          {acting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : sequence.status === "active" ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
+        <div className="flex flex-col items-end gap-1">
+          <button
+            type="button"
+            onClick={toggleStatus}
+            disabled={toggleMutation.isPending}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              sequence.status === "active"
+                ? "border border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
+                : "bg-gold text-white hover:bg-gold-hover"
+            } disabled:opacity-60`}
+          >
+            {toggleMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : sequence.status === "active" ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+            {sequence.status === "active" ? "Pause" : "Activate"}
+          </button>
+          {toggleMutation.isError && (
+            <p className="text-xs text-red-500 max-w-[220px] text-right">
+              {toggleMutation.error instanceof Error
+                ? toggleMutation.error.message
+                : "Update failed"}
+            </p>
           )}
-          {sequence.status === "active" ? "Pause" : "Activate"}
-        </button>
+        </div>
       </div>
 
       {/* Stats */}
