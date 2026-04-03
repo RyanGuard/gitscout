@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Activity, Search, List, X, AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
+
+type BriefingIconKind = "search" | "activity" | "list" | "stale" | "clock";
 
 interface BriefingItem {
   id: string;
@@ -14,125 +17,148 @@ interface BriefingItem {
   type: "activity" | "stale" | "tip";
 }
 
+interface BriefingItemData {
+  id: string;
+  iconKind: BriefingIconKind;
+  message: string;
+  cta: { label: string; href: string };
+  type: BriefingItem["type"];
+}
+
+function iconFor(kind: BriefingIconKind): React.ReactNode {
+  switch (kind) {
+    case "search":
+      return <Search className="h-4 w-4 text-gold" />;
+    case "activity":
+      return <Activity className="h-4 w-4 text-emerald-400" />;
+    case "list":
+      return <List className="h-4 w-4 text-purple-400" />;
+    case "stale":
+      return <AlertTriangle className="h-4 w-4 text-yellow-400" />;
+    case "clock":
+      return <Clock className="h-4 w-4 text-orange-400" />;
+    default:
+      return null;
+  }
+}
+
+async function fetchBriefingItems(): Promise<BriefingItemData[]> {
+  const briefingItems: BriefingItemData[] = [];
+
+  try {
+    const favRes = await fetch("/api/favorites");
+    const favData = await favRes.json();
+    const favCount = favData.favorites?.length || 0;
+
+    if (favCount === 0) {
+      briefingItems.push({
+        id: "no-favorites",
+        iconKind: "search",
+        message: "Start building your pipeline — save developers from search results.",
+        cta: { label: "Search now", href: "/search" },
+        type: "tip",
+      });
+    } else {
+      briefingItems.push({
+        id: "favorites-count",
+        iconKind: "activity",
+        message: `You have ${favCount} saved developer${favCount !== 1 ? "s" : ""}. Check for new activity.`,
+        cta: { label: "View saved", href: "/favorites" },
+        type: "activity",
+      });
+    }
+  } catch {
+    // Ignore
+  }
+
+  try {
+    const listsRes = await fetch("/api/lists");
+    const listsData = await listsRes.json();
+    const lists = listsData.lists || [];
+
+    if (lists.length === 0) {
+      briefingItems.push({
+        id: "no-lists",
+        iconKind: "list",
+        message: "Create your first candidate list to organize your pipeline.",
+        cta: { label: "Create list", href: "/lists" },
+        type: "tip",
+      });
+    } else {
+      const staleList = lists.find((l: { updatedAt: string }) => {
+        const days = (Date.now() - new Date(l.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
+        return days > 7;
+      });
+      if (staleList) {
+        briefingItems.push({
+          id: "stale-list",
+          iconKind: "stale",
+          message: `Your "${staleList.name}" list hasn't been updated in a while.`,
+          cta: { label: "Check it", href: `/lists/${staleList.id}` },
+          type: "stale",
+        });
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  const streakKey = "scout_active_dates";
+  const today = new Date().toISOString().split("T")[0];
+  const stored: string[] = JSON.parse(localStorage.getItem(streakKey) || "[]");
+  if (!stored.includes(today)) {
+    stored.push(today);
+    const recent = stored.filter((d: string) => {
+      const diff = (Date.now() - new Date(d).getTime()) / (1000 * 60 * 60 * 24);
+      return diff <= 30;
+    });
+    localStorage.setItem(streakKey, JSON.stringify(recent));
+  }
+
+  const sorted = [...stored].sort().reverse();
+  let streak = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    const expected = new Date();
+    expected.setDate(expected.getDate() - i);
+    if (sorted[i] === expected.toISOString().split("T")[0]) {
+      streak++;
+    } else break;
+  }
+
+  if (streak >= 3) {
+    briefingItems.push({
+      id: "streak",
+      iconKind: "clock",
+      message: `${streak}-day scouting streak 🔥 Keep hunting.`,
+      cta: { label: "Search", href: "/search" },
+      type: "activity",
+    });
+  }
+
+  return briefingItems;
+}
+
 export function DailyBriefing() {
   const { data: session } = useSession();
-  const [items, setItems] = useState<BriefingItem[]>([]);
+  const userId = session?.user?.id;
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!session?.user?.id) {
-      queueMicrotask(() => setLoading(false));
-      return;
-    }
+  const { data: rawItems = [], isPending } = useQuery({
+    queryKey: ["daily-briefing", userId],
+    queryFn: fetchBriefingItems,
+    enabled: Boolean(userId),
+    staleTime: 2 * 60 * 1000,
+  });
 
-    async function loadBriefing() {
-      const briefingItems: BriefingItem[] = [];
+  const items: BriefingItem[] = rawItems.map((row) => ({
+    id: row.id,
+    message: row.message,
+    cta: row.cta,
+    type: row.type,
+    icon: iconFor(row.iconKind),
+  }));
 
-      // Check saved developers count
-      try {
-        const favRes = await fetch("/api/favorites");
-        const favData = await favRes.json();
-        const favCount = favData.favorites?.length || 0;
-
-        if (favCount === 0) {
-          briefingItems.push({
-            id: "no-favorites",
-            icon: <Search className="h-4 w-4 text-gold" />,
-            message: "Start building your pipeline — save developers from search results.",
-            cta: { label: "Search now", href: "/search" },
-            type: "tip",
-          });
-        } else if (favCount > 0) {
-          briefingItems.push({
-            id: "favorites-count",
-            icon: <Activity className="h-4 w-4 text-emerald-400" />,
-            message: `You have ${favCount} saved developer${favCount !== 1 ? "s" : ""}. Check for new activity.`,
-            cta: { label: "View saved", href: "/favorites" },
-            type: "activity",
-          });
-        }
-      } catch {
-        // Ignore
-      }
-
-      // Check lists
-      try {
-        const listsRes = await fetch("/api/lists");
-        const listsData = await listsRes.json();
-        const lists = listsData.lists || [];
-
-        if (lists.length === 0) {
-          briefingItems.push({
-            id: "no-lists",
-            icon: <List className="h-4 w-4 text-purple-400" />,
-            message: "Create your first candidate list to organize your pipeline.",
-            cta: { label: "Create list", href: "/lists" },
-            type: "tip",
-          });
-        } else {
-          // Find stale lists (placeholder — check updatedAt)
-          const staleList = lists.find((l: { updatedAt: string }) => {
-            const days = (Date.now() - new Date(l.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
-            return days > 7;
-          });
-          if (staleList) {
-            briefingItems.push({
-              id: "stale-list",
-              icon: <AlertTriangle className="h-4 w-4 text-yellow-400" />,
-              message: `Your "${staleList.name}" list hasn't been updated in a while.`,
-              cta: { label: "Check it", href: `/lists/${staleList.id}` },
-              type: "stale",
-            });
-          }
-        }
-      } catch {
-        // Ignore
-      }
-
-      // Check streak
-      const streakKey = "scout_active_dates";
-      const today = new Date().toISOString().split("T")[0];
-      const stored = JSON.parse(localStorage.getItem(streakKey) || "[]") as string[];
-      if (!stored.includes(today)) {
-        stored.push(today);
-        // Keep last 30 days
-        const recent = stored.filter((d: string) => {
-          const diff = (Date.now() - new Date(d).getTime()) / (1000 * 60 * 60 * 24);
-          return diff <= 30;
-        });
-        localStorage.setItem(streakKey, JSON.stringify(recent));
-      }
-
-      // Count consecutive days
-      const sorted = stored.sort().reverse();
-      let streak = 0;
-      for (let i = 0; i < sorted.length; i++) {
-        const expected = new Date();
-        expected.setDate(expected.getDate() - i);
-        if (sorted[i] === expected.toISOString().split("T")[0]) {
-          streak++;
-        } else break;
-      }
-
-      if (streak >= 3) {
-        briefingItems.push({
-          id: "streak",
-          icon: <Clock className="h-4 w-4 text-orange-400" />,
-          message: `${streak}-day scouting streak 🔥 Keep hunting.`,
-          cta: { label: "Search", href: "/search" },
-          type: "activity",
-        });
-      }
-
-      setItems(briefingItems);
-      setLoading(false);
-    }
-
-    queueMicrotask(() => void loadBriefing());
-  }, [session?.user?.id]);
-
-  if (!session || loading) return null;
+  if (!session || !userId || isPending) return null;
 
   const visibleItems = items.filter((i) => !dismissed.has(i.id));
 

@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Mail, MessageSquare, ArrowLeft, Loader2,
@@ -87,33 +88,39 @@ export default function SequenceDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const queryClient = useQueryClient();
 
-  const [sequence, setSequence] = useState<SequenceDetail | null>(null);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const isAuthReady = authStatus === "authenticated" && Boolean(session?.user?.id);
+  const { data, isPending } = useQuery({
+    queryKey: ["sequence-detail", id],
+    enabled: isAuthReady && Boolean(id),
+    queryFn: async () => {
+      const [seqRes, enrollRes] = await Promise.all([
+        fetch(`/api/sequences/${id}`),
+        fetch(`/api/sequences/${id}/enrollments`),
+      ]);
+      let sequence: SequenceDetail | null = null;
+      let enrollments: Enrollment[] = [];
+      if (seqRes.ok) sequence = await seqRes.json();
+      if (enrollRes.ok) {
+        const enrollData = await enrollRes.json();
+        enrollments = enrollData.enrollments || [];
+      }
+      return { sequence, enrollments };
+    },
+  });
+
+  const sequence = data?.sequence ?? null;
+  const enrollments = data?.enrollments ?? [];
+
   const [tab, setTab] = useState<"overview" | "enrollments" | "messages">("overview");
   const [acting, setActing] = useState(false);
-
-  const load = useCallback(async () => {
-    const [seqRes, enrollRes] = await Promise.all([
-      fetch(`/api/sequences/${id}`),
-      fetch(`/api/sequences/${id}/enrollments`),
-    ]);
-    if (seqRes.ok) setSequence(await seqRes.json());
-    if (enrollRes.ok) {
-      const data = await enrollRes.json();
-      setEnrollments(data.enrollments || []);
-    }
-    setLoading(false);
-  }, [id]);
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
       router.push("/api/auth/signin?callbackUrl=/outreach");
-      return;
     }
-    if (session?.user?.id) queueMicrotask(() => void load());
-  }, [session, authStatus, router, load]);
+  }, [authStatus, router]);
 
   async function toggleStatus() {
     if (!sequence) return;
@@ -123,9 +130,12 @@ export default function SequenceDetailPage() {
         ? `/api/sequences/${id}/pause`
         : `/api/sequences/${id}/activate`;
     await fetch(endpoint, { method: "POST" });
-    await load();
+    await queryClient.invalidateQueries({ queryKey: ["sequence-detail", id] });
     setActing(false);
   }
+
+  const loading =
+    authStatus === "loading" || (isAuthReady && isPending);
 
   if (loading) {
     return (

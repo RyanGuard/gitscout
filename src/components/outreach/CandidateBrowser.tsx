@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { List, Map, Bell, User, ArrowLeft, Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CompactCandidateRow } from "./CompactCandidateRow";
@@ -86,6 +87,11 @@ interface SurfacedCandidate {
   email: string | null;
 }
 
+type MapCandidateRow = {
+  candidate: MapCompanyWithCandidates["candidates"][0];
+  companyName: string;
+};
+
 // ─── Tabs ───
 
 type Tab = "lists" | "maps" | "alerts" | "manual";
@@ -96,6 +102,109 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: st
   { id: "alerts", label: "Alerts", icon: Bell },
   { id: "manual", label: "Manual", icon: User },
 ];
+
+async function fetchListsSummary(): Promise<ListSummary[]> {
+  try {
+    const res = await fetch("/api/lists");
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.lists || []).map((l: { id: string; name: string; entryCount: number }) => ({
+      id: l.id,
+      name: l.name,
+      entryCount: l.entryCount,
+    }));
+  } catch (err) {
+    console.warn("[candidate-browser] fetchLists failed:", err);
+    return [];
+  }
+}
+
+async function fetchListEntries(listId: string): Promise<ListEntry[]> {
+  try {
+    const res = await fetch(`/api/lists/${listId}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.entries || [];
+  } catch (err) {
+    console.warn("[candidate-browser] fetchListEntries failed:", err);
+    return [];
+  }
+}
+
+async function fetchMapsSummary(): Promise<MapSummary[]> {
+  try {
+    const res = await fetch("/api/market-map/list");
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.maps || []).map(
+      (m: { id: string; name: string; roleTitle: string; candidateCount: number }) => ({
+        id: m.id,
+        name: m.name,
+        roleTitle: m.roleTitle,
+        candidateCount: m.candidateCount,
+      })
+    );
+  } catch (err) {
+    console.warn("[candidate-browser] fetchMaps failed:", err);
+    return [];
+  }
+}
+
+async function fetchMapCandidatesFlat(mapId: string): Promise<MapCandidateRow[]> {
+  try {
+    const res = await fetch(`/api/market-map/${mapId}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const allCandidates: MapCandidateRow[] = [];
+    const companies: MapCompanyWithCandidates[] = [
+      ...(data.tiers?.A || []),
+      ...(data.tiers?.B || []),
+      ...(data.tiers?.C || []),
+    ];
+    if (data.companies) {
+      for (const co of data.companies) {
+        for (const c of co.candidates || []) {
+          allCandidates.push({ candidate: c, companyName: co.companyName });
+        }
+      }
+    } else {
+      for (const co of companies) {
+        for (const c of co.candidates || []) {
+          allCandidates.push({ candidate: c, companyName: co.companyName });
+        }
+      }
+    }
+    allCandidates.sort((a, b) => (b.candidate.fitScore || 0) - (a.candidate.fitScore || 0));
+    return allCandidates;
+  } catch (err) {
+    console.warn("[candidate-browser] fetchMapCandidates failed:", err);
+    return [];
+  }
+}
+
+async function fetchSignalsList(): Promise<Signal[]> {
+  try {
+    const res = await fetch("/api/alerts/signals?limit=20");
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.signals || []).filter((s: Signal) => s.candidateCount > 0);
+  } catch (err) {
+    console.warn("[candidate-browser] fetchSignals failed:", err);
+    return [];
+  }
+}
+
+async function fetchSurfacedForSignal(signalId: string): Promise<SurfacedCandidate[]> {
+  try {
+    const res = await fetch(`/api/alerts/signals/${signalId}/candidates`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.candidates || [];
+  } catch (err) {
+    console.warn("[candidate-browser] fetchSurfacedCandidates failed:", err);
+    return [];
+  }
+}
 
 // ─── Component ───
 
@@ -115,157 +224,61 @@ export function CandidateBrowser({
   const [tab, setTab] = useState<Tab>("lists");
   const [filter, setFilter] = useState("");
 
-  // Lists state
-  const [lists, setLists] = useState<ListSummary[]>([]);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
-  const [listEntries, setListEntries] = useState<ListEntry[]>([]);
-  const [loadingLists, setLoadingLists] = useState(false);
-  const [loadingEntries, setLoadingEntries] = useState(false);
-
-  // Maps state
-  const [maps, setMaps] = useState<MapSummary[]>([]);
   const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
-  const [mapCandidates, setMapCandidates] = useState<{ candidate: MapCompanyWithCandidates["candidates"][0]; companyName: string }[]>([]);
-  const [loadingMaps, setLoadingMaps] = useState(false);
-  const [loadingMapCandidates, setLoadingMapCandidates] = useState(false);
-
-  // Alerts state
-  const [signals, setSignals] = useState<Signal[]>([]);
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
-  const [surfacedCandidates, setSurfacedCandidates] = useState<SurfacedCandidate[]>([]);
   const [selectedSignalCompany, setSelectedSignalCompany] = useState("");
-  const [loadingSignals, setLoadingSignals] = useState(false);
-  const [loadingCandidates, setLoadingCandidates] = useState(false);
 
-  // ─── Fetch lists on tab switch ───
-  const fetchLists = useCallback(async () => {
-    setLoadingLists(true);
-    try {
-      const res = await fetch("/api/lists");
-      if (res.ok) {
-        const data = await res.json();
-        setLists((data.lists || []).map((l: { id: string; name: string; entryCount: number }) => ({
-          id: l.id,
-          name: l.name,
-          entryCount: l.entryCount,
-        })));
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchLists failed:', err); }
-    setLoadingLists(false);
-  }, []);
+  const listsQuery = useQuery({
+    queryKey: ["candidate-browser", "lists"],
+    queryFn: fetchListsSummary,
+    enabled: tab === "lists",
+  });
 
-  const fetchListEntries = useCallback(async (listId: string) => {
-    setLoadingEntries(true);
-    try {
-      const res = await fetch(`/api/lists/${listId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setListEntries(data.entries || []);
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchListEntries failed:', err); }
-    setLoadingEntries(false);
-  }, []);
+  const listEntriesQuery = useQuery({
+    queryKey: ["candidate-browser", "list-entries", selectedListId],
+    queryFn: () => fetchListEntries(selectedListId!),
+    enabled: tab === "lists" && Boolean(selectedListId),
+  });
 
-  // ─── Fetch maps ───
-  const fetchMaps = useCallback(async () => {
-    setLoadingMaps(true);
-    try {
-      const res = await fetch("/api/market-map/list");
-      if (res.ok) {
-        const data = await res.json();
-        setMaps((data.maps || []).map((m: { id: string; name: string; roleTitle: string; candidateCount: number }) => ({
-          id: m.id,
-          name: m.name,
-          roleTitle: m.roleTitle,
-          candidateCount: m.candidateCount,
-        })));
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchMaps failed:', err); }
-    setLoadingMaps(false);
-  }, []);
+  const mapsQuery = useQuery({
+    queryKey: ["candidate-browser", "maps"],
+    queryFn: fetchMapsSummary,
+    enabled: tab === "maps",
+  });
 
-  const fetchMapCandidates = useCallback(async (mapId: string) => {
-    setLoadingMapCandidates(true);
-    try {
-      const res = await fetch(`/api/market-map/${mapId}`);
-      if (res.ok) {
-        const data = await res.json();
-        const allCandidates: { candidate: MapCompanyWithCandidates["candidates"][0]; companyName: string }[] = [];
-        const companies: MapCompanyWithCandidates[] = [
-          ...(data.tiers?.A || []),
-          ...(data.tiers?.B || []),
-          ...(data.tiers?.C || []),
-        ];
-        // Also check if companies are at top level
-        if (data.companies) {
-          for (const co of data.companies) {
-            for (const c of co.candidates || []) {
-              allCandidates.push({ candidate: c, companyName: co.companyName });
-            }
-          }
-        } else {
-          for (const co of companies) {
-            for (const c of co.candidates || []) {
-              allCandidates.push({ candidate: c, companyName: co.companyName });
-            }
-          }
-        }
-        // Sort by fitScore descending
-        allCandidates.sort((a, b) => (b.candidate.fitScore || 0) - (a.candidate.fitScore || 0));
-        setMapCandidates(allCandidates);
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchMapCandidates failed:', err); }
-    setLoadingMapCandidates(false);
-  }, []);
+  const mapCandidatesQuery = useQuery({
+    queryKey: ["candidate-browser", "map-candidates", selectedMapId],
+    queryFn: () => fetchMapCandidatesFlat(selectedMapId!),
+    enabled: tab === "maps" && Boolean(selectedMapId),
+  });
 
-  // ─── Fetch signals ───
-  const fetchSignals = useCallback(async () => {
-    setLoadingSignals(true);
-    try {
-      const res = await fetch("/api/alerts/signals?limit=20");
-      if (res.ok) {
-        const data = await res.json();
-        setSignals((data.signals || []).filter((s: Signal) => s.candidateCount > 0));
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchSignals failed:', err); }
-    setLoadingSignals(false);
-  }, []);
+  const signalsQuery = useQuery({
+    queryKey: ["candidate-browser", "signals"],
+    queryFn: fetchSignalsList,
+    enabled: tab === "alerts",
+  });
 
-  const fetchSurfacedCandidates = useCallback(async (signalId: string) => {
-    setLoadingCandidates(true);
-    try {
-      const res = await fetch(`/api/alerts/signals/${signalId}/candidates`);
-      if (res.ok) {
-        const data = await res.json();
-        setSurfacedCandidates(data.candidates || []);
-      }
-    } catch (err) { console.warn('[candidate-browser] fetchSurfacedCandidates failed:', err); }
-    setLoadingCandidates(false);
-  }, []);
+  const surfacedQuery = useQuery({
+    queryKey: ["candidate-browser", "surfaced", selectedSignalId],
+    queryFn: () => fetchSurfacedForSignal(selectedSignalId!),
+    enabled: tab === "alerts" && Boolean(selectedSignalId),
+  });
 
-  // ─── Tab switch loading ───
-  useEffect(() => {
-    queueMicrotask(() => {
-      if (tab === "lists" && lists.length === 0) void fetchLists();
-      if (tab === "maps" && maps.length === 0) void fetchMaps();
-      if (tab === "alerts" && signals.length === 0) void fetchSignals();
-    });
-  }, [tab, lists.length, maps.length, signals.length, fetchLists, fetchMaps, fetchSignals]);
+  const lists = listsQuery.data ?? [];
+  const listEntries = listEntriesQuery.data ?? [];
+  const maps = mapsQuery.data ?? [];
+  const mapCandidates = mapCandidatesQuery.data ?? [];
+  const signals = signalsQuery.data ?? [];
+  const surfacedCandidates = surfacedQuery.data ?? [];
 
-  // ─── Drill-down loading ───
-  useEffect(() => {
-    if (selectedListId) queueMicrotask(() => void fetchListEntries(selectedListId));
-  }, [selectedListId, fetchListEntries]);
+  const loadingLists = listsQuery.isPending;
+  const loadingEntries = listEntriesQuery.isPending;
+  const loadingMaps = mapsQuery.isPending;
+  const loadingMapCandidates = mapCandidatesQuery.isPending;
+  const loadingSignals = signalsQuery.isPending;
+  const loadingCandidates = surfacedQuery.isPending;
 
-  useEffect(() => {
-    if (selectedMapId) queueMicrotask(() => void fetchMapCandidates(selectedMapId));
-  }, [selectedMapId, fetchMapCandidates]);
-
-  useEffect(() => {
-    if (selectedSignalId) queueMicrotask(() => void fetchSurfacedCandidates(selectedSignalId));
-  }, [selectedSignalId, fetchSurfacedCandidates]);
-
-  // ─── Filter helpers ───
   function matchesFilter(text: string): boolean {
     if (!filter) return true;
     return text.toLowerCase().includes(filter.toLowerCase());
@@ -288,17 +301,18 @@ export function CandidateBrowser({
     return "text-neutral-500 bg-neutral-500/10";
   }
 
-  // ─── Render ───
   return (
     <div className="flex flex-col h-full">
-      {/* Tab strip */}
       <div className="flex border-b border-border px-2 pt-3 pb-0 gap-1">
         {TABS.map((t) => {
           const Icon = t.icon;
           return (
             <button
               key={t.id}
-              onClick={() => { setTab(t.id); setFilter(""); }}
+              onClick={() => {
+                setTab(t.id);
+                setFilter("");
+              }}
               className={cn(
                 "flex-1 flex flex-col items-center gap-0.5 pb-2 border-b-2 transition-colors",
                 tab === t.id
@@ -313,7 +327,6 @@ export function CandidateBrowser({
         })}
       </div>
 
-      {/* Search filter (non-manual tabs with candidates loaded) */}
       {tab !== "manual" && (
         <div className="px-3 py-2">
           <div className="relative">
@@ -328,29 +341,31 @@ export function CandidateBrowser({
         </div>
       )}
 
-      {/* Tab content */}
       <div className="flex-1 overflow-y-auto">
-        {/* ═══ LISTS TAB ═══ */}
         {tab === "lists" && !selectedListId && (
           <div className="px-3 py-1">
             {loadingLists ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : lists.length === 0 ? (
               <p className="text-xs text-text-muted py-4 text-center">No saved lists yet</p>
             ) : (
-              lists.filter((l) => matchesFilter(l.name)).map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => setSelectedListId(l.id)}
-                  className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
-                >
-                  <div>
-                    <p className="font-medium text-text">{l.name}</p>
-                    <p className="text-[10px] text-text-muted">{l.entryCount} candidates</p>
-                  </div>
-                  <span className="text-text-dim">&rsaquo;</span>
-                </button>
-              ))
+              lists
+                .filter((l) => matchesFilter(l.name))
+                .map((l) => (
+                  <button
+                    key={l.id}
+                    onClick={() => setSelectedListId(l.id)}
+                    className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
+                  >
+                    <div>
+                      <p className="font-medium text-text">{l.name}</p>
+                      <p className="text-[10px] text-text-muted">{l.entryCount} candidates</p>
+                    </div>
+                    <span className="text-text-dim">&rsaquo;</span>
+                  </button>
+                ))
             )}
           </div>
         )}
@@ -358,14 +373,16 @@ export function CandidateBrowser({
         {tab === "lists" && selectedListId && (
           <>
             <button
-              onClick={() => { setSelectedListId(null); setListEntries([]); }}
+              onClick={() => setSelectedListId(null)}
               className="flex items-center gap-1 px-3 py-2 text-[10px] font-medium text-text-muted hover:text-gold transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
               Back to lists
             </button>
             {loadingEntries ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : (
               listEntries
                 .filter((e) => matchesFilter(e.developer.name || e.developer.username))
@@ -376,11 +393,21 @@ export function CandidateBrowser({
                     <CompactCandidateRow
                       key={entry.id}
                       name={dev.name || dev.username}
-                      subtitle={[dev.company?.replace(/^@/, ""), dev.location].filter(Boolean).join(" · ") || `@${dev.username}`}
+                      subtitle={
+                        [dev.company?.replace(/^@/, ""), dev.location].filter(Boolean).join(" · ") ||
+                        `@${dev.username}`
+                      }
                       avatarUrl={dev.avatarUrl || `https://github.com/${dev.username}.png`}
                       initials={getInitials(dev.name || dev.username)}
-                      badge={dev.score > 0 ? { label: String(dev.score), color: scoreColor(dev.score) } : undefined}
-                      isActive={currentCandidate?.name === normalized.name && currentCandidate?.sourceDeveloperId === dev.id}
+                      badge={
+                        dev.score > 0
+                          ? { label: String(dev.score), color: scoreColor(dev.score) }
+                          : undefined
+                      }
+                      isActive={
+                        currentCandidate?.name === normalized.name &&
+                        currentCandidate?.sourceDeveloperId === dev.id
+                      }
                       onClick={() => onSelectCandidate(normalized)}
                     />
                   );
@@ -389,27 +416,32 @@ export function CandidateBrowser({
           </>
         )}
 
-        {/* ═══ MAPS TAB ═══ */}
         {tab === "maps" && !selectedMapId && (
           <div className="px-3 py-1">
             {loadingMaps ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : maps.length === 0 ? (
               <p className="text-xs text-text-muted py-4 text-center">No market maps yet</p>
             ) : (
-              maps.filter((m) => matchesFilter(m.name + m.roleTitle)).map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setSelectedMapId(m.id)}
-                  className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
-                >
-                  <div>
-                    <p className="font-medium text-text">{m.name}</p>
-                    <p className="text-[10px] text-text-muted">{m.roleTitle} · {m.candidateCount} candidates</p>
-                  </div>
-                  <span className="text-text-dim">&rsaquo;</span>
-                </button>
-              ))
+              maps
+                .filter((m) => matchesFilter(m.name + m.roleTitle))
+                .map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelectedMapId(m.id)}
+                    className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
+                  >
+                    <div>
+                      <p className="font-medium text-text">{m.name}</p>
+                      <p className="text-[10px] text-text-muted">
+                        {m.roleTitle} · {m.candidateCount} candidates
+                      </p>
+                    </div>
+                    <span className="text-text-dim">&rsaquo;</span>
+                  </button>
+                ))
             )}
           </div>
         )}
@@ -417,17 +449,21 @@ export function CandidateBrowser({
         {tab === "maps" && selectedMapId && (
           <>
             <button
-              onClick={() => { setSelectedMapId(null); setMapCandidates([]); }}
+              onClick={() => setSelectedMapId(null)}
               className="flex items-center gap-1 px-3 py-2 text-[10px] font-medium text-text-muted hover:text-gold transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
               Back to maps
             </button>
             {loadingMapCandidates ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : (
               mapCandidates
-                .filter((mc) => matchesFilter(mc.candidate.name + (mc.candidate.title || "") + mc.companyName))
+                .filter((mc) =>
+                  matchesFilter(mc.candidate.name + (mc.candidate.title || "") + mc.companyName)
+                )
                 .slice(0, 50)
                 .map((mc) => {
                   const c = mc.candidate;
@@ -438,8 +474,15 @@ export function CandidateBrowser({
                       name={c.name}
                       subtitle={[c.title, mc.companyName].filter(Boolean).join(" @ ")}
                       initials={getInitials(c.name)}
-                      badge={c.fitScore ? { label: String(c.fitScore), color: fitColor(c.fitScore) } : undefined}
-                      isActive={currentCandidate?.name === c.name && currentCandidate?.sourceMapId === selectedMapId}
+                      badge={
+                        c.fitScore
+                          ? { label: String(c.fitScore), color: fitColor(c.fitScore) }
+                          : undefined
+                      }
+                      isActive={
+                        currentCandidate?.name === c.name &&
+                        currentCandidate?.sourceMapId === selectedMapId
+                      }
                       onClick={() => onSelectCandidate(normalized)}
                     />
                   );
@@ -448,27 +491,35 @@ export function CandidateBrowser({
           </>
         )}
 
-        {/* ═══ ALERTS TAB ═══ */}
         {tab === "alerts" && !selectedSignalId && (
           <div className="px-3 py-1">
             {loadingSignals ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : signals.length === 0 ? (
               <p className="text-xs text-text-muted py-4 text-center">No signals with candidates</p>
             ) : (
-              signals.filter((s) => matchesFilter(s.companyName + s.eventType)).map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => { setSelectedSignalId(s.id); setSelectedSignalCompany(s.companyName); }}
-                  className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
-                >
-                  <div>
-                    <p className="font-medium text-text">{s.companyName}</p>
-                    <p className="text-[10px] text-text-muted capitalize">{s.eventType.replace(/_/g, " ")} · {s.candidateCount} candidates</p>
-                  </div>
-                  <span className="text-text-dim">&rsaquo;</span>
-                </button>
-              ))
+              signals
+                .filter((s) => matchesFilter(s.companyName + s.eventType))
+                .map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      setSelectedSignalId(s.id);
+                      setSelectedSignalCompany(s.companyName);
+                    }}
+                    className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-surface mb-1"
+                  >
+                    <div>
+                      <p className="font-medium text-text">{s.companyName}</p>
+                      <p className="text-[10px] text-text-muted capitalize">
+                        {s.eventType.replace(/_/g, " ")} · {s.candidateCount} candidates
+                      </p>
+                    </div>
+                    <span className="text-text-dim">&rsaquo;</span>
+                  </button>
+                ))
             )}
           </div>
         )}
@@ -476,14 +527,16 @@ export function CandidateBrowser({
         {tab === "alerts" && selectedSignalId && (
           <>
             <button
-              onClick={() => { setSelectedSignalId(null); setSurfacedCandidates([]); }}
+              onClick={() => setSelectedSignalId(null)}
               className="flex items-center gap-1 px-3 py-2 text-[10px] font-medium text-text-muted hover:text-gold transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
               Back to signals
             </button>
             {loadingCandidates ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-text-dim" /></div>
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-4 w-4 animate-spin text-text-dim" />
+              </div>
             ) : (
               surfacedCandidates
                 .filter((c) => matchesFilter(c.name + (c.title || "")))
@@ -494,9 +547,15 @@ export function CandidateBrowser({
                     <CompactCandidateRow
                       key={c.id}
                       name={c.name}
-                      subtitle={[c.title, location].filter(Boolean).join(" · ") || selectedSignalCompany}
+                      subtitle={
+                        [c.title, location].filter(Boolean).join(" · ") || selectedSignalCompany
+                      }
                       initials={getInitials(c.name)}
-                      badge={c.seniority ? { label: c.seniority, color: "text-text-secondary bg-surface-secondary" } : undefined}
+                      badge={
+                        c.seniority
+                          ? { label: c.seniority, color: "text-text-secondary bg-surface-secondary" }
+                          : undefined
+                      }
                       isActive={currentCandidate?.name === c.name}
                       onClick={() => onSelectCandidate(normalized)}
                     />
@@ -506,11 +565,12 @@ export function CandidateBrowser({
           </>
         )}
 
-        {/* ═══ MANUAL TAB ═══ */}
         {tab === "manual" && (
           <div className="px-3 py-2 space-y-3">
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Name *</label>
+              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                Name *
+              </label>
               <input
                 value={manualCandidate.name}
                 onChange={(e) => onManualChange({ ...manualCandidate, name: e.target.value })}
@@ -519,7 +579,9 @@ export function CandidateBrowser({
               />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Title</label>
+              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                Title
+              </label>
               <input
                 value={manualCandidate.title || ""}
                 onChange={(e) => onManualChange({ ...manualCandidate, title: e.target.value })}
@@ -528,7 +590,9 @@ export function CandidateBrowser({
               />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Company</label>
+              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                Company
+              </label>
               <input
                 value={manualCandidate.company || ""}
                 onChange={(e) => onManualChange({ ...manualCandidate, company: e.target.value })}
@@ -537,19 +601,30 @@ export function CandidateBrowser({
               />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">LinkedIn URL</label>
+              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                LinkedIn URL
+              </label>
               <input
                 value={manualCandidate.linkedinUrl || ""}
-                onChange={(e) => onManualChange({ ...manualCandidate, linkedinUrl: e.target.value })}
+                onChange={(e) =>
+                  onManualChange({ ...manualCandidate, linkedinUrl: e.target.value })
+                }
                 placeholder="linkedin.com/in/..."
                 className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
               />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">Notes</label>
+              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                Notes
+              </label>
               <textarea
                 value={(manualCandidate.context as Record<string, string>)?.notes || ""}
-                onChange={(e) => onManualChange({ ...manualCandidate, context: { ...manualCandidate.context, notes: e.target.value } })}
+                onChange={(e) =>
+                  onManualChange({
+                    ...manualCandidate,
+                    context: { ...manualCandidate.context, notes: e.target.value },
+                  })
+                }
                 placeholder="Anything relevant..."
                 rows={2}
                 className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
