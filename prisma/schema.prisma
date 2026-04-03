@@ -327,6 +327,7 @@ model MapCompany {
   departmentalHeadcount Json?
   lastStackScanAt    DateTime?
   createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
   map                MarketMap      @relation(fields: [mapId], references: [id], onDelete: Cascade)
   candidates         MapCandidate[]
 

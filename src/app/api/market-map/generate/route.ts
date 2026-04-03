@@ -156,6 +156,7 @@ Respond ONLY in JSON format:
           tier,
           tierReasoning: reasoning || null,
           enrichmentStatus: "pending" as const,
+          updatedAt: new Date(),
         };
       })
       .filter(Boolean) as Array<{
@@ -166,6 +167,7 @@ Respond ONLY in JSON format:
       tier: string;
       tierReasoning: string | null;
       enrichmentStatus: "pending";
+      updatedAt: Date;
     }>;
 
     if (insertRows.length === 0) {

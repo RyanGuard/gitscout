@@ -12,7 +12,35 @@ export async function GET(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const STALE_ENRICH_MS = 12 * 60 * 1000;
+
   try {
+    const owned = await prisma.marketMap.findFirst({
+      where: { id, userId },
+      select: { id: true },
+    });
+    if (!owned) {
+      return Response.json({ error: "Map not found" }, { status: 404 });
+    }
+
+    // Vercel can kill enrich-company past maxDuration without running catch — rows stay "enriching" forever.
+    try {
+      await prisma.mapCompany.updateMany({
+        where: {
+          mapId: id,
+          enrichmentStatus: "enriching",
+          updatedAt: { lt: new Date(Date.now() - STALE_ENRICH_MS) },
+        },
+        data: {
+          enrichmentStatus: "failed",
+          enrichmentSubstatus: null,
+          enrichmentError: "Enrichment timed out or was interrupted. Refresh the page to retry.",
+        },
+      });
+    } catch (unlockErr) {
+      console.warn("[market-map] Stale enrichment unlock skipped (schema not migrated yet?)", unlockErr);
+    }
+
     const map = await prisma.marketMap.findFirst({
       where: { id, userId },
       include: {

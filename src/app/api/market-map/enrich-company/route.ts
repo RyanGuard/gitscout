@@ -4,7 +4,9 @@ import { scoreTier, assignTier } from "@/lib/map/tierScoring";
 import { apolloFetch } from "@/lib/apollo-fetch";
 import { safeErrorMessage } from "@/lib/api-error";
 
-export const maxDuration = 60;
+// Apollo + org enrich + candidates + internal news (Claude) + classify often exceeds 60s.
+// Vercel Pro: up to 300s. Hobby is capped at 60 — upgrade or trim the pipeline.
+export const maxDuration = 300;
 
 const APOLLO_API = "https://api.apollo.io/api/v1";
 

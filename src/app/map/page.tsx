@@ -75,6 +75,7 @@ interface Company {
   newsSummary: string | null;
   flightRiskCompany: string | null;
   enrichmentStatus: string;
+  enrichmentError?: string | null;
   candidates: Candidate[];
   techStackVerified: string[];
   techStackSources: Record<string, string[]> | null;
@@ -333,7 +334,10 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
 
   const cfg = TIER_CONFIG[tier];
   const openCount = company.candidates.filter((c) => c.flightRisk === "high").length;
-  const isEnriching = company.enrichmentStatus === "pending" || company.enrichmentStatus === "enriching";
+  const status = company.enrichmentStatus;
+  const isQueued = status === "pending";
+  const isEnriching = status === "enriching";
+  const isFailed = status === "failed";
 
   const candidateIds = company.candidates.map((c) => c.id);
   const selectedCount = candidateIds.filter((id) => selectedIds.has(id)).length;
@@ -391,10 +395,16 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
           <p className="text-[11px] text-neutral-500 mt-0.5">{company.companyDomain}</p>
         </div>
         <div className="text-right shrink-0">
-          {isEnriching ? (
-            <div className="flex items-center gap-2 text-[11px] text-neutral-500">
-              <Loader2 className="h-3 w-3 animate-spin" /> Enriching...
+          {isFailed ? (
+            <div className="text-[11px] text-red-400 max-w-[140px] ml-auto" title={company.enrichmentError || ""}>
+              Failed{company.enrichmentError ? ` · ${company.enrichmentError.slice(0, 40)}${company.enrichmentError.length > 40 ? "…" : ""}` : ""}
             </div>
+          ) : isEnriching ? (
+            <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+              <Loader2 className="h-3 w-3 animate-spin" /> Enriching…
+            </div>
+          ) : isQueued ? (
+            <div className="text-[11px] text-neutral-500">Queued…</div>
           ) : (
             <>
               <p className="text-[11px] text-neutral-500">
@@ -1119,30 +1129,31 @@ function MarketMapInner() {
       router.push(`/map?id=${data.mapId}`);
       trackEvent("map_generated", { roleTitle, roleLevel, sourcingMode });
 
-      // Enrich companies in background — process 2 at a time to avoid timeouts
+      // One company at a time: each enrich-company call can run several minutes (Apollo + Claude chains).
       const companies = data.companies || [];
       (async () => {
-        for (let i = 0; i < companies.length; i += 2) {
-          const batch = companies.slice(i, i + 2);
-          await Promise.all(
-            batch.map((co: { id: string; domain: string; name: string }) =>
-              fetch("/api/market-map/enrich-company", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  map_id: data.mapId,
-                  company_id: co.id,
-                  company_domain: co.domain,
-                  company_name: co.name,
-                  role_title: roleTitle,
-                  role_level: roleLevel,
-                  role_stack: roleStack.split(",").map((s: string) => s.trim()),
-                  geography: geography ? [geography] : [],
-                }),
-              }).catch(() => {})
-            )
-          );
-          // One debounced reload — avoids many overlapping GETs + pool exhaustion with enrich POSTs
+        for (const co of companies as { id: string; domain: string; name: string }[]) {
+          try {
+            const enrichRes = await fetch("/api/market-map/enrich-company", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                map_id: data.mapId,
+                company_id: co.id,
+                company_domain: co.domain,
+                company_name: co.name,
+                role_title: roleTitle,
+                role_level: roleLevel,
+                role_stack: roleStack.split(",").map((s: string) => s.trim()),
+                geography: geography ? [geography] : [],
+              }),
+            });
+            if (!enrichRes.ok) {
+              console.warn("[map] enrich-company HTTP", co.id, enrichRes.status);
+            }
+          } catch (e) {
+            console.warn("[map] enrich-company failed", co.id, e);
+          }
           scheduleDebouncedMapReload(data.mapId);
         }
         if (mapReloadDebounceRef.current) clearTimeout(mapReloadDebounceRef.current);
