@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Link2 } from "lucide-react";
+import { Link2 } from "lucide-react";
 import Link from "next/link";
 
 export default function NetworkMapError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

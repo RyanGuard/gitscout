@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 
 export default function SearchError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

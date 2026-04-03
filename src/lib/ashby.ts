@@ -109,10 +109,37 @@ interface JobInfoResponse {
   results: AshbyJobDetails;
 }
 
+/** job.info payload varies by Ashby version — narrow fields we read. */
+interface AshbyCustomFieldRow {
+  title?: string;
+  value?: string | string[] | null;
+}
+
+interface AshbyJobInfoResult {
+  id?: string;
+  title?: string;
+  employmentType?: string | null;
+  department?: { name?: string } | null;
+  departmentName?: string | null;
+  location?: { name?: string } | null;
+  locationName?: string | null;
+  compensationTier?: {
+    min?: { value?: number; currencyCode?: string };
+    max?: { value?: number };
+  } | null;
+  compensation?: {
+    min?: number;
+    max?: number;
+    low?: number;
+    high?: number;
+  } | null;
+  customFields?: AshbyCustomFieldRow[];
+  hiringTeam?: unknown[];
+}
+
 export async function getJobDetails(apiKey: string, jobId: string) {
-  // Use loose typing to handle whatever Ashby returns
-  const data = await ashbyRequest<{ success: boolean; results: Record<string, unknown> }>("job.info", apiKey, { jobId });
-  const job = data.results as Record<string, any>;
+  const data = await ashbyRequest<{ success: boolean; results: AshbyJobInfoResult }>("job.info", apiKey, { jobId });
+  const job = data.results;
 
   console.log("[ashby] job.info raw keys:", Object.keys(job));
 
@@ -134,10 +161,11 @@ export async function getJobDetails(apiKey: string, jobId: string) {
   }
   // Try customFields for compensation
   if (!compensationMin && Array.isArray(job.customFields)) {
-    const compField = job.customFields.find((f: any) =>
-      f.title?.toLowerCase().includes("salary") ||
-      f.title?.toLowerCase().includes("compensation") ||
-      f.title?.toLowerCase().includes("pay")
+    const compField = job.customFields.find(
+      (f) =>
+        f.title?.toLowerCase().includes("salary") ||
+        f.title?.toLowerCase().includes("compensation") ||
+        f.title?.toLowerCase().includes("pay")
     );
     if (compField?.value) {
       const nums = String(compField.value).match(/\d[\d,]+/g);
@@ -149,14 +177,17 @@ export async function getJobDetails(apiKey: string, jobId: string) {
   }
 
   // Location — try multiple paths
-  const location = job.location?.name
-    || job.locationName
-    || (Array.isArray(job.customFields) ? job.customFields.find((f: any) => f.title?.toLowerCase().includes("location"))?.value : null)
-    || null;
+  const location =
+    job.location?.name ||
+    job.locationName ||
+    (Array.isArray(job.customFields)
+      ? job.customFields.find((f) => f.title?.toLowerCase().includes("location"))?.value
+      : null) ||
+    null;
 
   return {
-    id: job.id,
-    title: job.title,
+    id: job.id ?? "",
+    title: job.title ?? "",
     department: job.department?.name || job.departmentName || null,
     location,
     employmentType: job.employmentType || null,

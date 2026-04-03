@@ -75,10 +75,11 @@ export function StackOverflowWidget({ name }: StackOverflowWidgetProps) {
 
   useEffect(() => {
     if (!name) {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
       return;
     }
 
+    queueMicrotask(() => {
     fetch(`/api/enrich/stackoverflow?name=${encodeURIComponent(name)}`)
       .then((r) => {
         if (!r.ok) throw new Error();
@@ -87,6 +88,7 @@ export function StackOverflowWidget({ name }: StackOverflowWidgetProps) {
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
+    });
   }, [name]);
 
   if (loading) {

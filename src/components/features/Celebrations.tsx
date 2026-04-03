@@ -273,7 +273,7 @@ export function CelebrationProvider({ children }: { children: ReactNode }) {
 
     // Count backwards from most recent date
     const startDate = dates.includes(todayStr) ? todayStr : yesterdayStr;
-    let current = new Date(startDate);
+    const current = new Date(startDate);
 
     for (let i = 1; i < 30; i++) {
       current.setDate(current.getDate() - 1);

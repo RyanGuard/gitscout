@@ -108,7 +108,7 @@ export function OpenToMoveWidget({ developerId, companyDomain }: OpenToMoveWidge
 
   useEffect(() => {
     if (!developerId && !companyDomain) {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
       return;
     }
 
@@ -116,6 +116,7 @@ export function OpenToMoveWidget({ developerId, companyDomain }: OpenToMoveWidge
     if (developerId) params.set("developerId", developerId);
     if (companyDomain) params.set("domain", companyDomain);
 
+    queueMicrotask(() => {
     fetch(`/api/candidates/open-to-move?${params.toString()}`)
       .then((r) => {
         if (!r.ok) throw new Error();
@@ -124,6 +125,7 @@ export function OpenToMoveWidget({ developerId, companyDomain }: OpenToMoveWidge
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
+    });
   }, [developerId, companyDomain]);
 
   if (loading) return <SkeletonLoader />;

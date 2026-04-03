@@ -248,6 +248,230 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ═══ Market Map — futuristic HUD shell (scoped) ═══ */
+.map-hud {
+  position: relative;
+  isolation: isolate;
+}
+.map-hud-inner {
+  position: relative;
+  z-index: 1;
+}
+.map-hud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(200, 165, 90, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(200, 165, 90, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 80%);
+}
+.dark .map-hud::before {
+  background-image:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 47px, rgba(167, 139, 250, 0.06) 48px, transparent 49px),
+    linear-gradient(rgba(34, 211, 238, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px, 128px 128px, 32px 32px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 55%, transparent 88%);
+}
+.map-hud::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.035) 3px,
+    rgba(0, 0, 0, 0.035) 4px
+  );
+}
+.dark .map-hud::after {
+  opacity: 0.45;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(34, 211, 238, 0.04) 3px,
+    rgba(34, 211, 238, 0.04) 4px
+  );
+}
+.map-hud-card {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid rgba(200, 165, 90, 0.22);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 247, 245, 0.88) 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 16px 48px rgba(0, 0, 0, 0.07);
+  backdrop-filter: blur(12px);
+}
+.dark .map-hud-card {
+  border-color: rgba(34, 211, 238, 0.14);
+  background: linear-gradient(155deg, rgba(17, 17, 19, 0.82) 0%, rgba(8, 10, 18, 0.92) 100%);
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.07) inset,
+    0 0 80px rgba(34, 211, 238, 0.05),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+.map-hud-beam {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(34, 211, 238, 0.45),
+    rgba(200, 165, 90, 0.95),
+    rgba(167, 139, 250, 0.5),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: map-hud-beam 7s ease-in-out infinite;
+}
+@keyframes map-hud-beam {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+.map-hud-btn-primary {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 0 26px rgba(200, 165, 90, 0.22);
+}
+.dark .map-hud-btn-primary {
+  box-shadow:
+    0 0 32px rgba(200, 165, 90, 0.12),
+    0 0 48px rgba(34, 211, 238, 0.07);
+}
+.map-hud-btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.18) 50%, transparent 62%);
+  background-size: 220% 100%;
+  animation: map-hud-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.map-hud-btn-primary > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes map-hud-sweep {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+.map-hud-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(14, 116, 144, 0.8);
+}
+.dark .map-hud-label {
+  color: rgba(34, 211, 238, 0.55);
+}
+.map-hud-chip {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(200, 165, 90, 0.15);
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.25rem;
+}
+.dark .map-hud-chip {
+  border-color: rgba(34, 211, 238, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* ═══ Market Map — generating overlay (warm “mapping” moment) ═══ */
+.map-gen-overlay {
+  animation: map-gen-overlay-in 0.45s ease-out;
+}
+@keyframes map-gen-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.map-gen-radar-sweep {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(251, 191, 36, 0.18) 52deg,
+    transparent 53deg
+  );
+  animation: map-gen-radar-spin 5.5s linear infinite;
+}
+@keyframes map-gen-radar-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.map-gen-line {
+  animation: map-gen-line-pulse 2.4s ease-in-out infinite;
+}
+@keyframes map-gen-line-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+.map-gen-node {
+  animation: map-gen-node-glow 2.1s ease-in-out infinite;
+}
+@keyframes map-gen-node-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: brightness(0.95);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+}
+.map-gen-phase-title {
+  animation: map-gen-fade-up 0.48s ease-out;
+}
+.map-gen-phase-body {
+  animation: map-gen-fade-up 0.55s ease-out 0.07s both;
+}
+@keyframes map-gen-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .animate-shimmer,
@@ -258,5 +482,26 @@ body {
   [class*="animate-"] {
     animation: none !important;
     transition: none !important;
+  }
+  .map-hud-beam {
+    animation: none !important;
+    background-position: 50% 50% !important;
+  }
+  .map-hud-btn-primary::before {
+    animation: none !important;
+  }
+  .map-gen-radar-sweep {
+    animation: none !important;
+  }
+  .map-gen-line,
+  .map-gen-node {
+    animation: none !important;
+  }
+  .map-gen-phase-title,
+  .map-gen-phase-body {
+    animation: none !important;
+  }
+  .map-gen-overlay {
+    animation: none !important;
   }
 }

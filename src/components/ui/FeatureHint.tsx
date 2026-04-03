@@ -33,13 +33,12 @@ export function FeatureHint({ id, message, position = "bottom" }: FeatureHintPro
   const dotRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Check if dismissed or if onboarding is active
     const dismissed = getDismissedHints();
     const onboardingActive = localStorage.getItem("scout_onboarding_active") === "true";
     if (dismissed.has(id) || onboardingActive) return;
-    setVisible(true);
 
-    // Pulse once on mount, then static
+    queueMicrotask(() => setVisible(true));
+
     const timer = setTimeout(() => setPulsed(true), 1500);
     return () => clearTimeout(timer);
   }, [id]);

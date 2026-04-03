@@ -29,6 +29,28 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { GitHubUser, GitHubRepo } from "@/types";
+import type { ContactInfo as PrismaContactInfo } from "@/generated/prisma/client";
+
+type ProfileContactInfo = NonNullable<Parameters<typeof fromDeveloperProfile>[0]["contactInfo"]>;
+
+function contactInfoFromPrisma(ci: PrismaContactInfo | null | undefined): ProfileContactInfo | null {
+  if (!ci) return null;
+  return {
+    primaryEmail: ci.primaryEmail,
+    emails: ci.emails?.length ? [...ci.emails] : undefined,
+    phone: ci.phone,
+    linkedinUrl: ci.linkedinUrl,
+    twitterUrl: ci.twitterUrl,
+    currentTitle: ci.currentTitle,
+    headline: ci.headline,
+    normalizedCompany: ci.normalizedCompany,
+    seniorityLevel: ci.seniorityLevel,
+    employmentHistory: ci.employmentHistory,
+    photoUrl: ci.photoUrl,
+    enrichedAt: ci.enrichedAt?.toISOString() ?? null,
+    enrichmentSource: ci.enrichmentSource,
+  };
+}
 
 const GITHUB_API = "https://api.github.com";
 
@@ -104,21 +126,9 @@ async function getDeveloper(username: string) {
           topics: r.topics,
           pushedAt: r.pushedAt?.toISOString() ?? null,
         })),
-        contactInfo: (local as any).contactInfo ? {
-          primaryEmail: (local as any).contactInfo.primaryEmail,
-          emails: (local as any).contactInfo.emails,
-          phone: (local as any).contactInfo.phone,
-          linkedinUrl: (local as any).contactInfo.linkedinUrl,
-          twitterUrl: (local as any).contactInfo.twitterUrl,
-          currentTitle: (local as any).contactInfo.currentTitle,
-          headline: (local as any).contactInfo.headline,
-          normalizedCompany: (local as any).contactInfo.normalizedCompany,
-          seniorityLevel: (local as any).contactInfo.seniorityLevel,
-          employmentHistory: (local as any).contactInfo.employmentHistory,
-          photoUrl: (local as any).contactInfo.photoUrl,
-          enrichedAt: (local as any).contactInfo.enrichedAt?.toISOString() ?? null,
-          enrichmentSource: (local as any).contactInfo.enrichmentSource,
-        } : null,
+        contactInfo: contactInfoFromPrisma(
+          (local as { contactInfo?: PrismaContactInfo | null }).contactInfo
+        ),
       };
     }
   } catch (err) {
@@ -192,6 +202,7 @@ async function getDeveloper(username: string) {
       topics: r.topics,
       pushedAt: r.pushed_at,
     })),
+    contactInfo: null,
   };
 }
 
@@ -390,7 +401,7 @@ export default async function ProfilePage({
                     score: developer.score,
                     languages: developer.languages?.map((l: { language: string; percentage: number }) => ({ language: l.language, percentage: l.percentage })),
                     repositories: developer.repositories?.slice(0, 5).map((r: { name: string; stars: number; language: string | null }) => ({ name: r.name, stars: r.stars, language: r.language })),
-                    contactInfo: (developer as any).contactInfo ?? null,
+                    contactInfo: developer.contactInfo,
                   })}
                 />
               </div>

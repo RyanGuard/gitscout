@@ -67,10 +67,12 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Persist collapsed state
+  // Persist collapsed state (defer setState: avoid sync setState in effect)
   useEffect(() => {
-    const saved = localStorage.getItem("scout-sidebar-collapsed");
-    if (saved === "true") setCollapsed(true);
+    queueMicrotask(() => {
+      const saved = localStorage.getItem("scout-sidebar-collapsed");
+      if (saved === "true") setCollapsed(true);
+    });
   }, []);
 
   function toggleCollapsed() {

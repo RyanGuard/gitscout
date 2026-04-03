@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Sparkles, Loader2, ExternalLink, GitFork } from "lucide-react";
 
@@ -26,12 +26,11 @@ interface DiscoverResult {
 export function RecommendedProfiles({ query }: { query: string }) {
   const [data, setData] = useState<DiscoverResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [lastQuery, setLastQuery] = useState("");
+  const lastFetchedQueryRef = useRef("");
 
   useEffect(() => {
-    if (!query || query === lastQuery) return;
+    if (!query || query === lastFetchedQueryRef.current) return;
 
-    // Extract the core technology/skill from the query (strip location, filler)
     const coreQuery = query
       .replace(/\b(in|at|from|near)\s+[A-Z][a-z]+(\s+[A-Z][a-z]+)*/g, "")
       .replace(/\b(senior|junior|mid|staff|principal|lead|developer|engineer|engineers|developers)\b/gi, "")
@@ -39,17 +38,19 @@ export function RecommendedProfiles({ query }: { query: string }) {
 
     if (!coreQuery || coreQuery.length < 2) return;
 
-    setLoading(true);
-    setLastQuery(query);
+    lastFetchedQueryRef.current = query;
 
-    fetch(`/api/search/discover?q=${encodeURIComponent(coreQuery)}&limit=8`)
-      .then((res) => res.ok ? res.json() : null)
-      .then((result) => {
-        if (result) setData(result);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [query, lastQuery]);
+    queueMicrotask(() => {
+      setLoading(true);
+      fetch(`/api/search/discover?q=${encodeURIComponent(coreQuery)}&limit=8`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((result) => {
+          if (result) setData(result);
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    });
+  }, [query]);
 
   if (!query) return null;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,16 +14,16 @@ interface TagInputProps {
 
 export function TagInput({ tags, onAdd, onRemove, suggestions = [], disabled }: TagInputProps) {
   const [input, setInput] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  /** After blur, hide panel until user types again (suggestions are otherwise derived). */
+  const [suggestionsSuppressed, setSuggestionsSuppressed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = suggestions.filter(
     (s) => s.toLowerCase().includes(input.toLowerCase()) && !tags.includes(s)
   );
 
-  useEffect(() => {
-    setShowSuggestions(input.length > 0 && filtered.length > 0);
-  }, [input, filtered.length]);
+  const showSuggestions =
+    !suggestionsSuppressed && input.length > 0 && filtered.length > 0;
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && input.trim()) {
@@ -33,7 +33,7 @@ export function TagInput({ tags, onAdd, onRemove, suggestions = [], disabled }: 
         onAdd(tag);
       }
       setInput("");
-      setShowSuggestions(false);
+      setSuggestionsSuppressed(true);
     }
   }
 
@@ -62,9 +62,12 @@ export function TagInput({ tags, onAdd, onRemove, suggestions = [], disabled }: 
             ref={inputRef}
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setSuggestionsSuppressed(false);
+              setInput(e.target.value);
+            }}
             onKeyDown={handleKeyDown}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            onBlur={() => setTimeout(() => setSuggestionsSuppressed(true), 150)}
             placeholder="Add tag..."
             className="w-20 border-none bg-transparent text-xs text-neutral-700 outline-none placeholder:text-neutral-400 dark:text-neutral-300"
           />
@@ -80,7 +83,7 @@ export function TagInput({ tags, onAdd, onRemove, suggestions = [], disabled }: 
               onClick={() => {
                 onAdd(s);
                 setInput("");
-                setShowSuggestions(false);
+                setSuggestionsSuppressed(true);
                 inputRef.current?.focus();
               }}
               className={cn(

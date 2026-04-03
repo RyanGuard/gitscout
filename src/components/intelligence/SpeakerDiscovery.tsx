@@ -108,10 +108,11 @@ export function SpeakerDiscovery({ technology }: SpeakerDiscoveryProps) {
 
   useEffect(() => {
     if (!technology) {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
       return;
     }
 
+    queueMicrotask(() => {
     fetch(`/api/intelligence/speakers?technology=${encodeURIComponent(technology)}`)
       .then((r) => {
         if (!r.ok) throw new Error();
@@ -120,6 +121,7 @@ export function SpeakerDiscovery({ technology }: SpeakerDiscoveryProps) {
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
+    });
   }, [technology]);
 
   if (loading) {

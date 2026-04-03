@@ -245,22 +245,24 @@ export function CandidateBrowser({
 
   // ─── Tab switch loading ───
   useEffect(() => {
-    if (tab === "lists" && lists.length === 0) fetchLists();
-    if (tab === "maps" && maps.length === 0) fetchMaps();
-    if (tab === "alerts" && signals.length === 0) fetchSignals();
+    queueMicrotask(() => {
+      if (tab === "lists" && lists.length === 0) void fetchLists();
+      if (tab === "maps" && maps.length === 0) void fetchMaps();
+      if (tab === "alerts" && signals.length === 0) void fetchSignals();
+    });
   }, [tab, lists.length, maps.length, signals.length, fetchLists, fetchMaps, fetchSignals]);
 
   // ─── Drill-down loading ───
   useEffect(() => {
-    if (selectedListId) fetchListEntries(selectedListId);
+    if (selectedListId) queueMicrotask(() => void fetchListEntries(selectedListId));
   }, [selectedListId, fetchListEntries]);
 
   useEffect(() => {
-    if (selectedMapId) fetchMapCandidates(selectedMapId);
+    if (selectedMapId) queueMicrotask(() => void fetchMapCandidates(selectedMapId));
   }, [selectedMapId, fetchMapCandidates]);
 
   useEffect(() => {
-    if (selectedSignalId) fetchSurfacedCandidates(selectedSignalId);
+    if (selectedSignalId) queueMicrotask(() => void fetchSurfacedCandidates(selectedSignalId));
   }, [selectedSignalId, fetchSurfacedCandidates]);
 
   // ─── Filter helpers ───

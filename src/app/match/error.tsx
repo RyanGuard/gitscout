@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import Link from "next/link";
 
 export default function MatchError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

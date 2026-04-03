@@ -110,7 +110,7 @@ export function SequenceStatusCard({
   // Poll for LinkedIn action queue status
   useEffect(() => {
     if (!sequenceId) {
-      setLinkedInActions([]);
+      queueMicrotask(() => setLinkedInActions([]));
       return;
     }
     let cancelled = false;

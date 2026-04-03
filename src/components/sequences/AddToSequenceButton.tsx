@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Send, Check, Loader2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -102,9 +103,9 @@ export function AddToSequenceButton({ developerId, sourceType = "developer", cla
               {!loading && sequences.length === 0 && (
                 <p className="px-2 py-2 text-xs text-neutral-400">
                   No sequences yet.{" "}
-                  <a href="/outreach/new" className="text-gold hover:underline">
+                  <Link href="/outreach/new" className="text-gold hover:underline">
                     Create one
-                  </a>
+                  </Link>
                 </p>
               )}
               {!loading &&

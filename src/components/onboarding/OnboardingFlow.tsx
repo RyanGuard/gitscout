@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useIsClient } from "@/lib/use-is-client";
 import {
   Search,
   Send,
@@ -64,7 +65,7 @@ function SpotlightOverlay({
 
   useEffect(() => {
     if (!targetSelector) {
-      setCutout(null);
+      queueMicrotask(() => setCutout(null));
       return;
     }
 
@@ -76,8 +77,7 @@ function SpotlightOverlay({
       }
     }
 
-    // Try immediately and with delays for elements that render async
-    updateCutout();
+    queueMicrotask(() => updateCutout());
     const t1 = setTimeout(updateCutout, 300);
     const t2 = setTimeout(updateCutout, 800);
     const t3 = setTimeout(updateCutout, 1500);
@@ -213,14 +213,15 @@ export function OnboardingFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const [active, setActive] = useState(false);
   const [substep, setSubstep] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
 
   useEffect(() => {
-    setMounted(true);
-    if (!isOnboardingCompleted()) {
-      setActive(true);
-      setOnboardingActive(true);
-    }
+    queueMicrotask(() => {
+      if (!isOnboardingCompleted()) {
+        setActive(true);
+        setOnboardingActive(true);
+      }
+    });
   }, []);
 
   const skip = useCallback(() => {

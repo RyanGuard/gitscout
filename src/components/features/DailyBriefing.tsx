@@ -31,7 +31,7 @@ export function DailyBriefing() {
 
   useEffect(() => {
     if (!session?.user?.id) {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
       return;
     }
 
@@ -138,7 +138,7 @@ export function DailyBriefing() {
       setLoading(false);
     }
 
-    loadBriefing();
+    queueMicrotask(() => void loadBriefing());
   }, [session?.user?.id]);
 
   if (!session || loading) return null;

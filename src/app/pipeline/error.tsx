@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default function PipelineError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

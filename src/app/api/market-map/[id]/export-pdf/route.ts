@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { renderToBuffer } from "@react-pdf/renderer";
-import React from "react";
+import * as ReactPDF from "@react-pdf/renderer";
+import React, { type ReactElement } from "react";
 import { MapPdfDocument } from "@/lib/pdf/MapPdfDocument";
 
 export async function POST(
@@ -68,26 +69,24 @@ export async function POST(
       }
     }
 
-    // Render PDF
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const buffer = await renderToBuffer(
-      React.createElement(MapPdfDocument, {
-        variant: variant as "overview" | "full",
-        mapName: map.name,
-        roleTitle: map.roleTitle,
-        roleLevel: map.roleLevel,
-        roleStack: map.roleStack,
-        geography: map.geography,
-        recruiterName: session.user.name || "Scout User",
-        tiers,
-        stats: {
-          totalCompanies: map.companies.length,
-          totalCandidates,
-          avgFitScore,
-          statusCounts,
-        },
-      }) as any
-    );
+    const doc = React.createElement(MapPdfDocument, {
+      variant: variant as "overview" | "full",
+      mapName: map.name,
+      roleTitle: map.roleTitle,
+      roleLevel: map.roleLevel,
+      roleStack: map.roleStack,
+      geography: map.geography,
+      recruiterName: session.user.name || "Scout User",
+      tiers,
+      stats: {
+        totalCompanies: map.companies.length,
+        totalCandidates,
+        avgFitScore,
+        statusCounts,
+      },
+    }) as ReactElement<ReactPDF.DocumentProps>;
+
+    const buffer = await renderToBuffer(doc);
 
     const filename = `${map.name.replace(/[^a-zA-Z0-9]/g, "_")}_${variant}.pdf`;
 

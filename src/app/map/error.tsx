@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Map } from "lucide-react";
+import { Map } from "lucide-react";
 import Link from "next/link";
 
 export default function MarketMapError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

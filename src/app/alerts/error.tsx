@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 import Link from "next/link";
 
 export default function MarketResearchError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

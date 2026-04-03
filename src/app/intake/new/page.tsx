@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   FileText, Sparkles, ArrowRight, ArrowLeft, Target, AlertTriangle,
-  CheckCircle, Loader2, Map, X, Plus, Star, Shield, DollarSign,
-  MapPin, Briefcase, Building2, Code2,
+  CheckCircle, Loader2, Map, X, Star, Shield, DollarSign,
+  Briefcase, Code2,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════
@@ -147,7 +147,7 @@ function RealityCheckDisplay({ data }: { data: RealityCheckData }) {
 // ═══════════════════════════════════════════════════════════
 
 export default function IntakeNewPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { status: authStatus } = useSession();
   const router = useRouter();
 
   const [mode, setMode] = useState<"notes" | "guided">("notes");
@@ -245,8 +245,7 @@ export default function IntakeNewPage() {
 
   // ── Rendered sections (reusable between modes) ──
 
-  function RoleSection() {
-    return (
+  const renderRoleSection = () => (
       <SectionCard title="The Role" icon={Briefcase}>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -271,11 +270,9 @@ export default function IntakeNewPage() {
           <div><label className={label}>Responsibilities</label><textarea value={roleBasics.responsibilities} onChange={e => setRoleBasics(p => ({...p, responsibilities: e.target.value}))} rows={2} className={input} /></div>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function RequirementsSection() {
-    return (
+  const renderRequirementsSection = () => (
       <SectionCard title="Requirements" icon={Target}>
         <div className="space-y-3">
           <div><label className={label}>Must-haves</label><TagInput tags={candidateProfile.mustHaves} onAdd={t => setCandidateProfile(p => ({...p, mustHaves: addToArray(p.mustHaves, t)}))} onRemove={t => setCandidateProfile(p => ({...p, mustHaves: removeFromArray(p.mustHaves, t)}))} placeholder="Required skills — press Enter" /></div>
@@ -286,11 +283,9 @@ export default function IntakeNewPage() {
           <div><label className={label}>Personality / culture</label><textarea value={candidateProfile.personality} onChange={e => setCandidateProfile(p => ({...p, personality: e.target.value}))} rows={2} className={input} /></div>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function TechSection() {
-    return (
+  const renderTechSection = () => (
       <SectionCard title="Technical" icon={Code2}>
         <div className="space-y-3">
           <div><label className={label}>Languages</label><TagInput tags={technicalReqs.languages} onAdd={t => setTechnicalReqs(p => ({...p, languages: addToArray(p.languages, t)}))} onRemove={t => setTechnicalReqs(p => ({...p, languages: removeFromArray(p.languages, t)}))} /></div>
@@ -299,11 +294,9 @@ export default function IntakeNewPage() {
           <div><label className={label}>System design</label><textarea value={technicalReqs.systemDesign} onChange={e => setTechnicalReqs(p => ({...p, systemDesign: e.target.value}))} rows={2} className={input} /></div>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function PackageSection() {
-    return (
+  const renderPackageSection = () => (
       <SectionCard title="Package" icon={DollarSign}>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -329,11 +322,9 @@ export default function IntakeNewPage() {
           </label>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function SellingSection() {
-    return (
+  const renderSellingSection = () => (
       <SectionCard title="Selling Points" icon={Star}>
         <div className="space-y-3">
           <div><label className={label}>Why join?</label><TagInput tags={sellingPoints.points} onAdd={t => setSellingPoints(p => ({...p, points: addToArray(p.points, t)}))} onRemove={t => setSellingPoints(p => ({...p, points: removeFromArray(p.points, t)}))} placeholder="Add a selling point" /></div>
@@ -342,11 +333,9 @@ export default function IntakeNewPage() {
           <div><label className={label}>Tech appeal</label><textarea value={sellingPoints.techAppeal} onChange={e => setSellingPoints(p => ({...p, techAppeal: e.target.value}))} rows={2} className={input} /></div>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function StrategySection() {
-    return (
+  const renderStrategySection = () => (
       <SectionCard title="Strategy & Red Flags" icon={Shield}>
         <div className="space-y-3">
           <div><label className={label}>Target companies</label><TagInput tags={sourcingStrategy.targetCompanies} onAdd={t => setSourcingStrategy(p => ({...p, targetCompanies: addToArray(p.targetCompanies, t)}))} onRemove={t => setSourcingStrategy(p => ({...p, targetCompanies: removeFromArray(p.targetCompanies, t)}))} placeholder="Companies to source from" /></div>
@@ -356,11 +345,9 @@ export default function IntakeNewPage() {
           <div><label className={label}>Sourcing notes</label><textarea value={sourcingStrategy.notes} onChange={e => setSourcingStrategy(p => ({...p, notes: e.target.value}))} rows={2} className={input} /></div>
         </div>
       </SectionCard>
-    );
-  }
+  );
 
-  function ActionsBar() {
-    return (
+  const renderActionsBar = () => (
       <div className="mt-6 space-y-4">
         {/* Reality check */}
         <div className="rounded-xl border border-neutral-200/50 bg-surface p-5 shadow-sm dark:border-neutral-800/80">
@@ -381,8 +368,7 @@ export default function IntakeNewPage() {
           {generatingMap ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating market map...</> : <><Map className="h-4 w-4" /> Generate Market Map</>}
         </button>
       </div>
-    );
-  }
+  );
 
   // ── Page render ──
 
@@ -429,14 +415,14 @@ export default function IntakeNewPage() {
       {mode === "notes" && extracted && (
         <div>
           <div className="grid gap-4 lg:grid-cols-2">
-            <RoleSection />
-            <RequirementsSection />
-            <TechSection />
-            <PackageSection />
-            <SellingSection />
-            <StrategySection />
+            {renderRoleSection()}
+            {renderRequirementsSection()}
+            {renderTechSection()}
+            {renderPackageSection()}
+            {renderSellingSection()}
+            {renderStrategySection()}
           </div>
-          <ActionsBar />
+          {renderActionsBar()}
         </div>
       )}
 
@@ -459,8 +445,8 @@ export default function IntakeNewPage() {
 
           {guidedStep === 1 && (
             <div className="space-y-4">
-              <RoleSection />
-              <TechSection />
+              {renderRoleSection()}
+              {renderTechSection()}
               <div className="flex justify-end">
                 <button onClick={() => setGuidedStep(2)} className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover">
                   Next: Requirements <ArrowRight className="h-4 w-4" />
@@ -471,7 +457,7 @@ export default function IntakeNewPage() {
 
           {guidedStep === 2 && (
             <div className="space-y-4">
-              <RequirementsSection />
+              {renderRequirementsSection()}
               <div className="flex justify-between">
                 <button onClick={() => setGuidedStep(1)} className="flex items-center gap-2 text-sm text-neutral-500 hover:text-gold"><ArrowLeft className="h-4 w-4" /> Back</button>
                 <button onClick={() => setGuidedStep(3)} className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover">
@@ -483,7 +469,7 @@ export default function IntakeNewPage() {
 
           {guidedStep === 3 && (
             <div className="space-y-4">
-              <PackageSection />
+              {renderPackageSection()}
               <div className="flex justify-between">
                 <button onClick={() => setGuidedStep(2)} className="flex items-center gap-2 text-sm text-neutral-500 hover:text-gold"><ArrowLeft className="h-4 w-4" /> Back</button>
                 <button onClick={() => setGuidedStep(4)} className="flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-hover">
@@ -495,12 +481,12 @@ export default function IntakeNewPage() {
 
           {guidedStep === 4 && (
             <div className="space-y-4">
-              <SellingSection />
-              <StrategySection />
+              {renderSellingSection()}
+              {renderStrategySection()}
               <div className="flex justify-between items-start">
                 <button onClick={() => setGuidedStep(3)} className="flex items-center gap-2 text-sm text-neutral-500 hover:text-gold"><ArrowLeft className="h-4 w-4" /> Back</button>
               </div>
-              <ActionsBar />
+              {renderActionsBar()}
             </div>
           )}
         </div>

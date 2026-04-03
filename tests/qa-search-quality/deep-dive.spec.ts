@@ -260,10 +260,6 @@ function analyzeResults(
 }
 
 async function doSearch(
-  request: ReturnType<typeof test.info>["_test"] extends unknown ? never : never,
-  params: Record<string, string>,
-): Promise<{ data: SearchResponse; loadTimeMs: number; httpStatus: number }>;
-async function doSearch(
   request: { get: (url: string) => Promise<{ status: () => number; json: () => Promise<unknown>; ok: () => boolean; text: () => Promise<string> }> },
   params: Record<string, string>,
 ): Promise<{ data: SearchResponse; loadTimeMs: number; httpStatus: number }> {

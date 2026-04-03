@@ -609,7 +609,7 @@ function LoadingState({ domain }: { domain: string }) {
 //  MAIN PAGE
 // ═══════════════════════════════════════════════════════════
 export default function CompanyPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { status: authStatus } = useSession();
 
   // ── State ──
   const [domainInput, setDomainInput] = useState("");

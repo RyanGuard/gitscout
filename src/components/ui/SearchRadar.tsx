@@ -10,17 +10,22 @@ interface SearchRadarProps {
 export function SearchRadar({ isSearching, resultsFound }: SearchRadarProps) {
   const [dots, setDots] = useState<{ x: number; y: number; id: number }[]>([]);
 
+  // Random layout must not run during render (react-hooks/purity); defer with microtask.
   useEffect(() => {
-    if (!isSearching || resultsFound === 0) return;
-
-    // Add dots as results come in
+    if (!isSearching || resultsFound === 0) {
+      queueMicrotask(() => setDots([]));
+      return;
+    }
     const count = Math.min(resultsFound, 12);
-    const newDots = Array.from({ length: count }, (_, i) => ({
-      x: 15 + Math.random() * 70,
-      y: 15 + Math.random() * 70,
-      id: i,
-    }));
-    setDots(newDots);
+    queueMicrotask(() => {
+      setDots(
+        Array.from({ length: count }, (_, i) => ({
+          x: 15 + Math.random() * 70,
+          y: 15 + Math.random() * 70,
+          id: i,
+        }))
+      );
+    });
   }, [isSearching, resultsFound]);
 
   return (

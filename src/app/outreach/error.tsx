@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import Link from "next/link";
 
 export default function OutreachError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

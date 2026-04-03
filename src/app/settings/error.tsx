@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

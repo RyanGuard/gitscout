@@ -112,7 +112,7 @@ export default function SequenceDetailPage() {
       router.push("/api/auth/signin?callbackUrl=/outreach");
       return;
     }
-    if (session?.user?.id) load();
+    if (session?.user?.id) queueMicrotask(() => void load());
   }, [session, authStatus, router, load]);
 
   async function toggleStatus() {

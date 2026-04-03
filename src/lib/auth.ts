@@ -1,10 +1,19 @@
 // NextAuth configuration for Scout
-// GitHub OAuth App setup required:
-//   Homepage URL: https://gitscout-beta.vercel.app
-//   Callback URL: https://gitscout-beta.vercel.app/api/auth/callback/github
-//   For local dev: http://localhost:3000/api/auth/callback/github
 //
-// Required env vars: GITHUB_ID, GITHUB_SECRET, NEXTAUTH_SECRET, RESEND_API_KEY
+// GitHub OAuth App:
+//   Callback URL: {ORIGIN}/api/auth/callback/github
+//   Local: http://localhost:3000/api/auth/callback/github
+//
+// Google OAuth (Google Cloud Console → APIs & Services → Credentials → OAuth 2.0):
+//   Authorized JavaScript origins: http://localhost:3000 and your production origin
+//   Authorized redirect URIs: {ORIGIN}/api/auth/callback/google
+//   Env vars (either pair works):
+//     GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET  (Google / NextAuth default names)
+//     GOOGLE_ID + GOOGLE_SECRET                (legacy Scout names)
+//
+// Always set: NEXTAUTH_SECRET, NEXTAUTH_URL (e.g. http://localhost:3000 locally, https://your-domain on Vercel)
+//
+// Email magic links: RESEND_API_KEY, EMAIL_FROM (optional)
 
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
@@ -61,24 +70,40 @@ async function sendVerificationRequest({
   }
 }
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET;
+
+const providers: NextAuthOptions["providers"] = [
+  GitHubProvider({
+    clientId: process.env.GITHUB_ID || "",
+    clientSecret: process.env.GITHUB_SECRET || "",
+    authorization: {
+      params: {
+        prompt: "consent",
+      },
+    },
+  }),
+];
+
+if (googleClientId && googleClientSecret) {
+  providers.push(
+    GoogleProvider({
+      clientId: googleClientId,
+      clientSecret: googleClientSecret,
+    })
+  );
+} else if (process.env.NODE_ENV === "development") {
+  console.warn(
+    "[auth] Google sign-in disabled: set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET (or GOOGLE_ID and GOOGLE_SECRET)."
+  );
+}
+
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(prisma) as any,
-  providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID || "",
-      clientSecret: process.env.GITHUB_SECRET || "",
-      authorization: {
-        params: {
-          prompt: "consent",
-        },
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID || "",
-      clientSecret: process.env.GOOGLE_SECRET || "",
-    }),
-  ],
+  providers,
   callbacks: {
     session({ session, user }) {
       if (session.user) {
@@ -120,5 +145,10 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
     };
+  }
+
+  interface NextAuthOptions {
+    /** Supported at runtime (e.g. Vercel); not always in published types. */
+    trustHost?: boolean;
   }
 }

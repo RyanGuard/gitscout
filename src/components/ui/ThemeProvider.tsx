@@ -28,36 +28,38 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // On mount, read saved preference
   useEffect(() => {
-    const saved = localStorage.getItem("gitscout-theme") as Theme | null;
-    if (saved && ["dark", "light", "system"].includes(saved)) {
-      setThemeState(saved);
-    } else {
-      // Default to system preference (respects user's OS setting)
-      setThemeState("system");
-    }
+    queueMicrotask(() => {
+      const saved = localStorage.getItem("gitscout-theme") as Theme | null;
+      if (saved && ["dark", "light", "system"].includes(saved)) {
+        setThemeState(saved);
+      } else {
+        setThemeState("system");
+      }
+    });
   }, []);
 
   // Resolve and apply theme
   useEffect(() => {
-    let actual: "dark" | "light";
+    queueMicrotask(() => {
+      let actual: "dark" | "light";
 
-    if (theme === "system") {
-      actual = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    } else {
-      actual = theme;
-    }
+      if (theme === "system") {
+        actual = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      } else {
+        actual = theme;
+      }
 
-    setResolved(actual);
+      setResolved(actual);
 
-    // Apply to <html> element
-    const root = document.documentElement;
-    if (actual === "dark") {
-      root.classList.add("dark");
-      root.style.colorScheme = "dark";
-    } else {
-      root.classList.remove("dark");
-      root.style.colorScheme = "light";
-    }
+      const root = document.documentElement;
+      if (actual === "dark") {
+        root.classList.add("dark");
+        root.style.colorScheme = "dark";
+      } else {
+        root.classList.remove("dark");
+        root.style.colorScheme = "light";
+      }
+    });
   }, [theme]);
 
   // Listen for system changes when in "system" mode

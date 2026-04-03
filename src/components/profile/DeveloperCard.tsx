@@ -34,7 +34,7 @@ export function DeveloperCard({ developer, selected, onSelect }: DeveloperCardPr
   const [viewed, setViewed] = useState(false);
 
   useEffect(() => {
-    setViewed(isProfileViewed(developer.username));
+    queueMicrotask(() => setViewed(isProfileViewed(developer.username)));
   }, [developer.username]);
 
   function handleClick() {

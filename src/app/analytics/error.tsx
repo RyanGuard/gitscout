@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, BarChart3 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 export default function AnalyticsError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

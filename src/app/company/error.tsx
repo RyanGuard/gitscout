@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Building2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import Link from "next/link";
 
 export default function CompanySourcingError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

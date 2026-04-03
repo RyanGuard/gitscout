@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { computeOutreachAnalytics } from "@/lib/outreach/analytics";
 import { safeErrorMessage } from "@/lib/api-error";
 
@@ -12,6 +13,14 @@ interface LinkedinAction {
   scheduled_for: Date | null;
   executed_at: Date | null;
 }
+
+const marketSignalDashboardInclude = {
+  watchedCompany: { select: { companyName: true } },
+} satisfies Prisma.MarketSignalInclude;
+
+type MarketSignalForDashboard = Prisma.MarketSignalGetPayload<{
+  include: typeof marketSignalDashboardInclude;
+}>;
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -62,15 +71,17 @@ export async function GET() {
     }),
 
     // 5. Alerts (market signals)
-    prisma.marketSignal.findMany({
-      where: {
-        watchedCompany: { userId: session.user.id },
-        isDismissed: false,
-      },
-      include: { watchedCompany: { select: { companyName: true } } },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    }).catch(() => []),
+    prisma.marketSignal
+      .findMany({
+        where: {
+          watchedCompany: { userId: session.user.id },
+          isDismissed: false,
+        },
+        include: marketSignalDashboardInclude,
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      })
+      .catch((): MarketSignalForDashboard[] => []),
   ]);
 
   const now = new Date();
@@ -241,12 +252,12 @@ export async function GET() {
       },
     })),
 
-    alerts: (alerts as any[]).map(a => ({
+    alerts: alerts.map((a) => ({
       id: a.id,
       eventType: a.eventType,
       severity: a.severity,
       summary: a.summary,
-      companyName: a.watchedCompany?.companyName || a.companyName,
+      companyName: a.watchedCompany?.companyName ?? null,
       createdAt: a.createdAt.toISOString(),
       isRead: a.isRead,
     })),

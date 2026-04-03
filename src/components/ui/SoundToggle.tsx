@@ -8,7 +8,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    setEnabled(getSoundEngine().rawEnabled);
+    queueMicrotask(() => setEnabled(getSoundEngine().rawEnabled));
   }, []);
 
   const toggle = useCallback(() => {
@@ -38,7 +38,7 @@ export function SoundToggle() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    setEnabled(getSoundEngine().rawEnabled);
+    queueMicrotask(() => setEnabled(getSoundEngine().rawEnabled));
   }, []);
 
   const handleToggle = () => {

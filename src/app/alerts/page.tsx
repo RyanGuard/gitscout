@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Bell,
   TrendingDown,
@@ -1305,7 +1306,7 @@ export default function AlertsPage() {
               {!seqLoading && sequences.length === 0 && (
                 <div className="px-2 py-3 text-center">
                   <p className="text-xs text-neutral-400">No active sequences</p>
-                  <a href="/outreach/new" className="text-xs text-gold hover:underline mt-1 inline-block">Create one</a>
+                  <Link href="/outreach/new" className="mt-1 inline-block text-xs text-gold hover:underline">Create one</Link>
                 </div>
               )}
               {!seqLoading && sequences.map(seq => (

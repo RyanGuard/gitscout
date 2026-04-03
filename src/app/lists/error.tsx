@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, List } from "lucide-react";
+import { List } from "lucide-react";
 import Link from "next/link";
 
 export default function SavedListsError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
