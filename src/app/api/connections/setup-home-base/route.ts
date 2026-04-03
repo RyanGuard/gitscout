@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     const homeBaseId = homeBase.id;
 
     // Run enrichment in the background (don't await)
-    enrichHomeBase(homeBaseId, domain, session.user.id).catch((err) => {
+    enrichHomeBase(homeBaseId, domain).catch((err) => {
       console.error("[connections] Home base enrichment failed:", err);
     });
 
@@ -95,11 +95,7 @@ export async function POST(request: Request) {
   }
 }
 
-async function enrichHomeBase(
-  homeBaseId: string,
-  domain: string,
-  userId: string
-) {
+async function enrichHomeBase(homeBaseId: string, domain: string) {
   try {
     // Step 1: Enrich the organization
     const org = await enrichOrganization(domain);

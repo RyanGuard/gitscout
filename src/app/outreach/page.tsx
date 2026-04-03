@@ -100,14 +100,6 @@ const CHANNELS: { value: Channel; label: string; icon: React.ComponentType<{ cla
   { value: "multi_channel", label: "Multi", icon: Layers },
 ];
 
-const TONES: { value: Tone; label: string }[] = [
-  { value: "professional", label: "Professional" },
-  { value: "casual", label: "Casual" },
-  { value: "technical_peer", label: "Technical Peer" },
-  { value: "executive", label: "Executive" },
-  { value: "warm_intro", label: "Warm Intro" },
-];
-
 const CHANNEL_LIMITS: Record<string, { words?: number; chars?: number; label: string }> = {
   email: { words: 100, label: "100 words" },
   linkedin: { chars: 200, label: "200 chars" },
@@ -205,8 +197,6 @@ function OutreachStudio() {
   const [templateDesc, setTemplateDesc] = useState("");
   const [savedSequences, setSavedSequences] = useState<{ id: string; candidateName: string; status: string; updatedAt: string }[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [firstVisit, setFirstVisit] = useState(true);
-
   // Outreach history for the selected candidate
   const [outreachHistory, setOutreachHistory] = useState<OutreachHistoryItem[]>([]);
 
@@ -259,7 +249,6 @@ function OutreachStudio() {
         setBatchMapId(parsed.mapId);
         const first = parsed.candidates[0];
         setCandidate(fromMapCandidate(first, parsed.mapId, first.company ?? undefined));
-        setFirstVisit(false);
       }
     } catch { /* ignore malformed data */ }
     return () => {
@@ -284,7 +273,6 @@ function OutreachStudio() {
         sourceMapId: searchParams.get("mapId") || undefined,
         context: searchParams.get("ctx") ? JSON.parse(searchParams.get("ctx")!) : undefined,
       });
-      setFirstVisit(false);
 
       // Auto-set warm intro tone if from connections
       if (searchParams.get("source") === "connection") {
@@ -307,7 +295,6 @@ function OutreachStudio() {
     setTemplates(templatesRes.templates || []);
     const seqs = seqRes.sequences || [];
     setSavedSequences(seqs);
-    if (seqs.length > 0) setFirstVisit(false);
   }, [session?.user?.id]);
 
   useEffect(() => {
@@ -322,7 +309,6 @@ function OutreachStudio() {
     setSequenceId(null);
     setStrategy("");
     setSuggestions(null);
-    setFirstVisit(false);
     setOutreachHistory([]);
 
     // Fetch outreach history for this candidate
@@ -402,7 +388,6 @@ function OutreachStudio() {
       setMessages(data.messages || []);
       setActiveStep(0);
       setSequenceStatus("draft");
-      setFirstVisit(false);
       trackEvent("outreach_generated", { channel, tone, sequenceLength: seqLength });
       loadData();
     } catch (err) {
@@ -765,7 +750,6 @@ function OutreachStudio() {
       );
       setActiveStep(0);
       setShowHistory(false);
-      setFirstVisit(false);
     } catch (err) {
       console.error("Load sequence error:", err);
     }
@@ -1077,8 +1061,6 @@ function OutreachStudio() {
                   strategy={strategy}
                   roleContext={roleContext}
                   sequenceId={sequenceId}
-                  sequenceStatus={sequenceStatus}
-                  messages={messages}
                 />
               </div>
 
@@ -1190,7 +1172,7 @@ function OutreachStudio() {
               {/* LinkedIn preview */}
               {channel === "linkedin" && messages.length > 0 && activeMsg?.channel === "linkedin" && (
                 <div className="mt-3">
-                  <LinkedInPreview message={showVariant[activeStep] && variants[activeStep] ? variants[activeStep] : activeMsg.body} candidateName={candidate.name} />
+                  <LinkedInPreview message={showVariant[activeStep] && variants[activeStep] ? variants[activeStep] : activeMsg.body} />
                 </div>
               )}
             </>
@@ -1369,7 +1351,7 @@ function OutreachStudio() {
 
         {/* LinkedIn Queue Button */}
         {(channel === 'linkedin' || channel === 'multi_channel') && sequenceId && candidate.linkedinUrl && (
-          <LinkedInQueueButton sequenceId={sequenceId} candidateName={candidate.name} viewFirst={viewFirst} likePost={likePost} />
+          <LinkedInQueueButton sequenceId={sequenceId} viewFirst={viewFirst} likePost={likePost} />
         )}
 
         {/* Email Send Button */}

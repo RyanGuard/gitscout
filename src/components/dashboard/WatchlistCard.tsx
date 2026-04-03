@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, ArrowRight, User } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { FavoriteItem } from "./types";
 
@@ -85,6 +85,7 @@ export function WatchlistCard({ favorites }: { favorites: FavoriteItem[] }) {
               >
                 {/* Avatar */}
                 {dev.avatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- GitHub avatar URL */
                   <img
                     src={dev.avatarUrl}
                     alt={dev.name || dev.username}

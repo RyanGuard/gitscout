@@ -31,7 +31,6 @@ interface CandidateRowProps {
     tags: string[];
     lastNote: string | null;
   };
-  listId: string;
   tagSuggestions: string[];
   notes: Note[];
   onStageChange: (entryId: string, stage: string) => void;
@@ -43,7 +42,6 @@ interface CandidateRowProps {
 
 export function CandidateRow({
   entry,
-  listId,
   tagSuggestions,
   notes,
   onStageChange,

@@ -328,7 +328,7 @@ export async function GET(request: NextRequest) {
 
       // Short tenure check — use Apollo employment data if cached
       if (companyDomain) {
-        const tenureSignal = await checkShortTenure(developer.username, companyDomain);
+        const tenureSignal = await checkShortTenure(developer.username);
         if (tenureSignal) {
           allSignals.push(tenureSignal);
         }
@@ -395,10 +395,7 @@ function extractDomain(company: string | null): string | null {
  * Check if the developer has a short tenure at their current company
  * by looking at cached Apollo enrichment data.
  */
-async function checkShortTenure(
-  username: string,
-  _companyDomain: string
-): Promise<Signal | null> {
+async function checkShortTenure(username: string): Promise<Signal | null> {
   // Check if we have cached person enrichment data from Apollo
   const cacheKey = `person_enrichment:${username}`;
   const cached = await prisma.enrichmentCache.findUnique({

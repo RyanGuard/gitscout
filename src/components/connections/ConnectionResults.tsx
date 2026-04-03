@@ -213,8 +213,6 @@ function ConnectionCard({ connection }: { connection: ConnectionData }) {
   const [copied, setCopied] = useState(false);
   const strength =
     STRENGTH_CONFIG[connection.strength] || STRENGTH_CONFIG.weak;
-  const typeConfig =
-    TYPE_CONFIG[connection.connectionType] || TYPE_CONFIG.manual_tag;
 
   const handleCopy = () => {
     if (connection.suggestedAction) {

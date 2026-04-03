@@ -5,8 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
-  Send, Mail, MessageSquare, Users, ArrowLeft, Loader2,
-  Play, Pause, Clock, Check, AlertTriangle, Copy, ExternalLink,
+  Mail, MessageSquare, ArrowLeft, Loader2,
+  Play, Pause, Clock, Copy,
 } from "lucide-react";
 
 function LinkedinIcon({ className }: { className?: string }) {

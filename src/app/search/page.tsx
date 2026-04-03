@@ -513,6 +513,7 @@ function SearchPageInner() {
               <div className="rounded-xl border border-neutral-200/50 bg-surface p-6 shadow-sm dark:border-neutral-800/80">
                 <div className="flex items-start gap-4">
                   {linkedinResult.person.photoUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element -- external LinkedIn CDN URL */
                     <img src={linkedinResult.person.photoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
                   ) : (
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-bg text-lg font-bold text-gold">

@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import type { ApolloPerson } from "./apollo";
-import { fetchTargetPersonRepos } from "./github";
-
 export interface DetectedConnection {
   connectionType: string;
   strength: "strong" | "medium" | "weak";
@@ -234,7 +232,6 @@ export async function detectFormerEmployeeOverlap(
               );
 
               // Deduplicate: check if we already have this connection
-              const key = `${hp.id}-${tp.id}-${hCompany}`;
               const exists = connections.some(
                 (c) =>
                   c.homePersonId === hp.id &&
@@ -474,8 +471,9 @@ export async function detectSharedEducation(
 
 export async function detectGithubOverlap(
   homeBaseId: string,
-  targetPeople: ApolloPerson[]
+  _targetPeople: ApolloPerson[]
 ): Promise<DetectedConnection[]> {
+  void _targetPeople;
   const connections: DetectedConnection[] = [];
 
   // Get all home base GitHub repos
@@ -510,14 +508,7 @@ export async function detectGithubOverlap(
     repoMap.set(repo.repoFullName, list);
   }
 
-  // For each target engineer with a GitHub profile, check for repo overlap
-  for (const tp of targetPeople) {
-    // We need GitHub username for target person - check from Apollo employment
-    // For now, skip if no GitHub profile info available
-    // This would be enhanced by doing GitHub matching on target people too
-    // For MVP, we check if any target person has github info in their data
-    // (In practice, this would be improved in a later pass)
-  }
+  // For each target engineer with a GitHub profile, check for repo overlap (future: use targetPeople + GitHub usernames).
 
   return connections;
 }

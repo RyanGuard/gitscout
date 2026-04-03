@@ -56,6 +56,7 @@ export function CompactCandidateHeader({ candidate }: { candidate: CandidateData
       <div className="flex items-center gap-2.5 min-w-0">
         {/* Avatar */}
         {c.photoUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element -- external photo URL */
           <img
             src={c.photoUrl}
             alt={candidate.name}

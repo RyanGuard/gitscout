@@ -669,7 +669,15 @@ test.afterAll(async () => {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
   fs.writeFileSync(
     path.join(REPORT_DIR, "raw-metrics.json"),
-    JSON.stringify(allMetrics.map(({ rawResponse, ...rest }) => rest), null, 2),
+    JSON.stringify(
+      allMetrics.map((metric) => {
+        const { rawResponse, ...rest } = metric;
+        void rawResponse;
+        return rest;
+      }),
+      null,
+      2
+    ),
   );
 
   // Generate markdown report

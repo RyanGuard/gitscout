@@ -9,7 +9,6 @@ import {
   BarChart3,
   Building2,
   Sparkles,
-  Map,
   Settings,
   Link2,
   ArrowRight,

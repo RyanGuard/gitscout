@@ -363,7 +363,6 @@ export default function ListDetailPage({
                 <CandidateRow
                   key={entry.id}
                   entry={entry}
-                  listId={listId}
                   tagSuggestions={tagSuggestions}
                   notes={
                     entryNotes[entry.id] ||

@@ -34,19 +34,6 @@ function severityDotColor(severity: string): string {
   }
 }
 
-function severityBadgeColor(severity: string): string {
-  switch (severity) {
-    case "critical":
-    case "high":
-      return "bg-danger/20 text-danger";
-    case "medium":
-      return "bg-warning/20 text-warning";
-    case "low":
-    default:
-      return "bg-surface-secondary text-text-dim";
-  }
-}
-
 // ─── Component ───
 
 export function AlertsCard({ alerts }: { alerts: AlertItem[] }) {

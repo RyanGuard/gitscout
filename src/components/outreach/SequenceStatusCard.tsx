@@ -38,13 +38,6 @@ interface SequenceStatusCardProps {
     recentNews: string;
   };
   sequenceId: string | null;
-  sequenceStatus: string;
-  messages: Array<{
-    stepNumber: number;
-    delayDays: number;
-    channel: string;
-    body: string;
-  }>;
 }
 
 // ─── Helpers ───
@@ -102,8 +95,6 @@ export function SequenceStatusCard({
   strategy,
   roleContext,
   sequenceId,
-  sequenceStatus,
-  messages,
 }: SequenceStatusCardProps) {
   const [linkedInActions, setLinkedInActions] = useState<LinkedInAction[]>([]);
 

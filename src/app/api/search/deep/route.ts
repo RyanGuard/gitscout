@@ -24,7 +24,6 @@ export async function POST(request: Request) {
     roleCategory = "frontend",
     language,
     location,
-    minStars,
     activeInDays = 90,
     maxResults = 50,
   } = body;

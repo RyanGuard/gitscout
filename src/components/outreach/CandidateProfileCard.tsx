@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, MapPin, Building2, Mail, Star, Shield, AlertTriangle, Users, Zap, Send } from "lucide-react";
+import { ExternalLink, MapPin, Mail, Star, Shield, AlertTriangle, Users, Zap, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getLanguageColor } from "@/lib/utils";
 import type { CandidateData } from "@/lib/outreach/candidateNormalizer";

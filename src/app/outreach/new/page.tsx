@@ -78,7 +78,7 @@ function defaultStep(): StepDraft {
 }
 
 export default function NewSequencePage() {
-  const { data: session, status: authStatus } = useSession();
+  const { status: authStatus } = useSession();
   const router = useRouter();
 
   // Basics

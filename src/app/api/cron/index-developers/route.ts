@@ -5,7 +5,6 @@
 import { getGitHubClient } from "@/lib/github/client";
 import { ROLE_CATEGORIES } from "@/lib/search/seedRepos";
 import { calculateScore, type ScoringInput } from "@/lib/scoring/engine";
-import { matchesLocation, TARGET_CITIES } from "@/lib/search/locationMatch";
 import { prisma } from "@/lib/prisma";
 
 const MAX_PER_CATEGORY = 30; // Developers per role category per run

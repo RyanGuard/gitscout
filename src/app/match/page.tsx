@@ -22,7 +22,7 @@ interface MatchResponse {
 }
 
 export default function MatchPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [requirements, setRequirements] = useState<ParsedRequirements | null>(null);
   const [results, setResults] = useState<MatchResponse | null>(null);

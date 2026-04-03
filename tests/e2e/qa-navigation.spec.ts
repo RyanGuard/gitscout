@@ -56,13 +56,6 @@ async function getPerformanceMetrics(page: Page): Promise<Record<string, number>
     const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
     const paint = performance.getEntriesByType("paint");
     const fcp = paint.find((e) => e.name === "first-contentful-paint");
-    const lcp = new Promise<number>((resolve) => {
-      new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        resolve(entries.length > 0 ? entries[entries.length - 1].startTime : 0);
-      }).observe({ type: "largest-contentful-paint", buffered: true });
-      setTimeout(() => resolve(0), 3000);
-    });
 
     return {
       domContentLoaded: nav ? nav.domContentLoadedEventEnd - nav.startTime : 0,
@@ -368,7 +361,6 @@ test.describe("Dark theme consistency", () => {
         textElements.forEach((el) => {
           const style = getComputedStyle(el as HTMLElement);
           const color = style.color;
-          const bg = style.backgroundColor;
           // Check for very light text on very light background (light-on-light in dark mode)
           if (color === "rgb(0, 0, 0)" || color === "rgb(23, 23, 23)") {
             // Dark text that should have been flipped in dark mode

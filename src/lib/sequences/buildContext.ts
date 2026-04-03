@@ -34,7 +34,7 @@ export async function buildCandidateContext(
   if (source.type === "map_candidate") {
     return buildFromMapCandidate(source.id, userId);
   } else if (source.type === "developer") {
-    return buildFromDeveloper(source.id, userId);
+    return buildFromDeveloper(source.id);
   } else if (source.type === "candidate_entry") {
     return buildFromCandidateEntry(source.id, userId);
   }
@@ -82,10 +82,7 @@ async function buildFromMapCandidate(
   return ctx;
 }
 
-async function buildFromDeveloper(
-  id: string,
-  _userId: string
-): Promise<CandidateContextSnapshot | null> {
+async function buildFromDeveloper(id: string): Promise<CandidateContextSnapshot | null> {
   const developer = await prisma.developer.findUnique({
     where: { id },
     include: {

@@ -6,12 +6,11 @@ import { cn } from "@/lib/utils";
 
 interface LinkedInPreviewProps {
   message: string;
-  candidateName: string;
 }
 
 // ─── Component ───
 
-export function LinkedInPreview({ message, candidateName }: LinkedInPreviewProps) {
+export function LinkedInPreview({ message }: LinkedInPreviewProps) {
   return (
     <div className="rounded-lg border border-border bg-surface p-3">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted mb-2">LinkedIn Preview</p>

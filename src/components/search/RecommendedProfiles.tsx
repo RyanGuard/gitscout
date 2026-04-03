@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Sparkles, Loader2, ExternalLink, GitFork } from "lucide-react";
+import { Sparkles, Loader2, GitFork } from "lucide-react";
 
 interface DiscoveredDev {
   id: string;

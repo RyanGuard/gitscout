@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, FileText, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { Upload, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 
 export function LinkedinImport() {
   const [importing, setImporting] = useState(false);

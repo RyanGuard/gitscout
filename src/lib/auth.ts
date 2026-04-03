@@ -13,62 +13,14 @@
 //
 // Always set: NEXTAUTH_SECRET, NEXTAUTH_URL (e.g. http://localhost:3000 locally, https://your-domain on Vercel)
 //
-// Email magic links: RESEND_API_KEY, EMAIL_FROM (optional)
+// Email magic links: add EmailProvider + Resend when re-enabled (RESEND_API_KEY, EMAIL_FROM).
 
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
-import type { SendVerificationRequestParams } from "next-auth/providers/email";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-
-async function sendVerificationRequest({
-  identifier: email,
-  url,
-}: SendVerificationRequestParams) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: process.env.EMAIL_FROM || "Scout <onboarding@resend.dev>",
-      to: email,
-      subject: "Sign in to Scout",
-      html: `
-        <div style="max-width:480px;margin:0 auto;font-family:'Instrument Sans',system-ui,sans-serif;padding:40px 20px">
-          <div style="text-align:center;margin-bottom:32px">
-            <div style="display:inline-block;background:#C8A55A;border-radius:7px;padding:10px 12px">
-              <span style="color:#19191A;font-weight:700;font-size:18px">S</span>
-            </div>
-          </div>
-          <h1 style="font-size:20px;font-weight:700;text-align:center;color:#1c1c1a;margin-bottom:8px">
-            Sign in to Scout
-          </h1>
-          <p style="text-align:center;color:#737373;font-size:14px;margin-bottom:32px">
-            Click the button below to sign in. This link expires in 24 hours.
-          </p>
-          <div style="text-align:center;margin-bottom:32px">
-            <a href="${url}" style="display:inline-block;background:#C8A55A;color:#fff;font-weight:600;font-size:14px;padding:12px 32px;border-radius:8px;text-decoration:none">
-              Sign in
-            </a>
-          </div>
-          <p style="text-align:center;color:#a3a3a3;font-size:12px">
-            If you didn&rsquo;t request this email, you can ignore it.
-          </p>
-        </div>
-      `,
-    }),
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(`Resend error: ${JSON.stringify(error)}`);
-  }
-}
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET;

@@ -105,48 +105,12 @@ export async function POST(
     );
   }
 
-  // Build candidate context for Claude
-  const candidateContext = candidates
-    .map(
-      (c) => `- Candidate ID: ${c.id}
-  Name: ${c.name}
-  Current title: ${c.title || "Unknown"}
-  Current company: ${c.company.companyName} (${c.company.companyDomain})
-  Seniority: ${c.seniority || "Unknown"}
-  Location: ${[c.city, c.state].filter(Boolean).join(", ") || "Unknown"}
-  Fit score: ${c.fitScore || "N/A"}/100
-  Fit reasoning: ${c.fitReasoning || "N/A"}
-  Flight risk: ${c.flightRisk || "unknown"}
-  Flight risk signals: ${c.flightRiskSignals.length > 0 ? c.flightRiskSignals.join(", ") : "none"}
-  ${c.gitscoutScore ? `Scout score: ${c.gitscoutScore} (based on open source contributions)` : ""}`
-    )
-    .join("\n\n");
-
   const toneDescription =
     tone === "casual"
       ? "Friendly and conversational, like a peer reaching out"
       : tone === "technical_peer"
         ? "Focuses on the technical challenge, speaks engineer-to-engineer"
         : "Polished but warm, like a senior recruiter at a top firm";
-
-  const userMessage = `ROLE BRIEF:
-Title: ${map.roleTitle}
-Level: ${map.roleLevel || "Not specified"}
-Stack: ${map.roleStack.join(", ") || "Not specified"}
-Geography: ${map.geography.join(", ") || "Not specified"}
-
-${
-  sellingPoints.length > 0
-    ? `SELLING POINTS:\n${sellingPoints.map((p) => `- ${p}`).join("\n")}`
-    : ""
-}
-
-TONE: ${tone} — ${toneDescription}
-
-${customInstructions ? `ADDITIONAL INSTRUCTIONS:\n${customInstructions}\n` : ""}
-
-CANDIDATES:
-${candidateContext}`;
 
   // Batch into groups of 5
   const batches: typeof candidates[] = [];

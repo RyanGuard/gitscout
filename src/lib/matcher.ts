@@ -3,14 +3,6 @@ import type { ParsedRequirements, MatchResult, DeveloperProfile } from "@/types"
 // --- Seniority inference thresholds ---
 
 function inferSeniority(dev: DeveloperProfile): string {
-  const accountAge = dev.repositories.length > 0
-    ? Math.max(
-        ...dev.repositories
-          .map((r) => r.pushedAt ? new Date(r.pushedAt).getTime() : 0)
-          .filter(Boolean)
-      )
-    : 0;
-
   // Rough heuristic: use totalStars, followers, totalCommits
   const stars = dev.totalStars;
   const commits = dev.totalCommits;

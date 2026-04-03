@@ -229,9 +229,6 @@ test.describe("Profile Page QA Suite", () => {
     await page.goto(`/profile/${validUsername}`);
     await page.waitForLoadState("networkidle");
 
-    // Check for location (MapPin icon + text)
-    const locationEl = page.locator(".flex.items-center.gap-1").filter({ has: page.locator("svg") }).first();
-
     // Check for company (Building2 icon)
     // These are conditional — the developer may not have them set
     const metaRow = page.locator(".flex.flex-wrap.gap-4.text-sm");
@@ -398,9 +395,9 @@ test.describe("Profile Page QA Suite", () => {
     const pushAshbyBtn = page.locator("button:has-text('Ashby')");
     const addToListBtn = page.locator("button:has-text('Add to List')");
 
-    const hasEnrich = await enrichBtn.isVisible().catch(() => false);
-    const hasAshby = await pushAshbyBtn.isVisible().catch(() => false);
-    const hasList = await addToListBtn.isVisible().catch(() => false);
+    await enrichBtn.isVisible().catch(() => false);
+    await pushAshbyBtn.isVisible().catch(() => false);
+    await addToListBtn.isVisible().catch(() => false);
 
     // These all require auth + indexed developer
     await screenshotOnContext(page, "T12-profile-actions");
@@ -423,16 +420,12 @@ test.describe("Profile Page QA Suite", () => {
       await expect(limitedText).toBeVisible();
     }
 
-    // Check for Hireable badge
-    const hireableBadge = page.locator("text=Hireable");
-    const isHireable = await hireableBadge.isVisible().catch(() => false);
-
     await screenshotOnContext(page, "T13-source-badge");
   });
 
   test("T14 — Error handling: invalid/nonexistent username (404)", async ({ page }) => {
     // Navigate to a clearly non-existent profile
-    const response = await page.goto("/profile/this-user-definitely-does-not-exist-xyz-12345");
+    await page.goto("/profile/this-user-definitely-does-not-exist-xyz-12345");
 
     // Should show the not-found page
     await page.waitForLoadState("networkidle");
@@ -457,20 +450,19 @@ test.describe("Profile Page QA Suite", () => {
       expect(href).toBe("/search");
     } else {
       // Might get a Next.js 404 page or a different error
-      const title = await page.title();
-      // Take screenshot regardless
+      await page.title();
     }
 
     await screenshotOnContext(page, "T14-invalid-username-404");
   });
 
   test("T15 — Error handling: special characters in username", async ({ page }) => {
-    const response = await page.goto("/profile/<script>alert('xss')</script>");
+    await page.goto("/profile/<script>alert('xss')</script>");
     await page.waitForLoadState("networkidle");
 
     // Should not execute any script — should show 404 or error
     const notFoundHeading = page.locator("text=Developer not found");
-    const is404 = await notFoundHeading.isVisible({ timeout: 5000 }).catch(() => false);
+    await notFoundHeading.isVisible({ timeout: 5000 }).catch(() => false);
 
     // Page should not have any alert dialogs
     // (Playwright would throw on unhandled dialogs, so reaching here means no XSS)
@@ -483,12 +475,10 @@ test.describe("Profile Page QA Suite", () => {
   });
 
   test("T16 — Error handling: empty username", async ({ page }) => {
-    const response = await page.goto("/profile/");
+    await page.goto("/profile/");
     await page.waitForLoadState("networkidle");
 
     // This should either redirect or show 404
-    const status = response?.status();
-    // Document what happens
     await screenshotOnContext(page, "T16-empty-username");
   });
 
@@ -537,7 +527,6 @@ test.describe("Profile Page QA Suite", () => {
       return;
     }
 
-    const targetHref = await firstResult.getAttribute("href");
     await firstResult.click();
 
     // Should navigate to the profile page

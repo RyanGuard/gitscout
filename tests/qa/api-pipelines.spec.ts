@@ -1,7 +1,7 @@
 // QA: API pipeline tests — deep search, quick search, scoring
 
 import { test, expect } from "@playwright/test";
-import { gradeResults, printGradeReport, type QualityGrade } from "./helpers";
+import { printGradeReport, type QualityGrade } from "./helpers";
 
 const BASE = process.env.QA_BASE_URL || "https://gitscout-beta.vercel.app";
 
@@ -103,7 +103,7 @@ test("Scoring API returns valid 5-pillar breakdown", async ({ request }) => {
     console.log(`     Confidence: ${data.confidence}`);
 
     if (data.pillars) {
-      for (const [key, pillar] of Object.entries(data.pillars) as [string, { score: number; label: string }][]) {
+      for (const [, pillar] of Object.entries(data.pillars) as [string, { score: number; label: string }][]) {
         console.log(`     ${pillar.label}: ${pillar.score}/${10}`);
       }
     }

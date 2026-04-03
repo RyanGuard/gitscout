@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
-import { Sparkles, RefreshCw, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { showSuccess, showError as toastError } from "@/lib/toast";
 import { ContactCard } from "@/components/profile/ContactCard";

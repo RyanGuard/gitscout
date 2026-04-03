@@ -895,6 +895,10 @@ test.describe("Performance", () => {
       type: "total_search_time_ms",
       description: String(totalTime),
     });
+    test.info().annotations.push({
+      type: "api_search_timing_ms",
+      description: String(apiResponseTime),
+    });
 
     // Total time should be under 15 seconds (generous for live GitHub API)
     expect(totalTime).toBeLessThan(15000);

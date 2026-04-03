@@ -78,37 +78,6 @@ export async function listJobs(apiKey: string) {
 
 // --- Job details ---
 
-interface AshbyJobDetails {
-  id: string;
-  title: string;
-  status: string;
-  employmentType: string | null;
-  department: { id: string; name: string } | null;
-  location: { id: string; name: string } | null;
-  compensationTier: {
-    id: string;
-    title: string;
-    min: { value: number; currencyCode: string } | null;
-    max: { value: number; currencyCode: string } | null;
-  } | null;
-  customFields: Array<{
-    id: string;
-    title: string;
-    value: string | string[] | null;
-  }>;
-  hiringTeam: Array<{
-    userId: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-  }>;
-}
-
-interface JobInfoResponse {
-  success: boolean;
-  results: AshbyJobDetails;
-}
-
 /** job.info payload varies by Ashby version — narrow fields we read. */
 interface AshbyCustomFieldRow {
   title?: string;
