@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
@@ -7,8 +6,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -17,7 +16,7 @@ export async function POST(
 
   // Verify map ownership
   const map = await prisma.marketMap.findFirst({
-    where: { id: mapId, userId: session.user.id },
+    where: { id: mapId, userId },
     select: { id: true, name: true },
   });
   if (!map) {
@@ -35,7 +34,7 @@ export async function POST(
   const share = await prisma.mapShare.create({
     data: {
       mapId,
-      userId: session.user.id,
+      userId,
       shareToken,
       permissionLevel,
       recipientName,
@@ -56,18 +55,18 @@ export async function POST(
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id: mapId } = await params;
 
   const shares = await prisma.mapShare.findMany({
-    where: { mapId, userId: session.user.id },
+    where: { mapId, userId },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -96,8 +95,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -112,7 +111,7 @@ export async function DELETE(
     where: {
       id: body.share_id,
       mapId,
-      userId: session.user.id,
+      userId,
     },
   });
 

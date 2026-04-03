@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { safeErrorMessage } from "@/lib/api-error";
 
@@ -7,8 +6,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -23,7 +22,7 @@ export async function POST(
   try {
     // Verify map exists and belongs to user
     const map = await prisma.marketMap.findFirst({
-      where: { id: mapId, userId: session.user.id },
+      where: { id: mapId, userId },
     });
     if (!map) {
       return Response.json({ error: "Map not found" }, { status: 404 });

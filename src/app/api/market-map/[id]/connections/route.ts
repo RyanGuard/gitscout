@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -15,7 +14,7 @@ export async function GET(
 
   // Check user has a ready home base
   const homeBase = await prisma.connectionHomeBase.findFirst({
-    where: { userId: session.user.id, setupStatus: "ready" },
+    where: { userId, setupStatus: "ready" },
   });
 
   if (!homeBase) {

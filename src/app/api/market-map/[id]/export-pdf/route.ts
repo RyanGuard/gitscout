@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { renderToBuffer } from "@react-pdf/renderer";
 import * as ReactPDF from "@react-pdf/renderer";
@@ -10,8 +9,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -23,7 +22,7 @@ export async function POST(
 
     // Fetch map with ownership check
     const map = await prisma.marketMap.findFirst({
-      where: { id: mapId, userId: session.user.id },
+      where: { id: mapId, userId },
       include: {
         companies: {
           where: { hidden: false },
@@ -40,6 +39,11 @@ export async function POST(
     if (!map) {
       return Response.json({ error: "Map not found" }, { status: 404 });
     }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true },
+    });
 
     // Group by tier
     const tiers: Record<string, typeof map.companies> = { A: [], B: [], C: [] };
@@ -76,7 +80,7 @@ export async function POST(
       roleLevel: map.roleLevel,
       roleStack: map.roleStack,
       geography: map.geography,
-      recruiterName: session.user.name || "Scout User",
+      recruiterName: user?.name || "Scout User",
       tiers,
       stats: {
         totalCompanies: map.companies.length,

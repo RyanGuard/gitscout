@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logStatusChange } from "@/lib/map/statusHistory";
 import { logOutreachSignal } from "@/lib/map/outreachSignals";
@@ -12,8 +11,8 @@ export async function PATCH(
     params,
   }: { params: Promise<{ id: string; messageId: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -29,7 +28,7 @@ export async function PATCH(
 
   // Fetch the message
   const message = await prisma.outreachMessage.findFirst({
-    where: { id: messageId, mapId, userId: session.user.id },
+    where: { id: messageId, mapId, userId },
   });
 
   if (!message) {
@@ -73,7 +72,7 @@ export async function PATCH(
         mapId,
         candidate.status,
         "responded",
-        session.user.id
+        userId
       );
     }
   }
@@ -106,7 +105,7 @@ export async function PATCH(
         responseReceived: body.status === "responded",
         responseTimeHours,
         bounce: body.status === "bounced",
-        userId: session.user.id,
+        userId,
       });
     }
   } catch (err) {
@@ -123,13 +122,13 @@ export async function PATCH(
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   {
     params,
   }: { params: Promise<{ id: string; messageId: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -141,7 +140,7 @@ export async function GET(
   }
 
   const message = await prisma.outreachMessage.findFirst({
-    where: { id: messageId, mapId, userId: session.user.id },
+    where: { id: messageId, mapId, userId },
   });
 
   if (!message) {

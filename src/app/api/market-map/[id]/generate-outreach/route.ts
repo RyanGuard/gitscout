@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -37,8 +36,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -66,7 +65,7 @@ export async function POST(
 
   // Verify map ownership
   const map = await prisma.marketMap.findFirst({
-    where: { id: mapId, userId: session.user.id },
+    where: { id: mapId, userId },
     select: {
       id: true,
       roleTitle: true,
@@ -207,7 +206,7 @@ ${batchContext}`;
         data: {
           mapId,
           candidateId: msg.candidate_id,
-          userId: session.user.id,
+          userId,
           subjectLine: msg.subject_line,
           firstLine: msg.first_line,
           body: msg.body,

@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ templateId: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,7 +29,7 @@ export async function PATCH(
 
   try {
     const template = await prisma.outreachTemplate.update({
-      where: { id: templateId, userId: session.user.id },
+      where: { id: templateId, userId },
       data: updateData,
     });
     return Response.json({ template });
@@ -40,18 +39,18 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ templateId: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { templateId } = await params;
 
   const deleted = await prisma.outreachTemplate.deleteMany({
-    where: { id: templateId, userId: session.user.id },
+    where: { id: templateId, userId },
   });
 
   if (deleted.count === 0) {

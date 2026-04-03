@@ -1,17 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { safeErrorMessage } from "@/lib/api-error";
 
 // GET — list all templates for the user
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(request: Request) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const templates = await prisma.mapTemplate.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     orderBy: { createdAt: "desc" },
   });
 
@@ -20,8 +19,8 @@ export async function GET() {
 
 // POST — save a map as a template
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -34,7 +33,7 @@ export async function POST(request: Request) {
 
   try {
     const map = await prisma.marketMap.findFirst({
-      where: { id: map_id, userId: session.user.id },
+      where: { id: map_id, userId },
       include: { companies: { where: { hidden: false } } },
     });
 
@@ -62,7 +61,7 @@ export async function POST(request: Request) {
 
     const template = await prisma.mapTemplate.create({
       data: {
-        userId: session.user.id,
+        userId,
         name: name || map.roleTitle,
         roleConfig: roleConfig as object,
         companyConfig: companyConfig as object,

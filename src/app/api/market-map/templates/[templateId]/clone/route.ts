@@ -1,14 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { safeErrorMessage } from "@/lib/api-error";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ templateId: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,7 +15,7 @@ export async function POST(
 
   try {
     const template = await prisma.mapTemplate.findFirst({
-      where: { id: templateId, userId: session.user.id },
+      where: { id: templateId, userId },
     });
 
     if (!template) {
@@ -35,7 +34,7 @@ export async function POST(
     // Create new map from template
     const map = await prisma.marketMap.create({
       data: {
-        userId: session.user.id,
+        userId,
         name: `${template.name} (copy)`,
         roleTitle: (roleConfig.role_title as string) || template.name,
         roleLevel: (roleConfig.role_level as string) || null,
