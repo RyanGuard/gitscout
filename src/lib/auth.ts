@@ -25,6 +25,9 @@ import { prisma } from "@/lib/prisma";
 const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET;
 
+// GitHub is the primary provider. Use signIn("github") in clients and
+// githubSignInUrl() from @/lib/auth-signin for redirects so optional Google (below)
+// does not replace one-click GitHub with a provider picker.
 const providers: NextAuthOptions["providers"] = [
   GitHubProvider({
     clientId: process.env.GITHUB_ID || "",

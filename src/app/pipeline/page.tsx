@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { githubSignInUrl } from "@/lib/auth-signin";
 import {
   Loader2,
   Users,
@@ -263,7 +264,7 @@ export default function PipelinePage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/pipeline");
+      router.push(githubSignInUrl("/pipeline"));
     }
   }, [status, router]);
 

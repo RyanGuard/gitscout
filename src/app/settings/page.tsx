@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { githubSignInUrl } from "@/lib/auth-signin";
 import { AshbyConnectionForm } from "@/components/ashby/AshbyConnectionForm";
 import { AshbyPushHistory } from "@/components/ashby/AshbyPushHistory";
 
@@ -11,7 +12,7 @@ export const metadata = {
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/api/auth/signin?callbackUrl=/settings");
+  if (!session) redirect(githubSignInUrl("/settings"));
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8">

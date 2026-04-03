@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   ChevronDown,
 } from "lucide-react";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -102,7 +103,7 @@ export default function NewSequencePage() {
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/outreach/new");
+      router.push(githubSignInUrl("/outreach/new"));
     }
   }, [authStatus, router]);
 

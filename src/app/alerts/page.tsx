@@ -28,6 +28,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { DraftInStudioButton } from "@/components/outreach/DraftInStudioButton";
+import { githubSignInUrl } from "@/lib/auth-signin";
 import { fromSurfacedCandidate } from "@/lib/outreach/candidateNormalizer";
 import { showError, showSuccess } from "@/lib/toast";
 import { trackEvent } from "@/lib/posthog";
@@ -792,7 +793,7 @@ export default function AlertsPage() {
   // Auth redirect
   useEffect(() => {
     if (authStatus === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/alerts");
+      router.push(githubSignInUrl("/alerts"));
     }
   }, [authStatus, router]);
 

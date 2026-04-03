@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { githubSignInUrl } from "@/lib/auth-signin";
 import Link from "next/link";
 import {
   Mail, MessageSquare, ArrowLeft, Loader2,
@@ -146,9 +147,9 @@ export default function SequenceDetailPage() {
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/outreach");
+      router.push(githubSignInUrl(id ? `/outreach/${id}` : "/outreach"));
     }
-  }, [authStatus, router]);
+  }, [authStatus, router, id]);
 
   function toggleStatus() {
     if (!sequence) return;

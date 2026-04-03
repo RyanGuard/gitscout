@@ -35,6 +35,7 @@ import { CandidateProfileCard, type OutreachHistoryItem } from "@/components/out
 import { CompactCandidateHeader } from "@/components/outreach/CompactCandidateHeader";
 import { SequenceStatusCard } from "@/components/outreach/SequenceStatusCard";
 import { trackEvent } from "@/lib/posthog";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 // ─── Custom Icons ───
 
@@ -263,7 +264,7 @@ function OutreachStudio() {
   // ─── Auth check ───
   useEffect(() => {
     if (authStatus === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/outreach");
+      router.push(githubSignInUrl("/outreach"));
     }
   }, [authStatus, router]);
 

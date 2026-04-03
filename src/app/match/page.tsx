@@ -7,6 +7,7 @@ import { JobInput } from "@/components/match/JobInput";
 import { RequirementsEditor } from "@/components/match/RequirementsEditor";
 import { MatchCard } from "@/components/match/MatchCard";
 import type { ParsedRequirements, MatchResult } from "@/types";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 interface MatchResponse {
   requirements: ParsedRequirements;
@@ -65,7 +66,7 @@ export default function MatchPage() {
     );
   }
   if (status === "unauthenticated") {
-    router.push("/api/auth/signin?callbackUrl=/match");
+    router.push(githubSignInUrl("/match"));
     return null;
   }
 

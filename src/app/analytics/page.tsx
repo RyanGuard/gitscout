@@ -22,6 +22,7 @@ import {
   Sun,
   Download,
 } from "lucide-react";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 // ═══════════════════════════════════════════════════════════
 //  TYPES
@@ -161,7 +162,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/analytics");
+      router.push(githubSignInUrl("/analytics"));
       return;
     }
     if (session?.user?.id) fetchData();

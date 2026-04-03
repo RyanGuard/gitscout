@@ -8,6 +8,7 @@ import { ListCard } from "@/components/crm/ListCard";
 import { showError } from "@/lib/toast";
 import type { CandidateListSummary } from "@/types";
 import { trackEvent } from "@/lib/posthog";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 export default function ListsPage() {
   const { data: session, status } = useSession();
@@ -33,7 +34,7 @@ export default function ListsPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/lists");
+      router.push(githubSignInUrl("/lists"));
       return;
     }
     if (session?.user?.id) fetchLists();

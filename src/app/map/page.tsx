@@ -355,7 +355,7 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
   const cfg = TIER_CONFIG[tier];
   const openCount = company.candidates.filter((c) => c.flightRisk === "high").length;
   const status = company.enrichmentStatus;
-  const isQueued = status === "pending";
+  const isQueued = status === "pending" || status === "queued";
   const isEnriching = status === "enriching";
   const isFailed = status === "failed";
 
@@ -852,6 +852,7 @@ function MarketMapInner() {
   const loadMapSeqRef = useRef(0);
   /** Coalesces rapid loadMap calls during background enrichment (reduces DB pool contention). */
   const mapReloadDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const candidateDetailRef = useRef<HTMLDivElement>(null);
 
   const allCandidates = useMemo(() => {
     if (!mapData) return [];
@@ -1012,6 +1013,17 @@ function MarketMapInner() {
     },
     []
   );
+
+  // Without sticky positioning, the detail panel lives in normal document flow (top of the row on lg).
+  // After picking someone lower in the list, scroll so the card is in view instead of leaving it off-screen above.
+  const activePersonScrollKey = activePerson?.id;
+  useEffect(() => {
+    if (!activePersonScrollKey) return;
+    const rafId = requestAnimationFrame(() => {
+      candidateDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, [activePersonScrollKey]);
 
   // Auto-verify all companies in stack mode
   async function verifyAllStacks() {
@@ -1191,7 +1203,7 @@ function MarketMapInner() {
       router.push(`/map?id=${data.mapId}`);
       trackEvent("map_generated", { roleTitle, roleLevel, sourcingMode });
 
-      // One company at a time: each enrich-company call can run several minutes (Apollo + Claude chains).
+      // Sequential POSTs: each run processes phased enrichment in-function (may return 202 until complete).
       const companies = data.companies || [];
       (async () => {
         for (const co of companies as { id: string; domain: string; name: string }[]) {
@@ -1924,7 +1936,10 @@ function MarketMapInner() {
             </div>
 
             {activePerson && (
-              <div className="w-full shrink-0 lg:sticky lg:top-20 lg:w-80">
+              <div
+                ref={candidateDetailRef}
+                className="w-full shrink-0 scroll-mt-24 lg:w-80 lg:max-h-[min(80vh,calc(100vh-5.5rem))] lg:overflow-y-auto"
+              >
                 <CandidateDetail person={activePerson} onClose={() => setActivePerson(null)} mapId={mapIdParam || ""} />
               </div>
             )}

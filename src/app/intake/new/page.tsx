@@ -9,6 +9,7 @@ import {
   CheckCircle, Loader2, Map, X, Star, Shield, DollarSign,
   Briefcase, Code2,
 } from "lucide-react";
+import { githubSignInUrl } from "@/lib/auth-signin";
 
 // ═══════════════════════════════════════════════════════════
 //  TAG INPUT
@@ -173,7 +174,7 @@ export default function IntakeNewPage() {
   const [generatingMap, setGeneratingMap] = useState(false);
 
   if (authStatus === "unauthenticated") {
-    router.push("/api/auth/signin?callbackUrl=/intake/new");
+    router.push(githubSignInUrl("/intake/new"));
     return null;
   }
 

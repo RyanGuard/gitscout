@@ -2,13 +2,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { githubSignInUrl } from "@/lib/auth-signin";
 import { DeveloperCard } from "@/components/profile/DeveloperCard";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
 export default async function FavoritesPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/api/auth/signin?callbackUrl=/favorites");
+  if (!session?.user?.id) redirect(githubSignInUrl("/favorites"));
 
   const favorites = await prisma.favorite.findMany({
     where: { userId: session.user.id },
