@@ -88,6 +88,7 @@ export function fromMapCandidate(candidate: {
   state?: string | null;
   country?: string | null;
   linkedinUrl?: string | null;
+  githubUrl?: string | null;
   email?: string | null;
   fitScore?: number | null;
   fitReasoning?: string | null;
@@ -104,6 +105,7 @@ export function fromMapCandidate(candidate: {
     company: companyName || undefined,
     location: location || undefined,
     linkedinUrl: candidate.linkedinUrl || undefined,
+    githubUrl: candidate.githubUrl || undefined,
     email: candidate.email || undefined,
     sourceType: "market_map",
     sourceMapId: mapId,

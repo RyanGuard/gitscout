@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronDown, X, Users, Building2, TrendingUp,
   Download, Share2, Send, Map, Plus, Loader2, AlertTriangle,
-  CheckSquare, Square, Link2, Shield, Filter,
+  CheckSquare, Square, Link2, Shield, Filter, ExternalLink,
   GripVertical, Search, Save, Copy, Clock, Mail, Pencil, FileText, ArrowRight,
   LayoutDashboard, Presentation, Sparkles,
 } from "lucide-react";
@@ -42,6 +42,7 @@ interface Candidate {
   state: string | null;
   country: string | null;
   linkedinUrl: string | null;
+  githubUrl: string | null;
   headline: string | null;
   fitScore: number | null;
   fitReasoning: string | null;
@@ -142,6 +143,15 @@ function scoreColor(s: number) {
   if (s >= 80) return "text-blue-700 dark:text-blue-400 bg-blue-500/10";
   if (s >= 70) return "text-amber-700 dark:text-amber-400 bg-amber-500/10";
   return "text-neutral-600 dark:text-neutral-400 bg-neutral-500/10";
+}
+
+/** Apollo / DB sometimes store profile URLs without a scheme */
+function externalProfileHref(raw: string | null | undefined): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  const t = raw.trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t.replace(/^\/+/, "")}`;
 }
 
 const MAP_FIELD_BASE =
@@ -264,6 +274,8 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
     onCandidateStatusUpdated?.();
   }
 
+  const linkedInHref = externalProfileHref(candidate.linkedinUrl);
+
   return (
     <div
       onClick={() => onSelectPerson(candidate)}
@@ -277,17 +289,25 @@ function CandidateRow({ candidate, mapId, selected, onSelect, onSelectPerson, is
         {selected ? <CheckSquare className="h-3.5 w-3.5 text-gold" /> : <Square className="h-3.5 w-3.5" />}
       </button>
       <div className="min-w-0">
-        <p className="font-medium text-[13px] truncate text-foreground">{candidate.name}</p>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <p className="font-medium text-[13px] truncate text-foreground">{candidate.name}</p>
+          {linkedInHref ? (
+            <a
+              href={linkedInHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open LinkedIn profile"
+              onClick={(e) => e.stopPropagation()}
+              className="shrink-0 rounded p-0.5 text-[#0A66C2] hover:bg-[#0A66C2]/10 dark:hover:bg-[#0A66C2]/20 transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          ) : null}
+        </div>
         <p className="text-[11px] text-neutral-500 truncate mt-0.5">{candidate.title}</p>
       </div>
       <FlightRiskBadge risk={candidate.flightRisk} signals={candidate.flightRiskSignals} reasoning={candidate.flightRiskReasoning} />
       <span className="hidden sm:inline-flex"><StatusDropdown status={candidate.status} onUpdate={updateStatus} /></span>
-      {candidate.linkedinUrl && (
-        <a href={candidate.linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
-          className="hidden sm:inline-flex text-neutral-600 hover:text-blue-400 transition-colors">
-          <Link2 className="h-3.5 w-3.5" />
-        </a>
-      )}
       <span className="hidden sm:inline-flex">
         <DraftInStudioButton
           variant="icon"
@@ -553,27 +573,73 @@ function DraggableCompanyCard({ company, mapId, tier, expanded, onToggle, select
 // ═══════════════════════════════════════════════════════════
 
 function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClose: () => void; mapId: string }) {
+  const linkedInHref = externalProfileHref(person.linkedinUrl);
+  const githubHref = externalProfileHref(person.githubUrl);
+  const tenureLabel =
+    person.tenureMonths != null && person.tenureMonths > 0
+      ? `${person.tenureMonths} mo. at current role`
+      : null;
+
   return (
     <div className="map-hud-card relative p-5">
       <button onClick={onClose} className="absolute right-3 top-3 text-neutral-500 transition-colors hover:text-cyan-600 dark:text-neutral-400 dark:hover:text-cyan-300">
         <X className="h-4 w-4" />
       </button>
 
-      <div className="flex items-center gap-3 mb-5">
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-bold ${person.fitScore ? scoreColor(person.fitScore) : "bg-neutral-800 text-neutral-400"}`}>
-          {person.name.split(" ").map(n => n[0]).join("")}
+      <div className="mb-5 rounded-xl border border-neutral-200/60 bg-gradient-to-br from-neutral-50/90 to-white/80 p-4 shadow-sm dark:border-neutral-700/50 dark:from-neutral-900/80 dark:to-neutral-950/60">
+        <div className="flex items-start gap-3">
+          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl text-lg font-bold ${person.fitScore ? scoreColor(person.fitScore) : "bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"}`}>
+            {person.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-base font-semibold leading-snug text-neutral-900 dark:text-white">{person.name}</p>
+            {person.title ? (
+              <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-400">{person.title}</p>
+            ) : null}
+            {person.headline ? (
+              <p className="mt-2 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400 line-clamp-3">{person.headline}</p>
+            ) : null}
+            {tenureLabel ? (
+              <p className="mt-2 text-[11px] font-medium text-neutral-500 dark:text-neutral-500">{tenureLabel}</p>
+            ) : null}
+          </div>
         </div>
-        <div>
-          <p className="text-base font-semibold text-neutral-900 dark:text-white">{person.name}</p>
-          <p className="text-xs text-neutral-500 mt-0.5">{person.title}</p>
-        </div>
+
+        {linkedInHref ? (
+          <a
+            href={linkedInHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0A66C2] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004182]"
+          >
+            <ExternalLink className="h-4 w-4 shrink-0" />
+            View LinkedIn profile
+          </a>
+        ) : (
+          <div className="mt-4 rounded-lg border border-dashed border-neutral-300 bg-neutral-50/50 px-3 py-3 text-center dark:border-neutral-600 dark:bg-neutral-900/40">
+            <p className="text-xs text-neutral-600 dark:text-neutral-400">No LinkedIn URL from Apollo for this person.</p>
+            <p className="mt-1 text-[11px] text-neutral-500">Reveal contact or search by name on LinkedIn to verify.</p>
+          </div>
+        )}
+
+        {githubHref ? (
+          <a
+            href={githubHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            GitHub profile
+          </a>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-5">
         {[
           { label: "Fit score", val: person.fitScore != null ? String(person.fitScore) : "—" },
           { label: "Seniority", val: person.seniority || "—" },
-          { label: "Location", val: [person.city, person.state].filter(Boolean).join(", ") || "—" },
+          { label: "Location", val: [person.city, person.state, person.country].filter(Boolean).join(", ") || "—" },
           { label: "Status", val: STATUS_CONFIG[person.status]?.label || person.status },
         ].map((m) => (
           <div key={m.label} className="rounded-lg bg-neutral-100/60 dark:bg-neutral-800/40 p-3">
@@ -615,18 +681,14 @@ function CandidateDetail({ person, onClose, mapId }: { person: Candidate; onClos
         </div>
       )}
 
-      <div className="flex items-center gap-2 mb-4">
-        {person.linkedinUrl && (
-          <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors">
-            <Link2 className="h-3.5 w-3.5" /> LinkedIn
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-neutral-200/50 bg-neutral-50/40 px-3 py-2.5 dark:border-neutral-700/40 dark:bg-neutral-900/30">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Contact</span>
+        {person.email ? (
+          <a href={`mailto:${person.email}`} className="text-xs text-cyan-600 hover:underline dark:text-cyan-400">
+            {person.email}
           </a>
-        )}
-        {person.email && (
-          <span className="text-xs text-neutral-400">{person.email}</span>
-        )}
-        {!person.email && (
-          <button className="text-xs text-gold hover:text-gold-hover transition-colors">
+        ) : (
+          <button type="button" className="text-xs text-gold hover:text-gold-hover transition-colors">
             Reveal contact (1 credit)
           </button>
         )}
