@@ -82,7 +82,7 @@ function Landing() {
           <span className="text-sm font-bold" style={{ color: "#E8E6DF", letterSpacing: "-0.03em" }}>Scout</span>
         </div>
         <button
-          onClick={() => signIn()}
+          onClick={() => signIn("github")}
           className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all hover:brightness-110"
           style={{ border: "1px solid rgba(200,165,90,0.4)", color: "#C8A55A", background: "rgba(200,165,90,0.08)" }}
         >

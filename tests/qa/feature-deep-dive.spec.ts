@@ -75,8 +75,8 @@ test.describe("Market Map — API Deep Dive", () => {
     const data = await res.json().catch(() => ({}));
     console.log("Enrich response:", JSON.stringify(data).slice(0, 300));
 
-    // 200 (already_enriching), 500 (bad map_id — expected), or actual success
-    expect([200, 400, 500]).toContain(res.status);
+    // 202 (queued), 200 (already_enriching), 500 (bad map_id — expected), or actual success
+    expect([200, 202, 400, 500]).toContain(res.status);
 
     if (data.status === "already_enriching") {
       console.log("✅ Idempotency guard working — returned 'already_enriching'");

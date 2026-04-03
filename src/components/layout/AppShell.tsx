@@ -25,7 +25,7 @@ function GuestTopBar() {
         <span className="text-sm font-bold text-foreground" style={{ letterSpacing: "-0.03em" }}>Scout</span>
       </Link>
       <button
-        onClick={() => signIn()}
+        onClick={() => signIn("github")}
         className="flex items-center gap-1.5 rounded-lg border border-gold-border bg-gold-bg px-3 py-1.5 text-xs font-medium text-gold transition-colors hover:bg-gold/10"
       >
         <LogIn className="h-3.5 w-3.5" />

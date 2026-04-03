@@ -23,7 +23,7 @@ export async function GET(
       return Response.json({ error: "Map not found" }, { status: 404 });
     }
 
-    // Vercel can kill enrich-company past maxDuration without running catch — rows stay "enriching" forever.
+    // Vercel can kill workers mid-phase — rows stay "enriching" forever; queue can stall without cron.
     try {
       await prisma.mapCompany.updateMany({
         where: {
@@ -35,6 +35,18 @@ export async function GET(
           enrichmentStatus: "failed",
           enrichmentSubstatus: null,
           enrichmentError: "Enrichment timed out or was interrupted. Refresh the page to retry.",
+        },
+      });
+      await prisma.mapCompany.updateMany({
+        where: {
+          mapId: id,
+          enrichmentStatus: "queued",
+          updatedAt: { lt: new Date(Date.now() - 45 * 60 * 1000) },
+        },
+        data: {
+          enrichmentStatus: "failed",
+          enrichmentSubstatus: null,
+          enrichmentError: "Enrichment queue stalled. Open the map and retry enrichment for this company.",
         },
       });
     } catch (unlockErr) {

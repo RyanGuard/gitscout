@@ -121,7 +121,7 @@ test.describe("Feature 1: Company Timeline", () => {
       return;
     }
     // 500 from bad prisma query is expected, but NOT a crash/timeout
-    expect([200, 400, 404, 500]).toContain(res.status);
+    expect([200, 202, 400, 404, 500]).toContain(res.status);
     console.log(`Enrich endpoint: returns ${res.status}`);
   });
 

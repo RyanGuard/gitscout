@@ -238,7 +238,7 @@ function SignInCTA() {
         Save candidates to lists, create outreach sequences, build market maps, and track your pipeline — all powered by real code intelligence.
       </p>
       <button
-        onClick={() => signIn()}
+        onClick={() => signIn("github")}
         className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-hover"
       >
         Sign in with Google or GitHub
