@@ -1,15 +1,18 @@
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logStatusChange } from "@/lib/map/statusHistory";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; candidateId: string }> }
 ) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id: mapId, candidateId } = await params;
   const body = await request.json().catch(() => ({}));
-  const session = await getServerSession(authOptions);
 
   const updateData: Record<string, unknown> = {};
   if (body.status) updateData.status = body.status;
@@ -20,52 +23,50 @@ export async function PATCH(
   }
 
   try {
-    // Read current status before update for history logging
-    let oldStatus: string | undefined;
-    if (body.status) {
-      const current = await prisma.mapCandidate.findUnique({
-        where: { id: candidateId },
-        select: { status: true },
-      });
-      oldStatus = current?.status;
+    const existing = await prisma.mapCandidate.findFirst({
+      where: { id: candidateId, mapId, map: { userId } },
+      select: {
+        id: true,
+        status: true,
+        shortlistNote: true,
+        fitScore: true,
+        fitReasoning: true,
+        flightRisk: true,
+        flightRiskSignals: true,
+      },
+    });
+
+    if (!existing) {
+      return Response.json({ error: "Candidate not found" }, { status: 404 });
     }
+
+    const oldStatus = existing.status;
 
     const updated = await prisma.mapCandidate.update({
       where: { id: candidateId },
       data: updateData,
     });
 
-    // Log status change
-    if (body.status && oldStatus && oldStatus !== body.status) {
-      await logStatusChange(
-        candidateId,
-        mapId,
-        oldStatus,
-        body.status,
-        session?.user?.id
-      );
+    if (body.status && oldStatus !== body.status) {
+      await logStatusChange(candidateId, mapId, oldStatus, body.status, userId);
     }
 
-    // Auto-generate shortlist note on status change to shortlisted
-    if (body.status === "shortlisted") {
-      const fullCandidate = await prisma.mapCandidate.findUnique({
-        where: { id: candidateId },
-        select: { shortlistNote: true, fitScore: true, fitReasoning: true, flightRisk: true, flightRiskSignals: true },
-      });
-
-      if (fullCandidate && !fullCandidate.shortlistNote) {
-        const parts: string[] = [];
-        if (fullCandidate.fitScore != null) parts.push(`Fit: ${fullCandidate.fitScore}/100`);
-        if (fullCandidate.fitReasoning) parts.push(fullCandidate.fitReasoning);
-        if (fullCandidate.flightRisk === "high") {
-          parts.push(`High flight risk: ${(fullCandidate.flightRiskSignals || []).map((s: string) => s.replace(/_/g, " ").toLowerCase()).join(", ")}`);
-        }
-        if (parts.length > 0) {
-          await prisma.mapCandidate.update({
-            where: { id: candidateId },
-            data: { shortlistNote: parts.join(" · ") },
-          });
-        }
+    if (body.status === "shortlisted" && !existing.shortlistNote) {
+      const parts: string[] = [];
+      if (existing.fitScore != null) parts.push(`Fit: ${existing.fitScore}/100`);
+      if (existing.fitReasoning) parts.push(existing.fitReasoning);
+      if (existing.flightRisk === "high") {
+        parts.push(
+          `High flight risk: ${(existing.flightRiskSignals || [])
+            .map((s: string) => s.replace(/_/g, " ").toLowerCase())
+            .join(", ")}`
+        );
+      }
+      if (parts.length > 0) {
+        await prisma.mapCandidate.update({
+          where: { id: candidateId },
+          data: { shortlistNote: parts.join(" · ") },
+        });
       }
     }
 

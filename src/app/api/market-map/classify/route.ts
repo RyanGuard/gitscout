@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { logAiCall } from "@/lib/ai/logger";
@@ -6,6 +7,11 @@ import { safeErrorMessage } from "@/lib/api-error";
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => ({}));
   const {
     map_id,
@@ -20,6 +26,22 @@ export async function POST(request: Request) {
 
   if (!map_id || !company_id || !candidates?.length) {
     return Response.json({ error: "map_id, company_id, candidates required" }, { status: 400 });
+  }
+
+  const map = await prisma.marketMap.findFirst({
+    where: { id: map_id, userId },
+    select: { id: true },
+  });
+  if (!map) {
+    return Response.json({ error: "Map not found" }, { status: 404 });
+  }
+
+  const companyOnMap = await prisma.mapCompany.findFirst({
+    where: { id: company_id, mapId: map_id },
+    select: { id: true },
+  });
+  if (!companyOnMap) {
+    return Response.json({ error: "Company not found" }, { status: 404 });
   }
 
   try {
@@ -164,9 +186,16 @@ Evaluate each candidate for both fit and flight risk.`;
       }
     }
 
-    // Update candidates with classifications
+    const candidateIdsFromAi = classifications.map((c) => c.id).filter(Boolean);
+    const allowedRows = await prisma.mapCandidate.findMany({
+      where: { mapId: map_id, id: { in: candidateIdsFromAi } },
+      select: { id: true },
+    });
+    const allowedIds = new Set(allowedRows.map((r) => r.id));
+
     let updated = 0;
     for (const cl of classifications) {
+      if (!allowedIds.has(cl.id)) continue;
       try {
         await prisma.mapCandidate.update({
           where: { id: cl.id },

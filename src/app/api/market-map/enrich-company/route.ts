@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { scoreTier, assignTier } from "@/lib/map/tierScoring";
 import { apolloFetch } from "@/lib/apollo-fetch";
@@ -79,6 +80,11 @@ async function setCache(key: string, type: string, data: unknown) {
 }
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId(request);
+  if (!userId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => ({}));
   const { map_id, company_id, company_domain, role_title, role_level, role_stack, geography } = body;
 
@@ -86,11 +92,22 @@ export async function POST(request: Request) {
     return Response.json({ error: "map_id, company_id, company_domain required" }, { status: 400 });
   }
 
+  const companyRow = await prisma.mapCompany.findFirst({
+    where: { id: company_id, mapId: map_id, map: { userId } },
+    select: { id: true, companyDomain: true },
+  });
+  if (!companyRow) {
+    return Response.json({ error: "Company not found" }, { status: 404 });
+  }
+  if (String(company_domain).toLowerCase() !== companyRow.companyDomain.toLowerCase()) {
+    return Response.json({ error: "company_domain does not match this record" }, { status: 400 });
+  }
+
   // Look up intake data for enriched classification
   let intakeData: Record<string, unknown> | null = null;
   try {
-    const mapWithIntake = await prisma.marketMap.findUnique({
-      where: { id: map_id },
+    const mapWithIntake = await prisma.marketMap.findFirst({
+      where: { id: map_id, userId },
       include: { intake: true },
     });
     intakeData = mapWithIntake?.intake as unknown as Record<string, unknown> | null;
@@ -336,12 +353,19 @@ export async function POST(request: Request) {
     // Chain: fetch news for this company (non-blocking — best effort)
     await prisma.mapCompany.update({ where: { id: company_id }, data: { enrichmentSubstatus: "enriching_news" } }).catch(() => {});
     let newsResult: { events?: object[]; flightRisk?: string; summary?: string } = {};
+    const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
+    const internalHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader) internalHeaders.cookie = cookieHeader;
+    const evalKeyHeader = request.headers.get("x-eval-api-key");
+    if (evalKeyHeader) internalHeaders["x-eval-api-key"] = evalKeyHeader;
+
     try {
-      const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
       const newsRes = await fetch(`${baseUrl}/api/market-map/enrich-news`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: internalHeaders,
         body: JSON.stringify({
+          map_id,
           company_id,
           company_name: body.company_name || company_domain.split(".")[0],
         }),
@@ -358,10 +382,9 @@ export async function POST(request: Request) {
     let classifyResult: { classified?: number; highRisk?: number } = {};
     if (candidates.length > 0 && (role_title || role_stack?.length)) {
       try {
-        const baseUrl = request.url.replace(/\/api\/market-map\/enrich-company.*/, "");
         const classifyRes = await fetch(`${baseUrl}/api/market-map/classify`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: internalHeaders,
           body: JSON.stringify({
             map_id,
             company_id,

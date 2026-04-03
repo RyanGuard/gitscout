@@ -32,6 +32,14 @@ export async function POST(
   }
 
   try {
+    const map = await prisma.marketMap.findFirst({
+      where: { id: mapId, userId },
+      select: { id: true },
+    });
+    if (!map) {
+      return Response.json({ error: "Map not found" }, { status: 404 });
+    }
+
     // Fetch current statuses for history logging
     let oldStatuses: Map<string, string> | null = null;
     if (update.status) {
@@ -72,7 +80,7 @@ export async function POST(
     // Auto-generate shortlist notes on bulk status change to shortlisted
     if (update.status === "shortlisted") {
       const candidates = await prisma.mapCandidate.findMany({
-        where: { id: { in: candidate_ids }, shortlistNote: null },
+        where: { id: { in: candidate_ids }, mapId, shortlistNote: null },
         select: { id: true, fitScore: true, fitReasoning: true, flightRisk: true, flightRiskSignals: true },
       });
       for (const c of candidates) {

@@ -91,6 +91,7 @@ test.describe("Market Map — API Deep Dive", () => {
     const res = await api("/api/market-map/enrich-news", {
       method: "POST",
       body: {
+        map_id: "test-map",
         company_id: "test-id",
         company_name: "Stripe",
       },
@@ -100,13 +101,13 @@ test.describe("Market Map — API Deep Dive", () => {
     console.log(`Enrich-news: status=${res.status}`);
     const data = await res.json().catch(() => ({}));
 
-    // Will fail with bad company_id but should not 500 crash
+    // Will fail with bad ids but should not 500 crash
     if (res.status === 200) {
       console.log(`✅ News enrichment: ${data.articlesAnalyzed || 0} articles, flight risk: ${data.flightRisk}`);
     } else {
       console.log(`⚠️  ${res.status}: ${data.error || "unknown"}`);
     }
-    expect([200, 400, 500]).toContain(res.status);
+    expect([200, 400, 401, 404, 500]).toContain(res.status);
   });
 
   test("classify endpoint responds", async () => {
@@ -124,7 +125,7 @@ test.describe("Market Map — API Deep Dive", () => {
     console.log(`Classify: status=${res.status}`);
     const data = await res.json().catch(() => ({}));
     console.log("Classify response:", JSON.stringify(data).slice(0, 300));
-    expect([200, 400, 500]).toContain(res.status);
+    expect([200, 400, 401, 404, 500]).toContain(res.status);
   });
 
   test("map list endpoint returns user maps", async () => {

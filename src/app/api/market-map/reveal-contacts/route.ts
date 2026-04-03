@@ -27,9 +27,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Fetch candidates to get Apollo person IDs
     const candidates = await prisma.mapCandidate.findMany({
-      where: { id: { in: candidate_ids } },
+      where: {
+        id: { in: candidate_ids },
+        map: { userId },
+      },
     });
 
     // Separate: already enriched vs needs enrichment

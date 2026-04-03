@@ -1,14 +1,20 @@
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
+  const userId = await getAuthUserId(request);
+  if (!userId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const map = await prisma.marketMap.findUnique({
-      where: { id },
+    const map = await prisma.marketMap.findFirst({
+      where: { id, userId },
       include: {
         companies: {
           where: { hidden: false },

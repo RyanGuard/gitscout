@@ -85,10 +85,6 @@ Respond ONLY in JSON format:
     const text = response.content[0].type === "text" ? response.content[0].text : "";
     console.log("[market-map] Claude response received, parsing...");
 
-    logAiCall(
-      { userId: userId, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
-      { inputTokens: response.usage?.input_tokens || 0, outputTokens: response.usage?.output_tokens || 0, latencyMs: Date.now() - aiStart, success: true }
-    ).catch(() => {});
     let companies: Array<{
       company_name: string;
       company_domain: string;
@@ -96,18 +92,33 @@ Respond ONLY in JSON format:
       reasoning: string;
     }> = [];
 
+    let parseOk = false;
     try {
-      // Try direct JSON parse
       const parsed = JSON.parse(text);
       companies = parsed.companies || [];
+      parseOk = Array.isArray(companies);
     } catch {
-      // Try extracting JSON from markdown code block
       const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
-        companies = parsed.companies || [];
+        try {
+          const parsed = JSON.parse(jsonMatch[1].trim());
+          companies = parsed.companies || [];
+          parseOk = Array.isArray(companies);
+        } catch {
+          /* invalid fenced JSON */
+        }
       }
     }
+
+    logAiCall(
+      { userId: userId, feature: "map_generate", metadata: { role_title, role_level, role_stack, geography } },
+      {
+        inputTokens: response.usage?.input_tokens || 0,
+        outputTokens: response.usage?.output_tokens || 0,
+        latencyMs: Date.now() - aiStart,
+        success: parseOk && companies.length > 0,
+      }
+    ).catch(() => {});
 
     if (companies.length === 0) {
       await prisma.marketMap.update({
@@ -120,28 +131,78 @@ Respond ONLY in JSON format:
       );
     }
 
-    console.log(`[market-map] Parsed ${companies.length} companies, inserting...`);
+    const tierOk = (t: unknown) => {
+      const u = String(t ?? "").toUpperCase();
+      return u === "A" || u === "B" || u === "C" ? u : null;
+    };
+
+    const insertRows = companies
+      .map((co) => {
+        const name = String(co.company_name ?? "").trim().slice(0, 500);
+        const domain = String(co.company_domain ?? "")
+          .trim()
+          .replace(/^https?:\/\//i, "")
+          .split("/")[0]
+          .toLowerCase()
+          .slice(0, 253);
+        const tier = tierOk(co.tier) ?? "C";
+        const reasoning = String(co.reasoning ?? "").trim().slice(0, 4000);
+        if (!name || !domain) return null;
+        return {
+          id: crypto.randomUUID(),
+          mapId: map!.id,
+          companyName: name,
+          companyDomain: domain,
+          tier,
+          tierReasoning: reasoning || null,
+          enrichmentStatus: "pending" as const,
+        };
+      })
+      .filter(Boolean) as Array<{
+      id: string;
+      mapId: string;
+      companyName: string;
+      companyDomain: string;
+      tier: string;
+      tierReasoning: string | null;
+      enrichmentStatus: "pending";
+    }>;
+
+    if (insertRows.length === 0) {
+      await prisma.marketMap.update({
+        where: { id: map.id },
+        data: { status: "stale" },
+      });
+      return Response.json(
+        { error: "AI returned no companies with valid name and domain", mapId: map.id },
+        { status: 500 }
+      );
+    }
+
+    console.log(`[market-map] Parsed ${insertRows.length} valid companies (of ${companies.length}), inserting...`);
 
     // 3. Batch-insert map_companies in a single round-trip
-    //    Generate IDs client-side to avoid Prisma/DB cuid() default issues with createMany
     await prisma.mapCompany.createMany({
-      data: companies.map((co) => ({
-        id: crypto.randomUUID(),
-        mapId: map!.id,
-        companyName: co.company_name,
-        companyDomain: co.company_domain,
-        tier: co.tier.toUpperCase(),
-        tierReasoning: co.reasoning,
-        enrichmentStatus: "pending",
-      })),
+      data: insertRows,
     });
 
     console.log("[market-map] Companies inserted, fetching back...");
 
     // Fetch the created companies back (createMany doesn't return records)
+    // Explicit select: avoids failing when the DB is behind schema (missing newer columns).
+    // Run `npm run db:push` against your DATABASE_URL to fully align the table.
     const createdCompanies = await prisma.mapCompany.findMany({
       where: { mapId: map!.id },
       orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        companyName: true,
+        companyDomain: true,
+        tier: true,
+        tierReasoning: true,
+        enrichmentStatus: true,
+        createdAt: true,
+      },
     });
 
     // 4. Update map status — companies created, ready for enrichment

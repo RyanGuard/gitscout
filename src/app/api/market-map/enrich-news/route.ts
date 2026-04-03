@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { safeErrorMessage } from "@/lib/api-error";
@@ -14,11 +15,24 @@ interface NewsEvent {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const { company_id, company_name } = body;
+  const userId = await getAuthUserId(request);
+  if (!userId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  if (!company_id || !company_name) {
-    return Response.json({ error: "company_id and company_name required" }, { status: 400 });
+  const body = await request.json().catch(() => ({}));
+  const { map_id, company_id, company_name } = body;
+
+  if (!map_id || !company_id || !company_name) {
+    return Response.json({ error: "map_id, company_id, and company_name required" }, { status: 400 });
+  }
+
+  const companyRow = await prisma.mapCompany.findFirst({
+    where: { id: company_id, mapId: map_id, map: { userId } },
+    select: { id: true, apolloOrgId: true, companyDomain: true },
+  });
+  if (!companyRow) {
+    return Response.json({ error: "Company not found" }, { status: 404 });
   }
 
   const apiKey = process.env.APOLLO_API_KEY;
@@ -38,18 +52,10 @@ export async function POST(request: Request) {
     if (cached && cached.expiresAt > new Date()) {
       articles = cached.data as typeof articles;
     } else {
-      // Look up Apollo org ID from our DB
-      let apolloOrgId: string | null = null;
+      let apolloOrgId: string | null = companyRow.apolloOrgId;
       try {
-        const co = await prisma.mapCompany.findUnique({
-          where: { id: company_id },
-          select: { apolloOrgId: true, companyDomain: true },
-        });
-        apolloOrgId = co?.apolloOrgId || null;
-
-        // If no org ID cached, try to resolve via Apollo org enrichment
-        if (!apolloOrgId && co?.companyDomain) {
-          const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?domain=${co.companyDomain}`, {
+        if (!apolloOrgId && companyRow.companyDomain) {
+          const orgRes = await fetch(`${APOLLO_API}/organizations/enrich?domain=${companyRow.companyDomain}`, {
             headers: { "X-Api-Key": apiKey },
           });
           if (orgRes.ok) {
