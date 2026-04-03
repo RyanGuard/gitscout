@@ -895,7 +895,13 @@ function MarketMapInner() {
         if (res.status === 404) {
           throw new Error("MAP_NOT_FOUND");
         }
-        throw new Error("SERVER_ERROR");
+        if (res.status === 401) {
+          throw new Error("Your session expired. Sign in again to load this map.");
+        }
+        const errBody = await res.json().catch(() => ({}));
+        const detail =
+          typeof errBody.error === "string" ? errBody.error : `Request failed (${res.status})`;
+        throw new Error(detail);
       }
       const data = await res.json();
       setMapData(data);

@@ -67,23 +67,63 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development",
 };
 
+/** Parse `Cookie` header into a name→value map (for Route Handler session lookup). */
+function cookiesFromRequest(request: Request): Record<string, string> {
+  const header = request.headers.get("cookie");
+  if (!header) return {};
+  const out: Record<string, string> = {};
+  for (const part of header.split(";")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) continue;
+    const name = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    try {
+      value = decodeURIComponent(value);
+    } catch {
+      /* keep raw */
+    }
+    if (name) out[name] = value;
+  }
+  return out;
+}
+
 /**
  * Authenticate a request via session OR eval API key.
  * Returns the user ID if authenticated, null otherwise.
  * The eval API key (EVAL_API_KEY env var) lets the VPS eval agents
  * call authenticated endpoints without a browser session.
+ *
+ * When a `Request` is passed (App Router route handlers), session is resolved from
+ * that request's Cookie header. Relying only on `getServerSession(authOptions)` can
+ * return null for client `fetch()` calls in some Next.js versions.
  */
 export async function getAuthUserId(request?: Request): Promise<string | null> {
-  // Check eval API key first (header-based auth for eval agents)
   if (request) {
     const evalKey = request.headers.get("x-eval-api-key");
     if (evalKey && process.env.EVAL_API_KEY && evalKey === process.env.EVAL_API_KEY) {
-      // Return the configured eval user ID (the account the eval agents act as)
       return process.env.EVAL_USER_ID || "eval-service";
     }
+
+    const reqLike = {
+      headers: Object.fromEntries(request.headers.entries()),
+      cookies: cookiesFromRequest(request),
+    };
+    const resStub = {
+      getHeader() {},
+      setCookie() {},
+      setHeader() {},
+    };
+    // next-auth types target Pages router; this shape matches what AuthHandler reads for "session".
+    const session = await getServerSession(
+      reqLike as never,
+      resStub as never,
+      authOptions
+    );
+    if (session?.user?.id) return session.user.id;
   }
 
-  // Fall back to session auth
   const session = await getServerSession(authOptions);
   return session?.user?.id || null;
 }
