@@ -776,6 +776,10 @@ function MarketMapInner() {
   const [revealLoading, setRevealLoading] = useState(false);
   const [resumeUploading, setResumeUploading] = useState(false);
   const resumeInputRef = useRef<HTMLInputElement>(null);
+  /** Ignores stale loadMap responses when multiple GETs overlap (avoids success then error flash). */
+  const loadMapSeqRef = useRef(0);
+  /** Coalesces rapid loadMap calls during background enrichment (reduces DB pool contention). */
+  const mapReloadDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const allCandidates = useMemo(() => {
     if (!mapData) return [];
@@ -887,10 +891,12 @@ function MarketMapInner() {
 
   // Load existing map if ID in URL
   const loadMap = useCallback(async (id: string) => {
+    const seq = ++loadMapSeqRef.current;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(`/api/market-map/${id}`);
+      if (seq !== loadMapSeqRef.current) return;
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error("MAP_NOT_FOUND");
@@ -904,14 +910,36 @@ function MarketMapInner() {
         throw new Error(detail);
       }
       const data = await res.json();
+      if (seq !== loadMapSeqRef.current) return;
       setMapData(data);
     } catch (err) {
+      if (seq !== loadMapSeqRef.current) return;
       const msg = err instanceof Error ? err.message : "SERVER_ERROR";
       setError(msg);
     } finally {
-      setLoading(false);
+      if (seq === loadMapSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
+
+  const scheduleDebouncedMapReload = useCallback(
+    (id: string) => {
+      if (mapReloadDebounceRef.current) clearTimeout(mapReloadDebounceRef.current);
+      mapReloadDebounceRef.current = setTimeout(() => {
+        mapReloadDebounceRef.current = null;
+        void loadMap(id);
+      }, 2000);
+    },
+    [loadMap]
+  );
+
+  useEffect(
+    () => () => {
+      if (mapReloadDebounceRef.current) clearTimeout(mapReloadDebounceRef.current);
+    },
+    []
+  );
 
   // Auto-verify all companies in stack mode
   async function verifyAllStacks() {
@@ -1114,9 +1142,12 @@ function MarketMapInner() {
               }).catch(() => {})
             )
           );
-          // Reload map after each batch to show progress
-          loadMap(data.mapId);
+          // One debounced reload — avoids many overlapping GETs + pool exhaustion with enrich POSTs
+          scheduleDebouncedMapReload(data.mapId);
         }
+        if (mapReloadDebounceRef.current) clearTimeout(mapReloadDebounceRef.current);
+        mapReloadDebounceRef.current = null;
+        await loadMap(data.mapId);
       })();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");

@@ -9,8 +9,9 @@ function createPrismaClient() {
   const connectionString = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL;
   const adapter = new PrismaPg({
     connectionString,
-    // Limit pool size for serverless — prevents exhausting Supabase session pooler
-    max: 3,
+    // Headroom for concurrent map GETs + enrich-company (each holds a conn for a long time).
+    // Too small causes "Failed to load map" when many loadMap()s overlap after generate.
+    max: 10,
   });
   return new PrismaClient({ adapter });
 }
