@@ -14,10 +14,35 @@ const ROUTES = [
   { path: "/profile/torvalds", name: "profile-torvalds" },
 ];
 
+interface QaPerfRow {
+  route: string;
+  metrics: Record<string, number>;
+}
+
+interface QaA11yViolation {
+  id: string;
+  impact: string | null | undefined;
+  description: string;
+  helpUrl: string;
+  nodeCount: number;
+  targets: string[];
+}
+
+interface QaA11yRow {
+  route: string;
+  violationCount: number;
+  violations: QaA11yViolation[];
+}
+
+interface QaVisualRow {
+  route: string;
+  issues: string[];
+}
+
 const data: {
-  accessibility: any[];
-  performance: any[];
-  visualBugs: any[];
+  accessibility: QaA11yRow[];
+  performance: QaPerfRow[];
+  visualBugs: QaVisualRow[];
 } = { accessibility: [], performance: [], visualBugs: [] };
 
 test.describe.serial("Collect QA data", () => {

@@ -16,11 +16,20 @@ const ROUTES = [
   { path: "/profile/torvalds", name: "profile-torvalds" },
 ];
 
+interface QaNavA11yViolation {
+  id: string;
+  impact: string | null | undefined;
+  description: string;
+  helpUrl: string;
+  nodes: number;
+  targets: string[];
+}
+
 // Shared report data accumulator
 const reportData: {
   screenshots: { route: string; file: string; theme: string }[];
   navigation: { test: string; passed: boolean; details: string }[];
-  accessibility: { route: string; violations: any[] }[];
+  accessibility: { route: string; violations: QaNavA11yViolation[] }[];
   performance: { route: string; metrics: Record<string, number> }[];
   visualBugs: { route: string; issues: string[] }[];
 } = {
