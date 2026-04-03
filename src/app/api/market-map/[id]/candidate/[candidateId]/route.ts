@@ -24,7 +24,7 @@ export async function PATCH(
 
   try {
     const existing = await prisma.mapCandidate.findFirst({
-      where: { id: candidateId, mapId, map: { userId } },
+      where: { id: candidateId, mapId, company: { map: { userId } } },
       select: {
         id: true,
         status: true,

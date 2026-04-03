@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const candidates = await prisma.mapCandidate.findMany({
       where: {
         id: { in: candidate_ids },
-        map: { userId },
+        company: { map: { userId } },
       },
     });
 
