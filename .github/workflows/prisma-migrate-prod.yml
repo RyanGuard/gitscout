@@ -1,0 +1,41 @@
+# Applies pending Prisma migrations to production Postgres.
+#
+# Setup (GitHub → Settings → Secrets → Actions):
+#   DIRECT_DATABASE_URL — Supabase *direct* connection string (port 5432), not the
+#   pooler URL. Same value you use for DDL / prisma migrate locally against prod.
+#
+# Runs when prisma/schema or migrations change on main, or when triggered manually.
+
+name: Prisma migrate (production)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "prisma/schema.prisma"
+      - "prisma/migrations/**"
+      - ".github/workflows/prisma-migrate-prod.yml"
+
+concurrency:
+  group: prisma-migrate-prod
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: prisma migrate deploy
+        env:
+          # prisma.config.ts reads DATABASE_URL
+          DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
+        run: npx prisma migrate deploy
